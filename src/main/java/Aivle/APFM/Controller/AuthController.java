@@ -1,18 +1,29 @@
 package Aivle.APFM.Controller;
 
+import Aivle.APFM.DTO.SignupRequestDTO;
 import Aivle.APFM.Service.EmailService;
+import Aivle.APFM.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/auth")
 public class AuthController {
     private final EmailService emailService;
+    private final UserService userService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDTO request) {
+        try {
+            userService.signup(request);
+            return ResponseEntity.ok("회원가입 성공");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     @PostMapping("/send-code")
     public ResponseEntity<?> sendCode(@RequestParam String email) {
@@ -25,4 +36,6 @@ public class AuthController {
         boolean result = emailService.verifyAuthCode(email, code);
         return result ? ResponseEntity.ok("인증 성공") : ResponseEntity.badRequest().body("인증 실패");
     }
+
+
 }
