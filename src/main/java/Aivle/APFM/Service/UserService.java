@@ -1,6 +1,7 @@
 package Aivle.APFM.Service;
 
 import Aivle.APFM.DTO.SignupRequestDTO;
+import Aivle.APFM.Entity.ApprovalStatus;
 import Aivle.APFM.Entity.Department;
 import Aivle.APFM.Entity.Users;
 import Aivle.APFM.Repository.UserRepository;
@@ -30,7 +31,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        user.setApprovalStatus(ApprovalStatus.PENDING);
         user.setDepartment(Department.valueOf(String.valueOf(request.getDepartment())));
 
 

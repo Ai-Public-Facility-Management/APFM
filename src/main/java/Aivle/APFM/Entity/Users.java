@@ -23,6 +23,9 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Department department;
 
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatus approvalStatus = ApprovalStatus.PENDING; // 기본값: 대기중
+
 
 
 }
