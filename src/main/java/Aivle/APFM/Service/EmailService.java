@@ -7,25 +7,35 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
+    private static class AuthCodeEntry {
+        String code;
+        long createdAt;
+
+        AuthCodeEntry(String code, long createdAt) {
+            this.code = code;
+            this.createdAt = createdAt;
+        }
+    }
 
     private final JavaMailSender mailSender;
 
     @Value("${custom.auth-code-expiration-millis:1800000}")
     private long authCodeExpirationMillis;
 
-    // 인증 코드 저장소 (임시 Map 사용 / 실무에선 DB나 Redis 사용)
-    private final Map<String, String> authCodeStore = new ConcurrentHashMap<>();
+    private final Map<String, AuthCodeEntry> authCodeStore = new ConcurrentHashMap<>();
+    private final Set<String> verifiedEmails = ConcurrentHashMap.newKeySet();
 
     public void sendAuthCode(String toEmail) {
         System.out.println("📨 인증코드 발송 시도 대상: " + toEmail);
 
         String authCode = generateAuthCode();
-        authCodeStore.put(toEmail, authCode);
+        authCodeStore.put(toEmail, new AuthCodeEntry(authCode, System.currentTimeMillis()));
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
@@ -38,7 +48,20 @@ public class EmailService {
     }
 
     public boolean verifyAuthCode(String email, String inputCode) {
-        return inputCode.equals(authCodeStore.get(email));
+        AuthCodeEntry entry = authCodeStore.get(email);
+        if (entry != null && inputCode.equals(entry.code)) {
+            long now = System.currentTimeMillis();
+            if (now - entry.createdAt <= authCodeExpirationMillis) {
+                verifiedEmails.add(email);
+                authCodeStore.remove(email); // optional: 인증 완료 후 제거
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isEmailVerified(String email) {
+        return verifiedEmails.contains(email);
     }
 
     private String generateAuthCode() {
