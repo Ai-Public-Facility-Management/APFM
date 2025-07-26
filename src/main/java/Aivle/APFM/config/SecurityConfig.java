@@ -27,7 +27,14 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())  // H2 콘솔 iframe 허용
                 )
-                .formLogin(Customizer.withDefaults());
+                .formLogin(Customizer.withDefaults())
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")             // 로그아웃 URL
+                        .logoutSuccessUrl("/login") // 성공 시 이동할 URL
+                        .invalidateHttpSession(true)               // 세션 무효화
+                        .deleteCookies("JSESSIONID")               // 세션 쿠키 삭제
+                );
+
 
         return http.build();
     }
