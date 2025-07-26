@@ -2,6 +2,7 @@ package Aivle.APFM.Service;
 
 
 import Aivle.APFM.DTO.LoginRequestDTO;
+import Aivle.APFM.Entity.ApprovalStatus;
 import Aivle.APFM.Entity.Users;
 import Aivle.APFM.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,9 @@ public class LoginService {
         Users user = userRepository.findById(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
 
+        if (user.getApprovalStatus() != ApprovalStatus.APPROVED) {
+            throw new RuntimeException("관리자의 승인이 필요합니다.");
+        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");

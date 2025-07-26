@@ -20,7 +20,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/h2-console/**", "/api/auth/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**"
+                                "/css/**", "/js/**", "/images/**", "/webjars/**","/api/admin/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
