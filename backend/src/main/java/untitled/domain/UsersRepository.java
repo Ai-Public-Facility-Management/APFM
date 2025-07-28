@@ -7,4 +7,7 @@ import untitled.domain.*;
 //<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "users", path = "users")
 public interface UsersRepository
-    extends PagingAndSortingRepository<Users, Long> {}
+    extends PagingAndSortingRepository<Users, String> {
+    boolean existsByEmail(String email);
+    Optional<Users> findByEmail(String email);
+}

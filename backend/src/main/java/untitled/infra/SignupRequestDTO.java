@@ -1,6 +1,7 @@
-package Aivle.APFM.DTO;
+package untitled.infra;
 
-import Aivle.APFM.Entity.Department;
+
+import untitled.domain.Department;
 import lombok.Data;
 
 @Data

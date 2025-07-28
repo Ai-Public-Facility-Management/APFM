@@ -1,6 +1,7 @@
-package Aivle.APFM.Controller;
+package untitled.infra;
 
-import Aivle.APFM.DTO.LoginRequestDTO;
+
+import untitled.infra.LoginRequestDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import Aivle.APFM.Service.LoginService;
+import untitled.infra.LoginService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

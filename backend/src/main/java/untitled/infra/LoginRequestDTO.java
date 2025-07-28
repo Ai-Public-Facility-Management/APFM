@@ -1,4 +1,5 @@
-package Aivle.APFM.DTO;
+package untitled.infra;
+
 
 import lombok.Data;
 

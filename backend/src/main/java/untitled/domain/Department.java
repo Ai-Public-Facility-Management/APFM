@@ -1,4 +1,4 @@
-package Aivle.APFM.Entity;
+package untitled.domain;
 
 public enum Department {
     DEVELOPMENT,

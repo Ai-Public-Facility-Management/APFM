@@ -14,6 +14,26 @@ spring:
         show_sql: true
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    default-encoding: UTF-8
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+    auth-code-expiration-millis: 1800000
+
   cloud:
     stream:
       kafka:
