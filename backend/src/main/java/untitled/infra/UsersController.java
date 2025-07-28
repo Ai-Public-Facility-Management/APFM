@@ -1,23 +1,42 @@
 package untitled.infra;
 
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 import untitled.domain.*;
 
-//<<< Clean Arch / Inbound Adaptor
+import java.util.List;
 
 @RestController
-// @RequestMapping(value="/users")
+@RequestMapping("/users")
 @Transactional
 public class UsersController {
 
-    @Autowired
-    UsersRepository usersRepository;
+    private final UsersService usersService;
+
+    public UsersController(UsersService usersService) {
+        this.usersService = usersService;
+    }
+
+    @PostMapping
+    public Users create(@RequestBody Users user) {
+        return usersService.createUser(user);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Users> getUser(@PathVariable Long id) {
+        return usersService.getUser(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public List<Users> list() {
+        return usersService.getAllUsers();
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        usersService.deleteUser(id);
+    }
 }
-//>>> Clean Arch / Inbound Adaptor

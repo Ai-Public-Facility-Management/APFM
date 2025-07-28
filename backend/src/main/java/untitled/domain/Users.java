@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.persistence.*;
 import lombok.Data;
 import untitled.BackendApplication;
+import untitled.domain.UserType;
 
 @Entity
 @Table(name = "Users_table")
@@ -24,7 +25,7 @@ public class Users {
 
     private String password;
 
-    private type type;
+    private UserType type;
 
     private Long level;
 
