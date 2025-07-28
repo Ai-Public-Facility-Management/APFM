@@ -18,6 +18,33 @@ import untitled.domain.*;
 public class InspectionController {
 
     @Autowired
-    InspectionRepository inspectionRepository;
+    InspectionService inspectionService;
+
+    @PostMapping("/inspections")
+    public Inspection create(@RequestBody Inspection inspection) {
+        return inspectionService.createInspection(
+            inspection.getCreateDate(), inspection.getIsinspected()
+        );
+    }
+
+    @GetMapping("/inspections")
+    public Iterable<Inspection> getAll() {
+        return inspectionService.getAllInspections();
+    }
+
+    @GetMapping("/inspections/{id}")
+    public Optional<Inspection> getOne(@PathVariable("id") Long id) {
+        return inspectionService.getInspection(id);
+    }
+
+    @PutMapping("/inspections/{id}")
+    public Inspection update(@PathVariable("id") Long id, @RequestBody Inspection updated) {
+        return inspectionService.updateInspection(id, updated.getIsinspected());
+    }
+
+    @DeleteMapping("/inspections/{id}")
+    public void delete(@PathVariable("id") Long id) {
+        inspectionService.deleteInspection(id);
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

@@ -10,4 +10,4 @@ import untitled.domain.*;
     path = "inspections"
 )
 public interface InspectionRepository
-    extends PagingAndSortingRepository<Inspection, Date> {}
+    extends PagingAndSortingRepository<Inspection, Long> {}
