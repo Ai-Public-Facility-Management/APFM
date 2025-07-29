@@ -23,9 +23,9 @@ public class UsersController {
         return usersService.createUser(user);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Users> getUser(@PathVariable Long id) {
-        return usersService.getUser(id)
+    @GetMapping("/{email}")
+    public ResponseEntity<Users> getUser(@PathVariable String email) {
+        return usersService.getUser(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -35,8 +35,14 @@ public class UsersController {
         return usersService.getAllUsers();
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        usersService.deleteUser(id);
+    @DeleteMapping("/{email}")
+    public void delete(@PathVariable String email) {
+        usersService.deleteUser(email);
     }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean isDuplicated = usersService.isEmailDuplicated(email);
+        return ResponseEntity.ok(isDuplicated);
+    } //email 중복 확인 api
 }

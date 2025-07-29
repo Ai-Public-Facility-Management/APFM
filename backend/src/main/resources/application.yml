@@ -8,12 +8,59 @@ spring:
 
 spring:
   profiles: default
+
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    initialization-mode: always
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console  
+      settings:
+        web-allow-others: true
+
+
   jpa:
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+    
     properties:
       hibernate:
         show_sql: true
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+
+  # sql:
+  #   init:
+  #     mode: always
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    protocol: smtp
+    default-encoding: UTF-8
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+    auth-code-expiration-millis: 1800000
+
   cloud:
     stream:
       kafka:
