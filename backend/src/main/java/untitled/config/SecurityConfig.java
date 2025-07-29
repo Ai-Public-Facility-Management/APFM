@@ -19,13 +19,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
+            .cors().disable()
         //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
             .httpBasic().disable()
             .authorizeRequests()
                 .antMatchers(
-                    "/h2-console/**", "/api/auth/**", "/api/admin/**",
-                    "/css/**", "/js/**", "/images/**", "/webjars/**"
-                ).permitAll()
+                    "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
+                    "/css/**", "/js/**", "/images/**", "/webjars/**")
+                .permitAll()
                 .anyRequest().authenticated()
             .and()
             .headers().frameOptions().sameOrigin();
