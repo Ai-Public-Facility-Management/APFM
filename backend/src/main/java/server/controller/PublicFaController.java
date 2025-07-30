@@ -1,6 +1,6 @@
 package server.controller;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 import server.repository.PublicFaRepository;

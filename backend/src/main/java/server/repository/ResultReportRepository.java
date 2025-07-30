@@ -1,5 +1,6 @@
 package server.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import server.domain.ResultReport;
@@ -10,4 +11,4 @@ import server.domain.ResultReport;
     path = "resultReports"
 )
 public interface ResultReportRepository
-    extends PagingAndSortingRepository<ResultReport, Integer> {}
+    extends JpaRepository<ResultReport, Integer> {}

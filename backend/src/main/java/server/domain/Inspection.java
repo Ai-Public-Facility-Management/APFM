@@ -1,9 +1,13 @@
 package server.domain;
 
 import java.util.Date;
-import javax.persistence.*;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Table;
 import lombok.Data;
-import server.BackendApplication;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Inspection_table")
