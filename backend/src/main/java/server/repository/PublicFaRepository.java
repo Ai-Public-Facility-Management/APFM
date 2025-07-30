@@ -1,5 +1,6 @@
 package server.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import server.domain.PublicFa;
@@ -7,4 +8,4 @@ import server.domain.PublicFa;
 //<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "publicFas", path = "publicFas")
 public interface PublicFaRepository
-    extends PagingAndSortingRepository<PublicFa, Long> {}
+    extends JpaRepository<PublicFa, Long> {}

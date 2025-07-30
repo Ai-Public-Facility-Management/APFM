@@ -1,8 +1,9 @@
 package server.domain;
 
-import javax.persistence.*;
+
+import jakarta.persistence.*;
 import lombok.Data;
-import server.BackendApplication;
+
 
 @Entity
 @Table(name = "Camera_table")

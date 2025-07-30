@@ -1,5 +1,6 @@
 package server.controller;
 
+import server.domain.JwtUtil;
 import server.domain.Users;
 import server.repository.UsersRepository;
 import server.domain.ApprovalStatus;
@@ -7,45 +8,40 @@ import server.dto.LoginRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import server.service.LoginAttemptService;
 
 @Service
 @RequiredArgsConstructor
 public class LoginService {
 
-    private final UsersRepository usersRepository;
+    private final UsersRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final LoginAttemptService loginAttemptService;
 
-    public void login(LoginRequestDTO request) {
-
-        System.err.println("🔥 passwordEncoder null 여부: " + (passwordEncoder == null));
-        System.err.println("🔥 matches('1234', '$2a$10$7zY3O0s/...') = " + passwordEncoder.matches("1234", "$2a$10$7zY3O0s/6NeUwldmL36c0OqYhVp2tQJk4P8LB6yL3Xe9u3Cvzwr8K"));
-
-
-        Users user = usersRepository.findByEmail(request.getEmail())
+    public String login(LoginRequestDTO request) {
+        Users user = userRepository.findById(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("가입되지 않은 이메일입니다."));
 
         if (user.getApprovalStatus() != ApprovalStatus.APPROVED) {
             throw new RuntimeException("관리자의 승인이 필요합니다.");
         }
 
+        if (loginAttemptService.isBlocked(request.getEmail())) {
+            throw new RuntimeException("로그인 시도 횟수를 초과했습니다. 5분 후 다시 시도해주세요.");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            // 실패 기록 추가
+            loginAttemptService.loginFailed(request.getEmail());
             throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
 
-        System.out.println("입력된 비밀번호: " + request.getPassword());
-        System.out.println("DB 비밀번호: " + user.getPassword());
-        System.out.println("비교 결과: " + passwordEncoder.matches(request.getPassword(), user.getPassword()));
-        System.err.println("🔥 passwordEncoder 클래스: " + passwordEncoder.getClass().getName());
-        System.err.println("🔥 매칭 결과: " + passwordEncoder.matches("1234", "$2a$10$7zY3O0s/6NeUwldmL36c0OqYhVp2tQJk4P8LB6yL3Xe9u3Cvzwr8K"));
+        // 로그인 성공 시 실패 기록 제거
+        loginAttemptService.loginSucceeded(request.getEmail());
 
-
-
-        // 로그인 성공 후 로직 (예: 토큰 발급, 세션 설정 등)
         System.out.println("✅ 로그인 성공: " + user.getUsername());
-    }
-    public void init() {
-    System.out.println("🔥 passwordEncoder 존재 여부: " + (passwordEncoder != null));
+
+        return jwtUtil.generateToken(user.getEmail());
     }
 }
-

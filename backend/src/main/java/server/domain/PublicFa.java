@@ -1,7 +1,8 @@
 package server.domain;
 
 import java.util.Date;
-import javax.persistence.*;
+
+import jakarta.persistence.*;
 import lombok.Data;
 import server.BackendApplication;
 

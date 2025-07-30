@@ -1,7 +1,11 @@
 package server.domain;
 
 import java.util.Date;
-import javax.persistence.*;
+
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 import server.BackendApplication;
 

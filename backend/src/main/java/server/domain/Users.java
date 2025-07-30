@@ -1,9 +1,8 @@
 package server.domain;
 
-import javax.persistence.*;
-import lombok.Data;
-import server.BackendApplication;
 
+import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "Users_table")
