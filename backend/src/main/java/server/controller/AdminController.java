@@ -2,7 +2,7 @@ package server.controller;
 
 import server.domain.ApprovalStatus;
 import server.domain.Users;
-import server.domain.UserRepository;
+import server.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
