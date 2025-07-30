@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import server.domain.JwtUtil;
 import server.dto.LoginRequestDTO;
 import org.springframework.http.ResponseEntity;
+import server.service.LoginService;
 import server.service.TokenBlacklistService;
 
 
@@ -14,7 +15,7 @@ import server.service.TokenBlacklistService;
 @RequestMapping("/api/auth")
 public class LoginController {
 
-    private final server.controller.LoginService authService;
+    private final LoginService authService;
     private final JwtUtil jwtUtil;
     private final TokenBlacklistService tokenBlacklistService;
 
