@@ -1,4 +1,4 @@
-package server.controller;
+package server.service;
 
 
 import lombok.RequiredArgsConstructor;

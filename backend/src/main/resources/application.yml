@@ -15,8 +15,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    initialization-mode: always
-
+    
   h2:
     console:
       enabled: true
@@ -78,14 +77,17 @@ spring:
         event-in:
           group: backend
 #<<< EDA / Topic Name
-          destination: untitled
+          destination: server
 #>>> EDA / Topic Name
           contentType: application/json
         event-out:
 #<<< EDA / Topic Name
-          destination: untitled
+          destination: server
 #>>> EDA / Topic Name
           contentType: application/json
+  sql:
+    init:
+      mode: always
 
 logging:
   level:
@@ -122,10 +124,10 @@ spring:
       bindings:
         event-in:
           group: backend
-          destination: untitled
+          destination: server
           contentType: application/json
         event-out:
-          destination: untitled
+          destination: server
           contentType: application/json
 
 
