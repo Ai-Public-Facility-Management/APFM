@@ -2,6 +2,8 @@ package server.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import server.repository.*;
+import server.dto.*;
 
 @Service
 public class IssueService {

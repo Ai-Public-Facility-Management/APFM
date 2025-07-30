@@ -20,6 +20,10 @@ public class Proposal {
     @Embedded
     private Photo content;
 
+    @OneToOne
+    @JoinColumn(name = "issue_id")
+    private Issue issue;
+
     // public static ProposalRepository repository() {
     //     ProposalRepository proposalRepository = BackendApplication.applicationContext.getBean(
     //         ProposalRepository.class
