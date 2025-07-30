@@ -1,4 +1,4 @@
-package server.event.controller;
+package server.controller.event;
 
 
 import jakarta.transaction.Transactional;
