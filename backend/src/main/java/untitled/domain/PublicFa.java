@@ -9,6 +9,9 @@ import java.util.Map;
 import javax.persistence.*;
 import lombok.Data;
 import untitled.BackendApplication;
+import untitled.domain.PublicFaStatus;
+import untitled.domain.PublicFaType;
+
 
 @Entity
 @Table(name = "PublicFa_table")
@@ -22,7 +25,7 @@ public class PublicFa {
 
     private Long cameraId;
 
-    private type type;
+    private PublicFaType type;
 
     private String section;
 
@@ -30,7 +33,7 @@ public class PublicFa {
 
     private Date lastRepair;
 
-    private type status;
+    private PublicFaStatus status;
 
     private Long obstruction;
 

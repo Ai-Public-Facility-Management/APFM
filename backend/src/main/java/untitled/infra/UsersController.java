@@ -1,23 +1,48 @@
 package untitled.infra;
 
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
 import untitled.domain.*;
 
-//<<< Clean Arch / Inbound Adaptor
+import java.util.List;
 
 @RestController
-// @RequestMapping(value="/users")
+@RequestMapping("/users")
 @Transactional
 public class UsersController {
 
-    @Autowired
-    UsersRepository usersRepository;
+    private final UsersService usersService;
+
+    public UsersController(UsersService usersService) {
+        this.usersService = usersService;
+    }
+
+    @PostMapping
+    public Users create(@RequestBody Users user) {
+        return usersService.createUser(user);
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<Users> getUser(@PathVariable String email) {
+        return usersService.getUser(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public List<Users> list() {
+        return usersService.getAllUsers();
+    }
+
+    @DeleteMapping("/{email}")
+    public void delete(@PathVariable String email) {
+        usersService.deleteUser(email);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean isDuplicated = usersService.isEmailDuplicated(email);
+        return ResponseEntity.ok(isDuplicated);
+    } //email 중복 확인 api
 }
-//>>> Clean Arch / Inbound Adaptor

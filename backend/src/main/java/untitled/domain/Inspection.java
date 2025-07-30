@@ -17,15 +17,15 @@ import untitled.BackendApplication;
 public class Inspection {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private Date createDate;
 
     private Boolean isinspected;
 
     public static InspectionRepository repository() {
-        InspectionRepository inspectionRepository = BackendApplication.applicationContext.getBean(
-            InspectionRepository.class
-        );
-        return inspectionRepository;
+        return BackendApplication.applicationContext.getBean(InspectionRepository.class);
     }
 }
 //>>> DDD / Aggregate Root

@@ -7,4 +7,4 @@ import untitled.domain.*;
 //<<< PoEAA / Repository
 @RepositoryRestResource(collectionResourceRel = "reports", path = "reports")
 public interface ReportRepository
-    extends PagingAndSortingRepository<Report, Date> {}
+    extends PagingAndSortingRepository<Report, Long> {}

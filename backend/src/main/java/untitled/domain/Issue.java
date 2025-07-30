@@ -9,6 +9,8 @@ import java.util.Map;
 import javax.persistence.*;
 import lombok.Data;
 import untitled.BackendApplication;
+import untitled.domain.IssueType;
+
 
 @Entity
 @Table(name = "Issue_table")
@@ -28,7 +30,8 @@ public class Issue {
 
     private Date creationDate;
 
-    private type type;
+    @Enumerated(EnumType.STRING)
+    private IssueType type;
 
     @Embedded
     private Photo image;
