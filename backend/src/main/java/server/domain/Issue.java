@@ -32,11 +32,6 @@ public class Issue {
 
     private String estimate;
 
-    public static IssueRepository repository() {
-        IssueRepository issueRepository = BackendApplication.applicationContext.getBean(
-            IssueRepository.class
-        );
-        return issueRepository;
-    }
+    
 }
 //>>> DDD / Aggregate Root

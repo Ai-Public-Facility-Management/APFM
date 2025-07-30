@@ -16,11 +16,11 @@ public class Proposal {
     @Embedded
     private Photo content;
 
-    public static ProposalRepository repository() {
-        ProposalRepository proposalRepository = BackendApplication.applicationContext.getBean(
-            ProposalRepository.class
-        );
-        return proposalRepository;
-    }
+    // public static ProposalRepository repository() {
+    //     ProposalRepository proposalRepository = BackendApplication.applicationContext.getBean(
+    //         ProposalRepository.class
+    //     );
+    //     return proposalRepository;
+    // }
 }
 //>>> DDD / Aggregate Root

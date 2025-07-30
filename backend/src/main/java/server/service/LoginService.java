@@ -1,8 +1,9 @@
 package server.controller;
 
 import server.domain.Users;
-import server.domain.UsersRepository;
+import server.repository.UsersRepository;
 import server.domain.ApprovalStatus;
+import server.dto.LoginRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -17,11 +17,11 @@ public class Report {
     @Embedded
     private Photo content;
 
-    public static ReportRepository repository() {
-        ReportRepository reportRepository = BackendApplication.applicationContext.getBean(
-            ReportRepository.class
-        );
-        return reportRepository;
-    }
+    // public static ReportRepository repository() {
+    //     ReportRepository reportRepository = BackendApplication.applicationContext.getBean(
+    //         ReportRepository.class
+    //     );
+    //     return reportRepository;
+    // }
 }
 //>>> DDD / Aggregate Root

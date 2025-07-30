@@ -3,7 +3,7 @@ package server.controller;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
-import server.domain.*;
+import server.repository.ProposalRepository;
 
 //<<< Clean Arch / Inbound Adaptor
 

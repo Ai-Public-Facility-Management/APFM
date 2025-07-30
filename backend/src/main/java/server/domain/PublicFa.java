@@ -30,11 +30,11 @@ public class PublicFa {
 
     private Long obstruction;
 
-    public static PublicFaRepository repository() {
-        PublicFaRepository publicFaRepository = BackendApplication.applicationContext.getBean(
-            PublicFaRepository.class
-        );
-        return publicFaRepository;
-    }
+    // public static PublicFaRepository repository() {
+    //     PublicFaRepository publicFaRepository = BackendApplication.applicationContext.getBean(
+    //         PublicFaRepository.class
+    //     );
+    //     return publicFaRepository;
+    // }
 }
 //>>> DDD / Aggregate Root

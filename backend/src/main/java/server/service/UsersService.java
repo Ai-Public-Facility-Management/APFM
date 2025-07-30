@@ -1,8 +1,11 @@
-package server.domain;
+package server.service;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import server.domain.Users;
+import server.repository.UsersRepository;
 
 import java.util.List;
 import java.util.Optional;

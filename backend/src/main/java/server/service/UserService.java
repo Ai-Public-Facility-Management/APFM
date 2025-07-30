@@ -1,12 +1,13 @@
-package server.controller;
+package server.service;
 
 import server.domain.Users;
-import server.domain.UsersRepository;
+import server.repository.UsersRepository;
 import server.domain.ApprovalStatus;
 import server.domain.Department;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import server.dto.SignupRequestDTO;
 
 @Service
 @RequiredArgsConstructor
