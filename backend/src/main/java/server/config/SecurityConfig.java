@@ -19,14 +19,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-<<<<<<< HEAD
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/h2-console/**", "/api/auth/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        // .requestMatchers(
+                        //         "/h2-console/**", "/api/auth/**",
+                        //         "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
+                        // ).permitAll()
+                        // .anyRequest().authenticated() 
+                        .anyRequest() .permitAll()  // postman 테스트 할 때는 이 부분만 남기고 위는 주석처리. 끝나면 이 부분 주석하고 윗부분 주석해제.
                 )
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())  // H2 콘솔 iframe 허용
@@ -45,29 +45,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-=======
-            .csrf().disable()
-            .cors().disable()
-        //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
-            .httpBasic().disable()
-            .authorizeRequests()
-                // .antMatchers(
-                //     "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
-                //     "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/issues/**")
-                // .permitAll()
-                // .anyRequest().authenticated()
-                .anyRequest().permitAll()
-            .and()
-            .headers().frameOptions().sameOrigin();
-        //     .and()
-        //     .formLogin()
-        //     .and()
-        //     .logout()
-        //         .logoutUrl("/api/auth/logout")
-        //         .logoutSuccessUrl("/login")
-        //         .invalidateHttpSession(true)
-        //         .deleteCookies("JSESSIONID");
->>>>>>> main
     }
 
     @Bean

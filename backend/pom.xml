@@ -19,7 +19,8 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version> 
+		<!-- Spring Boot 3.1 이상에서 JDK 17 필요, 11->17로 수정 -->
 		<spring-cloud.version>2021.0.8</spring-cloud.version>
 		<spring-cloud-stream.version>3.2.8</spring-cloud-stream.version>
 		<cucumber.version>6.8.1</cucumber.version>
