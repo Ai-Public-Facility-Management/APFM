@@ -21,7 +21,8 @@ public class Issue {
 
     private Long resultId;
 
-    private Long proposalId;
+    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL)
+    private Proposal proposal;
 
     private Date creationDate;
 

@@ -11,11 +11,15 @@ import server.BackendApplication;
 @Entity
 @Table(name = "Proposal_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Proposal {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id; // 고유 식별자
+
     private Integer totalEstimate;
+
+
 
     @Embedded
     private Photo content;

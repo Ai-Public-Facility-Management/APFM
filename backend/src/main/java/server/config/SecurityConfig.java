@@ -19,6 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
+<<<<<<< HEAD
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -44,6 +45,29 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+=======
+            .csrf().disable()
+            .cors().disable()
+        //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
+            .httpBasic().disable()
+            .authorizeRequests()
+                // .antMatchers(
+                //     "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
+                //     "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/issues/**")
+                // .permitAll()
+                // .anyRequest().authenticated()
+                .anyRequest().permitAll()
+            .and()
+            .headers().frameOptions().sameOrigin();
+        //     .and()
+        //     .formLogin()
+        //     .and()
+        //     .logout()
+        //         .logoutUrl("/api/auth/logout")
+        //         .logoutSuccessUrl("/login")
+        //         .invalidateHttpSession(true)
+        //         .deleteCookies("JSESSIONID");
+>>>>>>> main
     }
 
     @Bean
