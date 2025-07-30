@@ -4,18 +4,19 @@ package server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.domain.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/auth")
 public class AuthController {
     private final EmailService emailService;
-    private final UserService userService;
+    private final UsersService usersService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequestDTO request) {
         try {
-            userService.signup(request);
+            usersService.signup(request);
             return ResponseEntity.ok("회원가입 성공");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

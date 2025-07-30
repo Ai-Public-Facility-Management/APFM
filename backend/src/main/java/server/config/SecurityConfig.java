@@ -17,11 +17,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
             .httpBasic().disable()
             .authorizeRequests()
-                .antMatchers(
-                    "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
-                    "/css/**", "/js/**", "/images/**", "/webjars/**")
-                .permitAll()
-                .anyRequest().authenticated()
+                // .antMatchers(
+                //     "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
+                //     "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/issues/**")
+                // .permitAll()
+                // .anyRequest().authenticated()
+                .anyRequest().permitAll()
             .and()
             .headers().frameOptions().sameOrigin();
         //     .and()

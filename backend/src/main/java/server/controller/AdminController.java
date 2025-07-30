@@ -2,7 +2,7 @@ package server.controller;
 
 import server.domain.ApprovalStatus;
 import server.domain.Users;
-import server.domain.UserRepository;
+import server.domain.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final UsersRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @PostMapping("/approve/{email}")
     public ResponseEntity<String> approveUser(@PathVariable String email) {
-        Users user = userRepository.findByEmail(email)
+        Users user = usersRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이메일의 사용자를 찾을 수 없습니다."));
 
         if (user.getApprovalStatus() != ApprovalStatus.PENDING) {
@@ -25,7 +25,7 @@ public class AdminController {
         }
 
         user.setApprovalStatus(ApprovalStatus.APPROVED);
-        userRepository.save(user);
+        usersRepository.save(user);
 
         return ResponseEntity.ok("회원가입이 승인되었습니다: " + email);
     }
