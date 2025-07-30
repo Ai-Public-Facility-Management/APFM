@@ -19,8 +19,8 @@ public class Inspection {
 
     private Boolean isinspected;
 
-    public static InspectionRepository repository() {
-        return BackendApplication.applicationContext.getBean(InspectionRepository.class);
-    }
+    // public static InspectionRepository repository() {
+    //     return BackendApplication.applicationContext.getBean(InspectionRepository.class);
+    // }
 }
 //>>> DDD / Aggregate Root

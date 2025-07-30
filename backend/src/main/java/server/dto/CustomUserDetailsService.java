@@ -1,7 +1,7 @@
-package server.controller;
+package server.dto;
 
 import server.domain.Users;
-import server.domain.UsersRepository;
+import server.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

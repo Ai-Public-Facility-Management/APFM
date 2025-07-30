@@ -4,10 +4,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import server.domain.Proposal;
-import server.domain.ProposalRepository;
-import server.domain.IssueService;  // 서비스가 infra가 아니라면 package에 맞게 수정
+import server.repository.*;
+import server.domain.*;
 
 //<<< Clean Arch / Inbound Adaptor
 

@@ -1,4 +1,4 @@
-package server.controller;
+package server.dto;
 
 
 import server.domain.Department;

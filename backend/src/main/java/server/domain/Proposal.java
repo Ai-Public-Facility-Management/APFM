@@ -15,21 +15,16 @@ public class Proposal {
 
     private Integer totalEstimate;
 
-    // private String title;
 
-    // private String content;
 
     @Embedded
     private Photo content;
 
-    @OneToOne
-    @JoinColumn(name = "issue_id")
-    private Issue issue;
-
-    public static ProposalRepository repository() {
-        ProposalRepository proposalRepository = BackendApplication.applicationContext.getBean(
-            ProposalRepository.class
-        );
-        return proposalRepository;
-    }
+    // public static ProposalRepository repository() {
+    //     ProposalRepository proposalRepository = BackendApplication.applicationContext.getBean(
+    //         ProposalRepository.class
+    //     );
+    //     return proposalRepository;
+    // }
 }
+//>>> DDD / Aggregate Root

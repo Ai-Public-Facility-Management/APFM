@@ -2,6 +2,7 @@ package server.domain;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import server.repository.InspectionRepository;
 import java.util.Optional;
 import java.util.Date;
 

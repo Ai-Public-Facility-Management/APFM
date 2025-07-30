@@ -18,11 +18,11 @@ public class ResultReport {
 
     private Date creationDate;
 
-    public static ResultReportRepository repository() {
-        ResultReportRepository resultReportRepository = BackendApplication.applicationContext.getBean(
-            ResultReportRepository.class
-        );
-        return resultReportRepository;
-    }
+    // public static ResultReportRepository repository() {
+    //     ResultReportRepository resultReportRepository = BackendApplication.applicationContext.getBean(
+    //         ResultReportRepository.class
+    //     );
+    //     return resultReportRepository;
+    // }
 }
 //>>> DDD / Aggregate Root

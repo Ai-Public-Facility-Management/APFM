@@ -18,11 +18,11 @@ public class Camera {
 
     private String ip;
 
-    public static CameraRepository repository() {
-        CameraRepository cameraRepository = BackendApplication.applicationContext.getBean(
-            CameraRepository.class
-        );
-        return cameraRepository;
-    }
+    // public static CameraRepository repository() {
+    //     CameraRepository cameraRepository = BackendApplication.applicationContext.getBean(
+    //         CameraRepository.class
+    //     );
+    //     return cameraRepository;
+    // }
 }
 //>>> DDD / Aggregate Root

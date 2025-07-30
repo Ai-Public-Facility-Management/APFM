@@ -4,7 +4,8 @@ package server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.domain.*;
+import server.dto.SignupRequestDTO;
+import server.service.*;
 
 @RestController
 @RequiredArgsConstructor
