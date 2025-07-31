@@ -1,11 +1,14 @@
-package server.domain;
+package server.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import server.repository.*;
 import server.dto.*;
+import server.domain.*;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class IssueService {
 
     @Autowired
@@ -25,9 +28,8 @@ public class IssueService {
 
         Proposal proposal = new Proposal();
         // proposal.setTitle("자동 생성 제안서 - Issue #" + issueId);
-        // proposal.setContent("이슈 내용에 기반한 제안서입니다.");
+        // proposal.setContent("이슈 내용에 기반한 제안서입니다.");   -> 나중에 필요하면 생성 - 지금은 setTitle, setContent import 가 안돼서 방치
         proposal.setIssue(issue); // 연관 설정
-
         proposalRepository.save(proposal);
 
         issue.setProposal(proposal);
@@ -35,4 +37,12 @@ public class IssueService {
 
         return proposal;
     }
+
+    public int countRepairIssues(Long inspectionId) {
+        return issueRepository.countByInspectionIdAndType(inspectionId, IssueType.REPAIR);
+    } // 점검별 repair 이슈
+
+    public int countRemovalIssues(Long inspectionId) {
+        return issueRepository.countByInspectionIdAndType(inspectionId, IssueType.REMOVE);
+    } // 점검별 remove 이슈
 }

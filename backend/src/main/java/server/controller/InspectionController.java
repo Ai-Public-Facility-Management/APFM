@@ -2,21 +2,21 @@ package server.controller;
 
 import java.util.Optional;
 
-
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
-import server.domain.*;
-import server.service.InspectionService;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.domain.Sort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import server.domain.*;
+import server.service.*;
+
+import java.util.Map;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,11 +67,11 @@ public class InspectionController {
     }
 
     @GetMapping("/page")
-    public Page<Inspection> getPagedInspections(
+    public ResponseEntity<Map<String, Object>> getPagedInspections(
         @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
         Pageable pageable
     ) {
-        return inspectionService.getPagedInspections(pageable);
-    }  // 프론트에서 /inspections/page?page=0&size=10 로 호출하면 createDate 기준 최신순으로 페이징된 점검 리스트가 반환됨
+        return inspectionService.getInspectionListResponse(pageable);
+    } // 프론트에서 /inspections/page?page=0&size=10 로 호출하면 createDate 기준 최신순으로 페이징된 점검 리스트가 반환됨
 }
 //>>> Clean Arch / Inbound Adaptor

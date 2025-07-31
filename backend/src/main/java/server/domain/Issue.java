@@ -34,6 +34,8 @@ public class Issue {
 
     private String estimate;
 
+    private Long inspectionId;
+
     
 }
 //>>> DDD / Aggregate Root
