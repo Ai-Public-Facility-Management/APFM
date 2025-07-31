@@ -2,17 +2,46 @@ package server.controller;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-import server.repository.PublicFaRepository;
+import org.springframework.web.bind.annotation.*;
+import server.domain.PublicFa;
+import server.dto.PublicFaDTO;
+import server.service.PublicFaService;
+import java.util.List;
 
-//<<< Clean Arch / Inbound Adaptor
+
 
 @RestController
-// @RequestMapping(value="/publicFas")
+@RequestMapping(value="/api/publicfa")
 @Transactional
 public class PublicFaController {
 
     @Autowired
-    PublicFaRepository publicFaRepository;
+    PublicFaService publicFaService;
+
+    @GetMapping(value="/all")
+    @ResponseBody
+    public List<PublicFa> viewAllPublicFa() {
+        return publicFaService.getFas();
+    }
+
+
+    @PostMapping()
+    @ResponseBody
+    public PublicFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
+        return publicFaService.createPublicFa(publicFaDTO);
+    }
+
+    @PostMapping(value="/update")
+    @ResponseBody
+    public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
+        return publicFaService.updateFa(publicFaDTO);
+    }
+
+    @DeleteMapping
+    @ResponseBody
+    public void deleteFa(@RequestParam Long id) {
+        publicFaService.deleteFa(id);
+    }
+
 }
 //>>> Clean Arch / Inbound Adaptor
