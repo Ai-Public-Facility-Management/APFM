@@ -37,11 +37,13 @@ public class PublicFa {
     @JoinColumn(name = "inspection_id")
     private Inspection inspection;
 
-    // public static PublicFaRepository repository() {
-    //     PublicFaRepository publicFaRepository = BackendApplication.applicationContext.getBean(
-    //         PublicFaRepository.class
-    //     );
-    //     return publicFaRepository;
-    // }
+    private String category;
+
+    private String imageUrl;
+
+    @Column(name = "matched_public_fa_id")
+    private Long matchedPublicFaId;
+
+    
 }
 //>>> DDD / Aggregate Root
