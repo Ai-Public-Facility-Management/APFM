@@ -4,12 +4,11 @@ package server.controller;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import server.repository.IssueRepository;
-import org.springframework.http.ResponseEntity;
-import server.repository.*;
 import server.domain.*;
 import server.dto.*;
 import server.service.IssueService;
+
+import java.util.List;
 
 
 @RestController
@@ -34,6 +33,11 @@ public class IssueController {
     @DeleteMapping
     public void deleteIssue(@RequestBody IssueDTO issueDTO) {
         issueService.deleteIssue(issueDTO);
+    }
+
+    @GetMapping
+    public List<Issue> getAllIssue() {
+        return issueService.getAllIssue();
     }
 
 }

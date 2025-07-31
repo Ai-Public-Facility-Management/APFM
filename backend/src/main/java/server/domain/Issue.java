@@ -5,7 +5,6 @@ import java.util.Date;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.BackendApplication;
 import server.dto.IssueDTO;
 
 
@@ -13,7 +12,6 @@ import server.dto.IssueDTO;
 @Table(name = "Issue_table")
 @NoArgsConstructor
 @Data
-//<<< DDD / Aggregate Root
 public class Issue {
 
     @Id
