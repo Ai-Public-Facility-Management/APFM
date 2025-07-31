@@ -71,7 +71,14 @@ public class InspectionController {
         @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
         Pageable pageable
     ) {
-        return inspectionService.getInspectionListResponse(pageable);
-    } // 프론트에서 /inspections/page?page=0&size=10 로 호출하면 createDate 기준 최신순으로 페이징된 점검 리스트가 반환됨
+        return inspectionService.getInspectionListResponse(pageable);// 프론트에서 /inspections/page?page=0&size=10 로 호출하면 createDate 기준 최신순으로 페이징된 점검 리스트가 반환됨
+    } 
+
+    @GetMapping("/{id}/unmatched-facilities")
+    public ResponseEntity<Boolean> checkUnmatchedFacilities(@PathVariable Long id) {
+        boolean hasUnmatched = inspectionService.hasUnmatchedFacilities(id);
+        return ResponseEntity.ok(hasUnmatched);
+    }  // GET /inspections/3/unmatched-facilities 이런 식으로 호출 시 Boolean(true, false) 반환 api
+       // true면 매칭 안되는 시설물이 있어서 모달띄움, false면 바로 상세 페이지
 }
 //>>> Clean Arch / Inbound Adaptor

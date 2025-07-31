@@ -2,11 +2,11 @@ package server.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
 import server.domain.Inspection;
-import server.repository.InspectionRepository;
+import server.repository.*;
 import server.dto.InspectionListResponseDTO;
 
 @Data
@@ -26,6 +26,7 @@ public class InspectionService {
     private final InspectionRepository inspectionRepository;
     private final IssueService issueService;
     // private final ReportService reportService;
+    private final PublicFaRepository publicFaRepository;
 
     public ResponseEntity<Map<String, Object>> getInspectionListResponse(Pageable pageable) {
         Page<Inspection> inspections = inspectionRepository.findAll(pageable);
@@ -87,4 +88,8 @@ public class InspectionService {
     public void deleteInspection(Long id) {
         inspectionRepository.deleteById(id);
     }
+
+    public boolean hasUnmatchedFacilities(Long inspectionId) {
+        return publicFaRepository.existsByInspection_IdAndMatchedFalse(inspectionId);
+    }  // publicFaRepository 메서드를 호출해서 결과 반환
 }

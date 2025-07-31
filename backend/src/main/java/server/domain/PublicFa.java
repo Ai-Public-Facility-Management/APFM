@@ -30,6 +30,13 @@ public class PublicFa {
 
     private Long obstruction;
 
+    @Column(name = "matched", nullable = false)
+    private Boolean matched;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inspection_id")
+    private Inspection inspection;
+
     // public static PublicFaRepository repository() {
     //     PublicFaRepository publicFaRepository = BackendApplication.applicationContext.getBean(
     //         PublicFaRepository.class
