@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/issues")
+@RequestMapping("/api/issue")
 @Transactional
 public class IssueController {
 
@@ -21,23 +21,39 @@ public class IssueController {
     IssueService issueService;
 
     @PostMapping
+    @ResponseBody
     public Issue createIssue(@RequestBody IssueDTO issueDTO) {
         return issueService.createIssue(issueDTO);
     }
 
+    @PutMapping
+    @ResponseBody
+    public Issue updateIssue(@RequestBody IssueDTO issueDTO) {
+        return issueService.updateIssue(issueDTO);
+    }
+
     @PostMapping(value = "/makeproposal")
+    @ResponseBody
     public Proposal makeProposal(@RequestBody IssueDTO issueDTO) {
         return issueService.requestProposal(issueDTO.getId());
     }
 
     @DeleteMapping
+    @ResponseBody
     public void deleteIssue(@RequestBody IssueDTO issueDTO) {
         issueService.deleteIssue(issueDTO);
     }
 
-    @GetMapping
-    public List<Issue> getAllIssue() {
+    @GetMapping(value="/all")
+    @ResponseBody
+    public List<Issue> viewAllIssue() {
         return issueService.getAllIssue();
+    }
+
+    @GetMapping
+    @ResponseBody
+    public Issue viewIssue(@RequestParam Long id) {
+        return issueService.getIssue(id);
     }
 
 }

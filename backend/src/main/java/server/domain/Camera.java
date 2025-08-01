@@ -4,6 +4,8 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Entity
 @Table(name = "Camera_table")
@@ -19,11 +21,6 @@ public class Camera {
 
     private String ip;
 
-    // public static CameraRepository repository() {
-    //     CameraRepository cameraRepository = BackendApplication.applicationContext.getBean(
-    //         CameraRepository.class
-    //     );
-    //     return cameraRepository;
-    // }
+
 }
 //>>> DDD / Aggregate Root

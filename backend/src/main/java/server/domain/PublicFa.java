@@ -11,7 +11,7 @@ import server.dto.PublicFaDTO;
 @Table(name = "PublicFa_table")
 @NoArgsConstructor
 @Data
-//<<< DDD / Aggregate Root
+
 public class PublicFa {
 
     @Id
