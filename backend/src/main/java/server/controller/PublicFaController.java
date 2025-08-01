@@ -24,6 +24,11 @@ public class PublicFaController {
         return publicFaService.getFas();
     }
 
+    @GetMapping
+    @ResponseBody
+    public PublicFa viewPublicFaById(@RequestParam long id) {
+       return publicFaService.getFa(id);
+    }
 
     @PostMapping()
     @ResponseBody
@@ -31,7 +36,7 @@ public class PublicFaController {
         return publicFaService.createPublicFa(publicFaDTO);
     }
 
-    @PostMapping(value="/update")
+    @PutMapping
     @ResponseBody
     public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
         return publicFaService.updateFa(publicFaDTO);
