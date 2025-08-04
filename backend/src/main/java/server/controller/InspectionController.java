@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 
 import server.service.*;
 import server.dto.*;
@@ -19,7 +21,10 @@ public class InspectionController {
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getInspectionList(Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> getInspectionList(
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
+        Pageable pageable
+    ) {
         return inspectionService.getInspectionListResponse(pageable);
     }
 
@@ -29,4 +34,5 @@ public class InspectionController {
         @RequestParam(defaultValue = "5") int count) {
         return ResponseEntity.ok(inspectionService.getDashboardInspections(count));
     }
+
 }

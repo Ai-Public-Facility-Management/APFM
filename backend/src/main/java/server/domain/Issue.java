@@ -1,53 +1,48 @@
 package server.domain;
 
-import java.util.Date;
-
 import jakarta.persistence.*;
 import lombok.Data;
-import server.BackendApplication;
-
+import java.util.Date;
 
 @Entity
 @Table(name = "Issue_table")
 @Data
-//<<< DDD / Aggregate Root
 public class Issue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long publicFaId;
+    // ✅ 어떤 점검에서 발생한 이슈인지
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inspection_id")
+    private Inspection inspection;
 
-    private Long resultId;
-
-    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL)
+    // ✅ 제안서 연관 (1:1)
+    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Proposal proposal;
 
-    private Date creationDate;
-
+    // ✅ 이슈 유형: REPAIR, REMOVE, ...
     @Enumerated(EnumType.STRING)
     private IssueType type;
 
+    // ✅ 이슈 이미지 (url + 설명)
     @Embedded
     private Photo image;
 
-    private String estimate;
+    // ✅ 이슈 설명 (UI에서 "확인 요청 사항" 또는 "내용" 등)
+    private String description;
 
-    private Long inspectionId;
+    // ✅ CCTV 위치명
+    private String cameraName;
 
-    private String cameraName;    // CCTV 위치명 (ex: 부산역 4번 cctv)
+    // ✅ 처리 방법 (선택된 처리 유형)
+    @Enumerated(EnumType.STRING)
+    private IssueStatus status;
 
-    private String description;   // 확인 요청 사항
+    // ✅ 처리중 여부
+    private boolean isProcessing;
 
-    private String status;        // 상태 (정상 / 노후화 등)
-
-    private int obstruction;      // 방해도
-
-    private int repairCost;       // 수리 견적
-
-    @Lob
-    private String basis;         // 산출 근거 설명
-
+    // 필요시 추가 가능:
+    // private Date creationDate;
 }
-//>>> DDD / Aggregate Root
