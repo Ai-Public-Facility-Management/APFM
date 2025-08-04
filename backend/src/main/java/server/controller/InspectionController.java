@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
 
-import server.service.InspectionService;
+import server.service.*;
+import server.dto.*;
 
 import java.util.Map;
 
@@ -20,5 +21,12 @@ public class InspectionController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getInspectionList(Pageable pageable) {
         return inspectionService.getInspectionListResponse(pageable);
+    }
+
+    // ✅ 정기점검 리스트 조회 (메인페이지)
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardInspectionResponseDTO> getDashboardInspections(
+        @RequestParam(defaultValue = "5") int count) {
+        return ResponseEntity.ok(inspectionService.getDashboardInspections(count));
     }
 }

@@ -12,10 +12,10 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import server.domain.Inspection;
-import server.repository.InspectionRepository;
-import server.dto.InspectionListResponseDTO;
-import server.service.IssueService;
+import server.domain.*;
+import server.repository.*;
+import server.dto.*;
+import server.service.*;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +55,40 @@ public class InspectionService {
         response.put("currentPage", inspections.getNumber());
 
         return ResponseEntity.ok(response);
+    }
+
+    // ✅ 점검 리스트 조회 (메인페이지 리스트용)
+    public DashboardInspectionResponseDTO getDashboardInspections(int count) {
+        List<Inspection> inspections = inspectionRepository
+            .findTopNByIsInspectedTrueOrderByCreateDateDesc(count); // 또는 Pageable 방식
+
+        List<String> dateList = new ArrayList<>();
+        Map<String, List<DashboardInspectionResponseDTO.IssueDTO>> issuesMap = new HashMap<>();
+
+        for (Inspection inspection : inspections) {
+            String dateStr = formatDate(inspection.getCreateDate());
+            dateList.add(dateStr);
+
+            List<Issue> issues = issueRepository.findByInspectionId(inspection.getId());
+            List<DashboardInspectionResponseDTO.IssueDTO> issueDTOs = issues.stream().map(issue -> {
+                DashboardInspectionResponseDTO.IssueDTO dto = new DashboardInspectionResponseDTO.IssueDTO();
+                dto.setId(issue.getId());
+                dto.setContent(issue.getContent());
+                return dto;
+            }).collect(Collectors.toList());
+
+            issuesMap.put(dateStr, issueDTOs);
+        }
+
+        DashboardInspectionResponseDTO response = new DashboardInspectionResponseDTO();
+        response.setInspectionDate(dateList);
+        response.setIssues(issuesMap);
+
+        return response;
+    }
+
+    private String formatDate(Date date) {
+        return new SimpleDateFormat("yyyy.MM.dd").format(date);
     }
 
     // ✅ 점검 생성 (자동 생성용)
