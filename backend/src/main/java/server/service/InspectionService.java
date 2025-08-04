@@ -14,9 +14,9 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
-import server.domain.Inspection;
+import server.domain.*;
 import server.repository.*;
-import server.dto.InspectionListResponseDTO;
+import server.dto.*;
 
 @Data
 @Service
@@ -92,4 +92,32 @@ public class InspectionService {
     public boolean hasUnmatchedFacilities(Long inspectionId) {
         return publicFaRepository.existsByInspection_IdAndMatchedFalse(inspectionId);
     }  // publicFaRepository 메서드를 호출해서 결과 반환
+
+    public InspectionDetailResponseDTO buildInspectionDetailResponse(Long inspectionId) {
+        Inspection inspection = inspectionRepository.findById(inspectionId)
+            .orElseThrow(() -> new IllegalArgumentException("해당 점검이 존재하지 않습니다."));
+
+        List<Issue> issues = issueService.getIssuesByInspectionId(inspectionId);
+        List<InspectionDetailResponseDTO.IssueDetailDTO> issueDTOs = issues.stream().map(issue -> {
+            InspectionDetailResponseDTO.IssueDetailDTO dto = new InspectionDetailResponseDTO.IssueDetailDTO();
+            dto.setLocation(issue.getCameraName()); // 또는 직접 계산
+            dto.setImageUrl(issue.getImageUrl());
+            dto.setType(issue.getType().name());
+            dto.setStatus(issue.getStatus());           // 필요 시 Issue에 추가 필드
+            dto.setObstruction(issue.getObstruction()); // 필요 시 필드 추가
+            dto.setDescription(issue.getDescription());
+            dto.setRepairCost(issue.getRepairCost());   // 필요 시 필드 추가
+            dto.setBasis(issue.getBasis());             // 필요 시 필드 추가
+            return dto;
+        }).collect(Collectors.toList());
+
+        InspectionDetailResponseDTO response = new InspectionDetailResponseDTO();
+        response.setInspectionId(inspection.getId());
+        response.setCreateDate(inspection.getCreateDate());
+        response.setIssueCount(issueDTOs.size());
+        response.setIssues(issueDTOs);
+
+        return response;
+    }
+
 }

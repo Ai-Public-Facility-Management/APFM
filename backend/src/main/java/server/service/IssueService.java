@@ -45,4 +45,8 @@ public class IssueService {
     public int countRemovalIssues(Long inspectionId) {
         return issueRepository.countByInspectionIdAndType(inspectionId, IssueType.REMOVE);
     } // 점검별 remove 이슈
+
+    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
+    return issueRepository.findByInspection_Id(inspectionId);
+}
 }

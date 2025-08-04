@@ -80,5 +80,10 @@ public class InspectionController {
         return ResponseEntity.ok(hasUnmatched);
     }  // GET /inspections/3/unmatched-facilities 이런 식으로 호출 시 Boolean(true, false) 반환 api
        // true면 매칭 안되는 시설물이 있어서 모달띄움, false면 바로 상세 페이지
+
+    @GetMapping("/{id}/detail")
+    public ResponseEntity<InspectionDetailResponseDTO> getInspectionDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(inspectionService.buildInspectionDetailResponse(id));
+    }
 }
 //>>> Clean Arch / Inbound Adaptor

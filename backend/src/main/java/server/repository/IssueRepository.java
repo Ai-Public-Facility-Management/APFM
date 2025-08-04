@@ -10,4 +10,5 @@ import server.domain.*;
 public interface IssueRepository
     extends JpaRepository<Issue, Long> {
         int countByInspectionIdAndType(Long inspectionId, IssueType type);
+        List<Issue> findByInspection_Id(Long inspectionId);
     }
