@@ -1,52 +1,47 @@
 package server.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Data;
 import org.springframework.stereotype.Service;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
-import server.domain.*;
-import server.repository.*;
-import server.dto.*;
+import server.domain.Inspection;
+import server.repository.InspectionRepository;
+import server.dto.InspectionListResponseDTO;
+import server.service.IssueService;
 
-@Data
 @Service
 @RequiredArgsConstructor
 public class InspectionService {
 
     private final InspectionRepository inspectionRepository;
     private final IssueService issueService;
-    // private final ReportService reportService;
-    private final PublicFaRepository publicFaRepository;
 
+    // ✅ 점검 리스트 조회 (UI 리스트용)
     public ResponseEntity<Map<String, Object>> getInspectionListResponse(Pageable pageable) {
         Page<Inspection> inspections = inspectionRepository.findAll(pageable);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
         List<InspectionListResponseDTO> dtos = inspections.getContent().stream().map(inspection -> {
             String formattedDate = formatter.format(inspection.getCreateDate());
-            String status = inspection.getIsinspected() ? "작성 완료" : "작성중";
 
-            // TODO: 실제 서비스 연결
             int repairCount = issueService.countRepairIssues(inspection.getId());
             int removalCount = issueService.countRemovalIssues(inspection.getId());
-            boolean hasIssue = (repairCount + removalCount) == 0;
-            boolean hasReport = false;  // boolean hasReport = reportService.existsByInspectionId(inspection.getId()); report 생성되면 교체
 
+            boolean hasIssue = (repairCount + removalCount) > 0;
+            boolean hasReport = false; // reportService.existsByInspectionId(inspection.getId());
 
             return new InspectionListResponseDTO(
                 inspection.getId(),
                 formattedDate,
-                status,
+                inspection.getIsinspected(),
                 repairCount,
                 removalCount,
                 hasIssue,
@@ -62,6 +57,7 @@ public class InspectionService {
         return ResponseEntity.ok(response);
     }
 
+    // ✅ 점검 생성 (자동 생성용)
     public Inspection createInspection(LocalDateTime createDate, Boolean isInspected) {
         Inspection inspection = new Inspection();
         Date converted = Date.from(createDate.atZone(ZoneId.systemDefault()).toInstant());
@@ -69,55 +65,4 @@ public class InspectionService {
         inspection.setIsinspected(isInspected);
         return inspectionRepository.save(inspection);
     }
-
-    public List<Inspection> getAllInspections() {
-        return inspectionRepository.findAll();
-    }
-
-    public Optional<Inspection> getInspection(Long id) {
-        return inspectionRepository.findById(id);
-    }
-
-    public Inspection updateInspection(Long id, Boolean isInspected) {
-        Inspection inspection = inspectionRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("해당 ID의 점검이 없습니다."));
-        inspection.setIsinspected(isInspected);
-        return inspectionRepository.save(inspection);
-    }
-
-    public void deleteInspection(Long id) {
-        inspectionRepository.deleteById(id);
-    }
-
-    public boolean hasUnmatchedFacilities(Long inspectionId) {
-        return publicFaRepository.existsByInspection_IdAndMatchedFalse(inspectionId);
-    }  // publicFaRepository 메서드를 호출해서 결과 반환
-
-    public InspectionDetailResponseDTO buildInspectionDetailResponse(Long inspectionId) {
-        Inspection inspection = inspectionRepository.findById(inspectionId)
-            .orElseThrow(() -> new IllegalArgumentException("해당 점검이 존재하지 않습니다."));
-
-        List<Issue> issues = issueService.getIssuesByInspectionId(inspectionId);
-        List<InspectionDetailResponseDTO.IssueDetailDTO> issueDTOs = issues.stream().map(issue -> {
-            InspectionDetailResponseDTO.IssueDetailDTO dto = new InspectionDetailResponseDTO.IssueDetailDTO();
-            dto.setLocation(issue.getCameraName()); // 또는 직접 계산
-            dto.setImageUrl(issue.getImageUrl());
-            dto.setType(issue.getType().name());
-            dto.setStatus(issue.getStatus());           // 필요 시 Issue에 추가 필드
-            dto.setObstruction(issue.getObstruction()); // 필요 시 필드 추가
-            dto.setDescription(issue.getDescription());
-            dto.setRepairCost(issue.getRepairCost());   // 필요 시 필드 추가
-            dto.setBasis(issue.getBasis());             // 필요 시 필드 추가
-            return dto;
-        }).collect(Collectors.toList());
-
-        InspectionDetailResponseDTO response = new InspectionDetailResponseDTO();
-        response.setInspectionId(inspection.getId());
-        response.setCreateDate(inspection.getCreateDate());
-        response.setIssueCount(issueDTOs.size());
-        response.setIssues(issueDTOs);
-
-        return response;
-    }
-
 }
