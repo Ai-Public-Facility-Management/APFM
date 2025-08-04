@@ -31,16 +31,23 @@ public class Issue {
     @Embedded
     private Photo image;
 
-    private String estimate;
+    private Long estimate;
+
+    @Column(length = 500)
+    private String estimateBasis;
 
     @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
     private PublicFa publicFa;
 
+    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "inspection_id")
+    private Inspection inspection;
 
     public Issue(IssueDTO issueDTO) {
         this.creationDate = issueDTO.getCreationDate();
         this.type = issueDTO.getType();
         this.image = issueDTO.getImage();
+        this.estimateBasis = issueDTO.getEstimateBasis();
         this.estimate = issueDTO.getEstimate();
     }
     

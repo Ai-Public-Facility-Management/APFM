@@ -3,12 +3,15 @@ package server.controller;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.domain.*;
 import server.dto.*;
 import server.service.IssueService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -52,8 +55,10 @@ public class IssueController {
 
     @GetMapping
     @ResponseBody
-    public Issue viewIssue(@RequestParam Long id) {
-        return issueService.getIssue(id);
+    public ResponseEntity<Map<String, Object>> viewIssues(@RequestHeader("InspectionId") Long id) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("issues", issueService.getIssues(id));
+        return ResponseEntity.ok(response);
     }
 
 }

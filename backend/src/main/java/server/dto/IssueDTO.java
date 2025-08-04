@@ -25,6 +25,9 @@ public class IssueDTO {
 
     private Photo image;
 
-    private String estimate;
+    private Long estimate;
+
+    private String estimateBasis;
+
 
 }
