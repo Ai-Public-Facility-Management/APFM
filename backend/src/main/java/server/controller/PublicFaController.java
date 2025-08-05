@@ -2,65 +2,79 @@ package server.controller;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import server.domain.PublicFa;
+import server.dto.PublicFaDTO;
+import server.dto.ResponseFa;
+import server.service.PublicFaService;
 
-import java.util.List;
+import java.util.HashMap;
+
 import java.util.Map;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import server.repository.*;
-import server.domain.*;
-import server.dto.*;
-//<<< Clean Arch / Inbound Adaptor
+
 
 @RestController
-@RequestMapping(value="/publicFas")
+@RequestMapping(value="/api/publicfa")
 @Transactional
 @RequiredArgsConstructor
 public class PublicFaController {
 
-    private final PublicFaRepository publicFaRepository;
 
-    @GetMapping("/unmatched")
-    public ResponseEntity<List<UnmatchedFacilityDTO>> getUnmatchedFacilities(@RequestParam Long inspectionId) {
-        List<PublicFa> unmatchedList = publicFaRepository.findByInspection_IdAndMatchedFalse(inspectionId);
-    
-        List<UnmatchedFacilityDTO> dtos = unmatchedList.stream()
-            .map(fa -> new UnmatchedFacilityDTO(fa.getId(), fa.getCategory(), fa.getImageUrl()))  //  fa.getLocation() 필요시 추가
-            .collect(Collectors.toList());
+    @Autowired
+    PublicFaService publicFaService;
 
-        return ResponseEntity.ok(dtos);
+    @GetMapping(value="/all")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> viewAllPublicFa(@PageableDefault(size = 15) Pageable pageable) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("publicFas", publicFaService.viewAllFas(pageable));
+        return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{id}/match-to-db")
-    public ResponseEntity<Void> matchToDbFacility(
-        @PathVariable Long id,
-        @RequestBody Map<String, Long> requestBody) {
-
-        Long matchedId = requestBody.get("matchedPublicFaId");
-
-        PublicFa target = publicFaRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("탐지된 시설물이 존재하지 않습니다."));
-
-        publicFaRepository.findById(matchedId)
-            .orElseThrow(() -> new IllegalArgumentException("기준 시설물이 존재하지 않습니다."));
-
-        target.setMatched(true);
-        target.setMatchedPublicFaId(matchedId);  // 연관관계 매핑
-        publicFaRepository.save(target);
-
-        return ResponseEntity.ok().build();
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> viewPublicFaById(@RequestParam long id) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("publicFa", publicFaService.viewFa(id));
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePublicFa(@PathVariable Long id) {
-        if (!publicFaRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/top")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> viewTopPublicFas() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("publicFas", publicFaService.viewTopFas());
 
-        publicFaRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
+
+    @PostMapping()
+    @ResponseBody
+    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
+        return publicFaService.addPublicFa(publicFaDTO);
+    }
+
+
+
+    @PostMapping("/approve")
+    public PublicFa approveBox(@RequestParam Long id) {
+        return publicFaService.approveFa(id);
+    }
+
+    @PutMapping
+    @ResponseBody
+    public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
+        return publicFaService.updateFa(publicFaDTO);
+    }
+
+    @DeleteMapping
+    @ResponseBody
+    public void deleteFa(@RequestParam Long id) {
+        publicFaService.deleteFa(id);
+    }
+
 }
 //>>> Clean Arch / Inbound Adaptor

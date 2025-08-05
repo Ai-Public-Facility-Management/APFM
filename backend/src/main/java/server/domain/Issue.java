@@ -1,48 +1,55 @@
 package server.domain;
 
+import java.util.Date;
+
 import jakarta.persistence.*;
 import lombok.Data;
-import java.util.Date;
+import lombok.NoArgsConstructor;
+import server.dto.IssueDTO;
+
 
 @Entity
 @Table(name = "Issue_table")
+@NoArgsConstructor
 @Data
 public class Issue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // ✅ 어떤 점검에서 발생한 이슈인지
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inspection_id")
-    private Inspection inspection;
+    private Long resultId;
 
-    // ✅ 제안서 연관 (1:1)
-    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL)
     private Proposal proposal;
 
-    // ✅ 이슈 유형: REPAIR, REMOVE, ...
+    private Date creationDate;
+
     @Enumerated(EnumType.STRING)
     private IssueType type;
 
-    // ✅ 이슈 이미지 (url + 설명)
     @Embedded
     private Photo image;
 
-    // ✅ 이슈 설명 (UI에서 "확인 요청 사항" 또는 "내용" 등)
-    private String description;
+    private Long estimate;
 
-    // ✅ CCTV 위치명
-    private String cameraName;
+    @Column(length = 500)
+    private String estimateBasis;
 
-    // ✅ 처리 방법 (선택된 처리 유형)
-    @Enumerated(EnumType.STRING)
-    private IssueStatus status;
+    @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
+    private PublicFa publicFa;
 
-    // ✅ 처리중 여부
-    private boolean isProcessing;
+    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "inspection_id")
+    private Inspection inspection;
 
-    // 필요시 추가 가능:
-    // private Date creationDate;
+    public Issue(IssueDTO issueDTO) {
+        this.creationDate = issueDTO.getCreationDate();
+        this.type = issueDTO.getType();
+        this.image = issueDTO.getImage();
+        this.estimateBasis = issueDTO.getEstimateBasis();
+        this.estimate = issueDTO.getEstimate();
+    }
+    
 }
+

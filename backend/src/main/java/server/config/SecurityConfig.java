@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import server.domain.JwtUtil;
 import server.service.CustomUserDetailsService;
 import server.service.TokenBlacklistService;
@@ -18,15 +19,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
+
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // .requestMatchers(
-                        //         "/h2-console/**", "/api/auth/**",
-                        //         "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
-                        // ).permitAll()
-                        // .anyRequest().authenticated() 
-                        .anyRequest() .permitAll()  // postman 테스트 할 때는 이 부분만 남기고 위는 주석처리. 끝나면 이 부분 주석하고 윗부분 주석해제.
+                        .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(
+                                 "/api/auth/**","/api/publicfa/**","/api/issue/**",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())  // H2 콘솔 iframe 허용
