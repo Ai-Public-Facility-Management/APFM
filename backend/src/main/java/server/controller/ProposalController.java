@@ -14,7 +14,7 @@ import server.dto.ProposalDTO;
 
 
 @RestController
-@RequestMapping("/api/proposals")  // prefix 유지
+@RequestMapping("/api/proposal")  // prefix 유지
 @RequiredArgsConstructor
 @Transactional
 public class ProposalController {
@@ -26,4 +26,5 @@ public class ProposalController {
         proposalService.handleProposalGeneration(dto.getIds(), dto.getFileUrl());
         return ResponseEntity.ok(dto);  // 요청으로 받은 DTO를 그대로 응답
     }
+
 }
