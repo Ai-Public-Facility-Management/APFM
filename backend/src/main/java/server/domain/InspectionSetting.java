@@ -3,13 +3,15 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Entity
-@Table(name = "inspection_setting")
-@Getter
-@Setter
+@Table(name = "InspectionSetting")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class InspectionSetting {
 
     @Id
@@ -27,4 +29,5 @@ public class InspectionSetting {
 
     // 지도 주소 (선택사항, 추후 사용)
     private String address;
+
 }

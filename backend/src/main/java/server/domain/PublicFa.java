@@ -11,7 +11,7 @@ import server.dto.PublicFaDTO;
 
 
 @Entity
-@Table(name = "PublicFa_table")
+@Table(name = "PublicFa")
 @NoArgsConstructor
 @Data
 

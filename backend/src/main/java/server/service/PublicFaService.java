@@ -3,7 +3,6 @@ package server.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -30,13 +29,6 @@ public class PublicFaService {
     @Autowired
     CameraRepository  cameraRepository;
 
-    //private static final double IOU_THRESHOLD = 0.5;
-
-//    public PublicFa addPublicFa(PublicFaDTO publicFaDTO) {
-//        PublicFa publicFa = new PublicFa(publicFaDTO);
-//        publicFa.setCamera(cameraRepository.findById(publicFaDTO.getCameraId()).orElse(new Camera()));
-//        return publicFaRepository.save(publicFa);
-//    }
 
     // 수정 필요
     @Transactional
@@ -70,11 +62,12 @@ public class PublicFaService {
         return new PublicFaDetail(publicFa);
     }
 
-    public List<IssueSummary>viewTopFas(){
-        List<PublicFa> Fas = publicFaRepository.findTop10ByStatusOrderByIdDesc(FacilityStatus.ABNORMAL);
-        List <IssueSummary> issues = new ArrayList<>();
+    public List<DashboardIssue>viewTopFas(int count){
+        PageRequest pageRequest = PageRequest.of(0, count);
+        List<PublicFa> Fas = publicFaRepository.findByStatusOrderByIdDesc(pageRequest,FacilityStatus.ABNORMAL);
+        List <DashboardIssue> issues = new ArrayList<>();
         Fas.forEach(fas->{
-            IssueSummary issue = new IssueSummary();
+            DashboardIssue issue = new DashboardIssue();
             issue.setPublicFaId(fas.getId());
             issue.setIssueType(fas.getIssue().getType());
             issue.setPublicFaType(fas.getType());

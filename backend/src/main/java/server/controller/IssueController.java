@@ -35,16 +35,16 @@ public class IssueController {
         return issueService.updateIssue(issueDTO);
     }
 
-    @PostMapping(value = "/makeproposal")
-    @ResponseBody
-    public Proposal makeProposal(@RequestBody IssueDTO issueDTO) {
-        return issueService.requestProposal(issueDTO.getId());
-    }
-
     @DeleteMapping
     @ResponseBody
     public void deleteIssue(@RequestBody IssueDTO issueDTO) {
         issueService.deleteIssue(issueDTO);
+    }
+
+    @PostMapping(value = "/makeproposal")
+    @ResponseBody
+    public Proposal makeProposal(@RequestBody IssueDTO issueDTO) {
+        return issueService.requestProposal(issueDTO.getId());
     }
 
     @GetMapping(value="/all")

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "Camera_table")
+@Table(name = "Camera")
 @Data
 //<<< DDD / Aggregate Root
 public class Camera {

@@ -3,7 +3,7 @@ package server.dto;
 import lombok.Data;
 
 @Data
-public class InspectionSettingRequestDTO {
+public class InspectionSettingDTO {
     private String startDate;
     private String startTime;
     private Integer inspectionCycle;

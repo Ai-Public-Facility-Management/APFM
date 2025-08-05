@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "Users_table")
+@Table(name = "Users")
 @Data
 //<<< DDD / Aggregate Root
 public class Users {
@@ -28,11 +28,6 @@ public class Users {
 
     private Long level;
 
-    // public static UsersRepository repository() {
-    //     UsersRepository usersRepository = BackendApplication.applicationContext.getBean(
-    //         UsersRepository.class
-    //     );
-    //     return usersRepository;
-    // }
+
 }
-//>>> DDD / Aggregate Root
+

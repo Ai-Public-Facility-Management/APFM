@@ -22,7 +22,6 @@ public class Inspection {
     private Boolean isinspected;
 
     // ✅ 연관관계 추가
-
     @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Issue> issues;
 

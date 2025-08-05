@@ -9,7 +9,7 @@ import server.dto.IssueDTO;
 
 
 @Entity
-@Table(name = "Issue_table")
+@Table(name = "Issue")
 @NoArgsConstructor
 @Data
 public class Issue {

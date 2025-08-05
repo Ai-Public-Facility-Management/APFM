@@ -25,7 +25,7 @@ public class InspectionReportService {
         // LLM으로부터 받아온다고 가정
         String content = "=== 정기 점검 보고서 ===\n" +
             issues.stream()
-                  .map(i -> "- " + i.getContent())
+                  .map(i -> "- " + i.getEstimateBasis())
                   .collect(Collectors.joining("\n"));
 
         // 파일명만 생성

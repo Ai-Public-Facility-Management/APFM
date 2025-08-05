@@ -2,15 +2,12 @@ package server.domain;
 
 import java.util.Date;
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import server.BackendApplication;
 
 @Entity
-@Table(name = "Report_table")
+@Table(name = "Report")
 @Data
 //<<< DDD / Aggregate Root
 public class Report {
@@ -21,11 +18,9 @@ public class Report {
     @Embedded
     private Photo content;
 
-    // public static ReportRepository repository() {
-    //     ReportRepository reportRepository = BackendApplication.applicationContext.getBean(
-    //         ReportRepository.class
-    //     );
-    //     return reportRepository;
-    // }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "inspection_id", unique = true)
+    private Inspection inspection;
+
 }
 //>>> DDD / Aggregate Root

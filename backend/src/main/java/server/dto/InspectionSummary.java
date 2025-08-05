@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class InspectionListResponseDTO {
+public class InspectionSummary {
 
     private Long id;
     private String createDate;        // ex) "2025.08.04 09:13:01"

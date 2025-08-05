@@ -9,7 +9,7 @@ import lombok.Data;
 import server.BackendApplication;
 
 @Entity
-@Table(name = "ResultReport_table")
+@Table(name = "ResultReport")
 @Data
 //<<< DDD / Aggregate Root
 public class ResultReport {

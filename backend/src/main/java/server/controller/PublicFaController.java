@@ -19,9 +19,7 @@ import java.util.Map;
 @RestController
 @RequestMapping(value="/api/publicfa")
 @Transactional
-@RequiredArgsConstructor
 public class PublicFaController {
-
 
     @Autowired
     PublicFaService publicFaService;
@@ -42,11 +40,11 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/top")
+    @GetMapping("/dashbord")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> viewTopPublicFas() {
+    public ResponseEntity<Map<String, Object>> viewTopPublicFas( @RequestParam(defaultValue = "5") int count) {
         Map<String, Object> response = new HashMap<>();
-        response.put("publicFas", publicFaService.viewTopFas());
+        response.put("publicFas", publicFaService.viewTopFas(count));
 
         return ResponseEntity.ok(response);
     }
@@ -56,8 +54,6 @@ public class PublicFaController {
     public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
         return publicFaService.addPublicFa(publicFaDTO);
     }
-
-
 
     @PostMapping("/approve")
     public PublicFa approveBox(@RequestParam Long id) {
@@ -77,4 +73,4 @@ public class PublicFaController {
     }
 
 }
-//>>> Clean Arch / Inbound Adaptor
+

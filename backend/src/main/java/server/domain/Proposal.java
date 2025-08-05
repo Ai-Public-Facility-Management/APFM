@@ -13,7 +13,7 @@ import lombok.Data;
 import server.BackendApplication;
 
 @Entity
-@Table(name = "Proposal_table")
+@Table(name = "Proposal")
 @Data
 public class Proposal {
 

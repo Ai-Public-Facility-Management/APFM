@@ -1,4 +1,4 @@
-INSERT INTO Users_table (
+INSERT INTO Users (
   email, password, username, department, type, approval_status, level
 ) VALUES (
   'test@example.com',
@@ -9,3 +9,14 @@ INSERT INTO Users_table (
   'APPROVED',
   1
 );
+INSERT INTO Inspection_Setting (
+    Id,start_Date,start_Time,inspection_Cycle,address
+) VALUES (
+    1,
+    '2028-08-05',
+    '09:00',
+    7,
+    '주소값'
+);
+
+
