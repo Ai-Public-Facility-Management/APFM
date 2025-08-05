@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import server.domain.JwtUtil;
 import server.service.CustomUserDetailsService;
 import server.service.TokenBlacklistService;
@@ -18,12 +19,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http
-<<<<<<< HEAD
-                .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(
-                                "/h2-console/**", "/api/auth/**",
+                                 "/api/auth/**","/api/publicfa/**","/api/issue/**",
                                 "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -45,29 +45,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-=======
-            .csrf().disable()
-            .cors().disable()
-        //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
-            .httpBasic().disable()
-            .authorizeRequests()
-                // .antMatchers(
-                //     "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
-                //     "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/issues/**")
-                // .permitAll()
-                // .anyRequest().authenticated()
-                .anyRequest().permitAll()
-            .and()
-            .headers().frameOptions().sameOrigin();
-        //     .and()
-        //     .formLogin()
-        //     .and()
-        //     .logout()
-        //         .logoutUrl("/api/auth/logout")
-        //         .logoutSuccessUrl("/login")
-        //         .invalidateHttpSession(true)
-        //         .deleteCookies("JSESSIONID");
->>>>>>> main
     }
 
     @Bean

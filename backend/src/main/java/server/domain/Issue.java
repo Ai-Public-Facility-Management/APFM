@@ -4,20 +4,19 @@ import java.util.Date;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import server.BackendApplication;
+import lombok.NoArgsConstructor;
+import server.dto.IssueDTO;
 
 
 @Entity
 @Table(name = "Issue_table")
+@NoArgsConstructor
 @Data
-//<<< DDD / Aggregate Root
 public class Issue {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    private Long publicFaId;
 
     private Long resultId;
 
@@ -32,8 +31,25 @@ public class Issue {
     @Embedded
     private Photo image;
 
-    private String estimate;
+    private Long estimate;
 
+    @Column(length = 500)
+    private String estimateBasis;
+
+    @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
+    private PublicFa publicFa;
+
+    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name = "inspection_id")
+    private Inspection inspection;
+
+    public Issue(IssueDTO issueDTO) {
+        this.creationDate = issueDTO.getCreationDate();
+        this.type = issueDTO.getType();
+        this.image = issueDTO.getImage();
+        this.estimateBasis = issueDTO.getEstimateBasis();
+        this.estimate = issueDTO.getEstimate();
+    }
     
 }
-//>>> DDD / Aggregate Root
+
