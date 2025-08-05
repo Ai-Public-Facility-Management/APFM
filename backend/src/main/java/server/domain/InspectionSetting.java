@@ -26,5 +26,5 @@ public class InspectionSetting {
     private Integer inspectionCycle;
 
     // 지도 주소 (선택사항, 추후 사용)
-    // private String address;
+    private String address;
 }

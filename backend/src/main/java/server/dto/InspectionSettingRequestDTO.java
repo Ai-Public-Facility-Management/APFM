@@ -7,5 +7,5 @@ public class InspectionSettingRequestDTO {
     private String startDate;
     private String startTime;
     private Integer inspectionCycle;
-    // private String address;
+    private String address;
 }

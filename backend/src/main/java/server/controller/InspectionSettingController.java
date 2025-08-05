@@ -23,7 +23,7 @@ public class InspectionSettingController {
                 .startDate(dto.getStartDate())
                 .startTime(dto.getStartTime())
                 .inspectionCycle(dto.getInspectionCycle())
-                // .address(dto.getAddress())
+                .address(dto.getAddress())
                 .build();
 
         settingRepository.save(setting);
