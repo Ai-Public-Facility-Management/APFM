@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import server.domain.FacilityStatus;
 import server.domain.PublicFa;
+import java.util.List;
 
 import java.util.List;
 
@@ -13,6 +14,12 @@ import java.util.List;
 @RepositoryRestResource(collectionResourceRel = "publicFas", path = "publicFas")
 public interface PublicFaRepository
     extends JpaRepository<PublicFa, Long> {
+
+    boolean existsByInspection_IdAndMatchedFalse(Long inspectionId);   // 해당 점검 ID에 대해 아직 매칭되지 않은 시설물이 있는지 확인 후 모달 띄울지 여부 확인
+    List<PublicFa> findByInspection_IdAndMatchedFalse(Long inspectionId); // 모달 띄운 후 내부 시설물 리스트 조회
+    List<PublicFa> findByInspection_Id(Long inspectionId);
+
+    //
     List<PublicFa> findByStatusAndCameraId(FacilityStatus status, Long cameraId);
 
     List<PublicFa> findTop10ByStatusOrderByIdDesc(FacilityStatus status);

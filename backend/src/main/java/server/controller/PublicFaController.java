@@ -19,7 +19,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(value="/api/publicfa")
 @Transactional
+@RequiredArgsConstructor
 public class PublicFaController {
+
 
     @Autowired
     PublicFaService publicFaService;

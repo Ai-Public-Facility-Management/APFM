@@ -1,10 +1,14 @@
 package server.domain;
 
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import lombok.Data;
 import server.BackendApplication;
 

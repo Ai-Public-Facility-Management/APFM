@@ -1,48 +1,38 @@
 package server.controller;
 
-import java.util.Optional;
-
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
-import server.domain.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 
-//<<< Clean Arch / Inbound Adaptor
+import server.service.*;
+import server.dto.*;
+
+import java.util.Map;
 
 @RestController
-// @RequestMapping(value="/inspections")
-@Transactional
+@RequestMapping("/api/inspections")
+@RequiredArgsConstructor
 public class InspectionController {
 
-    @Autowired
-    InspectionService inspectionService;
+    private final InspectionService inspectionService;
 
-    @PostMapping("/inspections")
-    public Inspection create(@RequestBody Inspection inspection) {
-        return inspectionService.createInspection(
-            inspection.getCreateDate(), inspection.getIsinspected()
-        );
+    // ✅ 정기점검 리스트 조회 (페이징 포함)
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getInspectionList(
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
+        Pageable pageable
+    ) {
+        return inspectionService.getInspectionListResponse(pageable);
     }
 
-    @GetMapping("/inspections")
-    public Iterable<Inspection> getAll() {
-        return inspectionService.getAllInspections();
+    // ✅ 정기점검 리스트 조회 (메인페이지)
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardInspectionResponseDTO> getDashboardInspections(
+        @RequestParam(defaultValue = "5") int count) {
+        return ResponseEntity.ok(inspectionService.getDashboardInspections(count));
     }
 
-    @GetMapping("/inspections/{id}")
-    public Optional<Inspection> getOne(@PathVariable("id") Long id) {
-        return inspectionService.getInspection(id);
-    }
-
-    @PutMapping("/inspections/{id}")
-    public Inspection update(@PathVariable("id") Long id, @RequestBody Inspection updated) {
-        return inspectionService.updateInspection(id, updated.getIsinspected());
-    }
-
-    @DeleteMapping("/inspections/{id}")
-    public void delete(@PathVariable("id") Long id) {
-        inspectionService.deleteInspection(id);
-    }
 }
-//>>> Clean Arch / Inbound Adaptor
