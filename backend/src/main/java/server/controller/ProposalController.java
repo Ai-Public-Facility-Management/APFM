@@ -1,30 +1,28 @@
 package server.controller;
 
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import jakarta.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import server.repository.*;
-import server.domain.*;
-import server.service.*;
+import server.service.ProposalService;
+import java.util.Map;
+import java.util.List;
 
-//<<< Clean Arch / Inbound Adaptor
+import server.dto.ProposalRequestDTO;
+import server.dto.ProposalResponseDTO;
 
 @RestController
-@RequestMapping("/api/proposals")  // ✅ prefix 명시 (가독성과 확장성)
+@RequestMapping("/api/proposals")  // prefix 유지
+@RequiredArgsConstructor
 @Transactional
 public class ProposalController {
 
-    @Autowired
-    ProposalRepository proposalRepository;
+    private final ProposalService proposalService;
 
-    @Autowired
-    IssueService issueService;
-
-    // ✅ 이슈 ID를 기반으로 Proposal 자동 생성
-    @PostMapping("/issues/{id}/generate")
-    public Proposal generateProposal(@PathVariable Long id) {
-        return issueService.generateProposalForIssue(id);
+    @PostMapping("/generate")
+    public ResponseEntity<ProposalDTO> generateProposals(@RequestBody ProposalDTO dto) {
+        proposalService.handleProposalGeneration(dto.getIds(), dto.getFileUrl());
+        return ResponseEntity.ok(dto);  // 요청으로 받은 DTO를 그대로 응답
     }
 }
