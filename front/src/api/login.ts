@@ -1,6 +1,6 @@
 // login.ts
 export interface LoginFormState {
-  id: string;
+  email: string;
   password: string;
   rememberId: boolean;
 }
