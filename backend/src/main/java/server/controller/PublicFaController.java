@@ -1,5 +1,6 @@
 package server.controller;
 
+import lombok.RequiredArgsConstructor;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

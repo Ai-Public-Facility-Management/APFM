@@ -53,11 +53,11 @@ public class IssueService {
     }
 
     public int countRepairIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndType(inspectionId,IssueType.REPAIR);
+        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
     }
 
     public int countRemovalIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndType(inspectionId, IssueType.REMOVE);
+        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
     } // 점검별 remove 이슈
 
     public List<Issue> getIssuesByInspectionId(Long inspectionId) {

@@ -28,6 +28,9 @@ public class Issue {
     @Enumerated(EnumType.STRING)
     private IssueType type;
 
+    @Enumerated(EnumType.STRING)
+    private IssueStatus status;
+
     @Embedded
     private Photo image;
 
@@ -50,6 +53,8 @@ public class Issue {
         this.estimateBasis = issueDTO.getEstimateBasis();
         this.estimate = issueDTO.getEstimate();
     }
+
+    private String content;
     
 }
 

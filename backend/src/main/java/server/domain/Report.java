@@ -21,4 +21,3 @@ public class Report {
     private Inspection inspection;
 
 }
-

@@ -10,6 +10,8 @@ import server.service.ProposalService;
 
 
 
+import server.dto.ProposalDTO;
+
 
 @RestController
 @RequestMapping("/api/proposals")  // prefix 유지

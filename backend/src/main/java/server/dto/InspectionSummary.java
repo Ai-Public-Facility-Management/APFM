@@ -10,7 +10,7 @@ public class InspectionSummary {
     private Long id;
     private String createDate;        // ex) "2025.08.04 09:13:01"
 
-    private boolean isInspected;      // 작성 여부 (true: 완료, false: 작성 중)
+    private String status;             // ✅ "작성중" / "작성 완료" 상태 문자열
 
     private int repairCount;          // 수리 필요 항목 수
     private int removalCount;         // 철거 필요 항목 수

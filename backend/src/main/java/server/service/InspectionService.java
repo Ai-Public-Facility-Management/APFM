@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,38 +39,33 @@ public class InspectionService {
         return inspections.map(inspection -> {
             Long inspectionId = inspection.getId();
             String formattedDate = formatter.format(inspection.getCreateDate());
-            List<Issue> issues = inspection.getIssues();
+
+            // Issue 조회
+            List<Issue> issues = issueRepository.findByInspection_Id(inspectionId);
 
             int repairCount = (int) issues.stream()
-                .filter(i -> i.getType() == IssueType.REPAIR)
+                .filter(i -> i.getStatus() == IssueStatus.REPAIR)
                 .count();
 
             int removalCount = (int) issues.stream()
-                .filter(i -> i.getType() == IssueType.REMOVE)
+                .filter(i -> i.getStatus() == IssueStatus.REMOVE)
                 .count();
 
             boolean hasIssue = !issues.isEmpty();
             boolean hasReport = inspection.getReport() != null;
 
-            if (inspection.getIsinspected()) {
-                return new InspectionSummary(
-                        inspectionId,
-                        formattedDate,
-                        true,
-                        repairCount,
-                        removalCount,
-                        hasIssue,
-                        hasReport
-                );
-            }
-            return new InspectionSummary(
-                    inspectionId,
-                    formattedDate,
-                    false,
-                    repairCount,
-                    removalCount,
-                    hasIssue,
-                    hasReport
+            // 상태 판별
+            Boolean isInspected = inspection.getIsinspected();
+            String status = Boolean.TRUE.equals(inspection.getIsinspected()) ? "작성 완료" : "작성중";
+
+            return new InspectionListResponseDTO(
+                inspectionId,
+                formattedDate,
+                status,
+                repairCount,
+                removalCount,
+                hasIssue,
+                hasReport
             );
         });
     }
