@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "Proposal")
+@Table(name = "Proposal_table")
 @Data
 public class Proposal {
 
@@ -14,13 +14,11 @@ public class Proposal {
 
     private Integer totalEstimate;
 
-
-
-    @Embedded
-    private Photo content;
+    // ✅ 제안서 파일 URL 및 설명
+    private String fileUrl;
+    private String fileDescription;
 
     @OneToOne
     @JoinColumn(name = "issue_id")
     private Issue issue;
-
 }
