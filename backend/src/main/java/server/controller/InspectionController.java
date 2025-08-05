@@ -6,9 +6,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.dto.InspectionReportRequestDTO;
-import server.dto.InspectionReportResponseDTO;
+import server.dto.InspectionReportDTO;
 import server.dto.InspectionSettingDTO;
+import server.dto.InspectionSummary;
 import server.repository.InspectionSettingRepository;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
@@ -31,7 +31,7 @@ public class InspectionController {
         Pageable pageable
     ) {
         Map<String, Object> response = new HashMap<>();
-        response.put("data", inspectionService.getInspectionListResponse(pageable));
+        response.put("data", inspectionService.getInspectionSummary(pageable));
         return ResponseEntity.ok(response);
     }
 
@@ -53,9 +53,9 @@ public class InspectionController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<InspectionReportResponseDTO> generateReport(
-            @RequestBody InspectionReportRequestDTO requestDTO) {
-        InspectionReportResponseDTO response = inspectionReportService.generateReport(requestDTO.getIssueIds());
+    public ResponseEntity<InspectionReportDTO> generateReport(
+            @RequestBody InspectionReportDTO requestDTO) {
+        InspectionReportDTO response = inspectionReportService.generateReport(requestDTO.getIssueIds());
         return ResponseEntity.ok(response);
     }
 

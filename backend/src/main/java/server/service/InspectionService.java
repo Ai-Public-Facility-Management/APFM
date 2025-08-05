@@ -14,11 +14,13 @@ import server.domain.Inspection;
 import server.domain.InspectionSetting;
 import server.domain.Issue;
 import server.domain.IssueType;
+import server.domain.IssueStatus;
 import server.dto.DashboardInspection;
 import server.dto.InspectionSettingDTO;
 import server.dto.InspectionSummary;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
+import server.repository.IssueRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,9 +32,10 @@ public class InspectionService {
 
     private final InspectionRepository inspectionRepository;
     private final InspectionSettingRepository settingRepository;
+    private final IssueRepository issueRepository;
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)
-    public Page<InspectionSummary> getInspectionListResponse(Pageable pageable) {
+    public Page<InspectionSummary> getInspectionSummary(Pageable pageable) {
         Page<Inspection> inspections = inspectionRepository.findAll(pageable);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
@@ -58,7 +61,7 @@ public class InspectionService {
             Boolean isInspected = inspection.getIsinspected();
             String status = Boolean.TRUE.equals(inspection.getIsinspected()) ? "작성 완료" : "작성중";
 
-            return new InspectionListResponseDTO(
+            return new InspectionSummary(
                 inspectionId,
                 formattedDate,
                 status,
