@@ -5,12 +5,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.transaction.Transactional;
 
+import server.dto.ProposalDTO;
 import server.service.ProposalService;
-import java.util.Map;
-import java.util.List;
 
-import server.dto.ProposalRequestDTO;
-import server.dto.ProposalResponseDTO;
+
+
 
 @RestController
 @RequestMapping("/api/proposals")  // prefix 유지
