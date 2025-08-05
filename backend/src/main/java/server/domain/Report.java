@@ -1,15 +1,13 @@
 package server.domain;
 
-import java.util.Date;
-
 import jakarta.persistence.*;
 import lombok.Data;
-import server.BackendApplication;
+
+import java.util.Date;
 
 @Entity
 @Table(name = "Report")
 @Data
-//<<< DDD / Aggregate Root
 public class Report {
 
     @Id
@@ -23,4 +21,4 @@ public class Report {
     private Inspection inspection;
 
 }
-//>>> DDD / Aggregate Root
+

@@ -1,12 +1,10 @@
 package server.dto;
 
 import lombok.Data;
+import server.domain.IssueType;
+import server.domain.PublicFaType;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import server.domain.*;
 
 @Data
 public class DashboardInspection {

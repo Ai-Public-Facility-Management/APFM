@@ -1,24 +1,26 @@
 package server.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import server.domain.*;
-import server.repository.*;
-import server.dto.*;
+import server.domain.Inspection;
+import server.domain.InspectionSetting;
+import server.domain.Issue;
+import server.domain.IssueType;
+import server.dto.DashboardInspection;
+import server.dto.InspectionSettingDTO;
+import server.dto.InspectionSummary;
+import server.repository.InspectionRepository;
+import server.repository.InspectionSettingRepository;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

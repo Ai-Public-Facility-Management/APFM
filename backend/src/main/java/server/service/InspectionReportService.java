@@ -2,14 +2,10 @@ package server.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import server.dto.InspectionReportResponseDTO;
 import server.domain.Issue;
+import server.dto.InspectionReportResponseDTO;
 import server.repository.IssueRepository;
 
-import java.io.FileWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 

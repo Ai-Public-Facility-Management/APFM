@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import server.domain.FacilityStatus;
 import server.domain.PublicFa;
-import java.util.List;
 
 import java.util.List;
 

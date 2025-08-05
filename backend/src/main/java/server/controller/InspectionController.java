@@ -1,16 +1,17 @@
 package server.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort;
-
-import server.domain.InspectionSetting;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import server.dto.InspectionReportRequestDTO;
+import server.dto.InspectionReportResponseDTO;
+import server.dto.InspectionSettingDTO;
 import server.repository.InspectionSettingRepository;
-import server.service.*;
-import server.dto.*;
+import server.service.InspectionReportService;
+import server.service.InspectionService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,6 @@ import java.util.Map;
 public class InspectionController {
 
     private final InspectionService inspectionService;
-    private final InspectionSettingRepository inspectionSettingRepository;
     private final InspectionReportService inspectionReportService;
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)

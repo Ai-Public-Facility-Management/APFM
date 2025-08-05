@@ -1,13 +1,11 @@
 package server.domain;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import server.dto.PublicFaDTO;
+
+import java.util.Date;
 
 
 @Entity
@@ -76,4 +74,4 @@ public class PublicFa {
         this.setCamera(camera);
     }
 }
-//>>> DDD / Aggregate Root
+
