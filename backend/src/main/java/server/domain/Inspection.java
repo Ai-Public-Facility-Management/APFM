@@ -27,4 +27,8 @@ public class Inspection {
 
     @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Report report;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_email") 
+    private Users user;
 }

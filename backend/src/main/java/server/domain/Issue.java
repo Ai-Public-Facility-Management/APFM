@@ -39,6 +39,10 @@ public class Issue {
     @Column(length = 500)
     private String estimateBasis;
 
+    private int obstructionLevel;
+
+    private String description;
+
     @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
     private PublicFa publicFa;
 

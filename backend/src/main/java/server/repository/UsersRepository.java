@@ -9,5 +9,9 @@ import java.util.Optional;
 @Repository
 public interface UsersRepository extends JpaRepository<Users, String> {
     boolean existsByEmail(String email);
+
     Optional<Users> findByEmail(String email);
+
+    // 🔹 점검 대상 사용자만 조회 (예: 승인된 사용자만)
+    List<Users> findAllByApprovalStatus(ApprovalStatus status);
 }
