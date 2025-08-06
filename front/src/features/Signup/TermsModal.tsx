@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import "./TermsModal.css";
 
 interface TermsModalProps {
@@ -8,22 +9,33 @@ interface TermsModalProps {
 export default function TermsModal({ onClose }: TermsModalProps) {
   const [agreements, setAgreements] = useState({
     all: false,
-    personalInfo: false,
+    termsOfUse: false,
     privacyPolicy: false,
-    onlinePolicy: false,
-    educationInfo: false,
+    thirdPartyConsent: false,
+    identifierInfo: false,
   });
 
   const [activeClause, setActiveClause] = useState<string | null>(null);
+  const [clauseContent, setClauseContent] = useState<string>("");
+
+   // ✅ 약관 파일 불러오기
+  useEffect(() => {
+    if (activeClause) {
+      import(`../../assets/terms/${activeClause}.md`)
+        .then((res) => fetch(res.default).then((r) => r.text()))
+        .then((text) => setClauseContent(text))
+        .catch(() => setClauseContent("약관 내용을 불러오는 데 실패했습니다."));
+    }
+  }, [activeClause]);
 
   const handleAllChange = () => {
     const newValue = !agreements.all;
     setAgreements({
       all: newValue,
-      personalInfo: newValue,
+      termsOfUse: newValue,
       privacyPolicy: newValue,
-      onlinePolicy: newValue,
-      educationInfo: newValue,
+      thirdPartyConsent: newValue,
+      identifierInfo: newValue,
     });
   };
 
@@ -31,10 +43,10 @@ export default function TermsModal({ onClose }: TermsModalProps) {
     setAgreements((prev) => {
       const updated = { ...prev, [field]: !prev[field] };
       const allChecked =
-        updated.personalInfo &&
+        updated.termsOfUse &&
         updated.privacyPolicy &&
-        updated.onlinePolicy &&
-        updated.educationInfo;
+        updated.thirdPartyConsent &&
+        updated.identifierInfo;
       return { ...updated, all: allChecked };
     });
   };
@@ -43,9 +55,9 @@ export default function TermsModal({ onClose }: TermsModalProps) {
   const closeClause = () => setActiveClause(null);
 
   const isAllRequiredAgreed =
-    agreements.personalInfo &&
+    agreements.termsOfUse &&
     agreements.privacyPolicy &&
-    agreements.onlinePolicy;
+    agreements.thirdPartyConsent;
 
   return (
     <div className="modal-backdrop">
@@ -73,11 +85,11 @@ export default function TermsModal({ onClose }: TermsModalProps) {
         <div className="agreement-box">
           <div className="agreement-item">
             <div className="agreement-title">
-              [필수] APFM 이용약관 <button type="button" onClick={() => openClause("personalInfo")}>약관읽기</button>
+              [필수] APFM 이용약관 <button type="button" onClick={() => openClause("termsOfUse")}>약관읽기</button>
             </div>
             <p>APFM 이용약관에 대한 안내 사항을 읽고 동의합니다.</p>
-            <label><input type="radio" name="personalInfo" checked={!agreements.personalInfo} onChange={() => handleChange("personalInfo")} /> 동의안함</label>
-            <label><input type="radio" name="personalInfo" checked={agreements.personalInfo} onChange={() => handleChange("personalInfo")} /> 동의함</label>
+            <label><input type="radio" name="termsOfUse" checked={!agreements.termsOfUse} onChange={() => handleChange("termsOfUse")} /> 동의안함</label>
+            <label><input type="radio" name="termsOfUse" checked={agreements.termsOfUse} onChange={() => handleChange("termsOfUse")} /> 동의함</label>
           </div>
 
           <div className="agreement-item">
@@ -91,24 +103,26 @@ export default function TermsModal({ onClose }: TermsModalProps) {
 
           <div className="agreement-item">
             <div className="agreement-title">
-              [필수] 개인정보 제3자 제공 동의 <button type="button" onClick={() => openClause("onlinePolicy")}>약관읽기</button>
+              [필수] 개인정보 제3자 제공 동의 <button type="button" onClick={() => openClause("thirdPartyConsent")}>약관읽기</button>
             </div>
             <p>개인정보 제3자 제공 정책에 대한 동의서를 읽고 동의합니다.</p>
-            <label><input type="radio" name="onlinePolicy" checked={!agreements.onlinePolicy} onChange={() => handleChange("onlinePolicy")} /> 동의안함</label>
-            <label><input type="radio" name="onlinePolicy" checked={agreements.onlinePolicy} onChange={() => handleChange("onlinePolicy")} /> 동의함</label>
+            <label><input type="radio" name="thirdPartyConsent" checked={!agreements.thirdPartyConsent} onChange={() => handleChange("thirdPartyConsent")} /> 동의안함</label>
+            <label><input type="radio" name="thirdPartyConsent" checked={agreements.thirdPartyConsent} onChange={() => handleChange("thirdPartyConsent")} /> 동의함</label>
           </div>
 
           <div className="agreement-item">
             <div className="agreement-title">
-              [선택] 고유식별정보 수집 및 이용 <button type="button" onClick={() => openClause("educationInfo")}>약관읽기</button>
+              [선택] 고유식별정보 수집 및 이용 <button type="button" onClick={() => openClause("identifierInfo")}>약관읽기</button>
             </div>
             <p>고유식별정보 수집 및 이용에 대한 안내 사항을 읽고 이해했습니다.</p>
             <label>
               <input
                 type="checkbox"
-                checked={agreements.educationInfo}
-                onChange={() => handleChange("educationInfo")}
-              /> 확인함
+                name="identifierInfo"
+                checked={agreements.identifierInfo}
+                onChange={() => handleChange("identifierInfo")}
+              />{" "}
+              확인함
             </label>
           </div>
         </div>
@@ -120,8 +134,10 @@ export default function TermsModal({ onClose }: TermsModalProps) {
         {activeClause && (
           <div className="clause-modal">
             <div className="clause-content">
-              <h3>약관 상세 보기: {activeClause}</h3>
-              <p>여기에 {activeClause} 약관의 상세 내용이 표시됩니다. 실제로는 API 또는 파일에서 불러올 수 있습니다.</p>
+              <h3>약관 상세 보기</h3>
+              <div className="clause-scroll-box">
+                <ReactMarkdown>{clauseContent}</ReactMarkdown>
+              </div>
               <button onClick={closeClause}>닫기</button>
             </div>
           </div>
