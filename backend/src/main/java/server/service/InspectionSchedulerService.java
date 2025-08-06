@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import server.domain.Users;
-import server.repository.UserRepository;
+import server.repository.UsersRepository;
 
 import java.util.*;
 
@@ -20,6 +20,7 @@ public class InspectionSchedulerService {
 
     // 🔹 REST 요청을 보내기 위한 도구 (FastAPI 호출용)
     private final RestTemplate restTemplate = new RestTemplate();
+    private final UsersRepository usersRepository;
 
     // ✅ [1] 주기적인 작업 수행: cron 기준 (매시 정각에 실행됨)
     @Scheduled(cron = "0 0 * * * *") // 실제 운영 시: 사용자마다 개별 스케줄을 동적으로 관리
@@ -70,7 +71,7 @@ public class InspectionSchedulerService {
     // ✅ [3] 테스트용 사용자 리스트
     private List<String> getEmailsToInspect() {
         // 🔧 조건 추가 가능: 승인된 사용자만, 특정 부서만 등
-        List<Users> users = userRepository.findAll();
+        List<Users> users = usersRepository.findAll();
 
         return users.stream()
                 .map(Users::getEmail)

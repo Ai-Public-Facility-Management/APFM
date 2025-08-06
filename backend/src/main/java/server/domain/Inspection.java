@@ -31,4 +31,6 @@ public class Inspection {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_email") 
     private Users user;
+
+    private String reportUrl;
 }

@@ -43,6 +43,8 @@ public class Issue {
 
     private String description;
 
+    private String location;
+
     @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
     private PublicFa publicFa;
 
