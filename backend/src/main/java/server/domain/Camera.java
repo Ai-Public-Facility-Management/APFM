@@ -6,7 +6,7 @@ import lombok.Data;
 
 
 @Entity
-@Table(name = "Camera_table")
+@Table(name = "Camera")
 @Data
 //<<< DDD / Aggregate Root
 public class Camera {
@@ -19,11 +19,6 @@ public class Camera {
 
     private String ip;
 
-    // public static CameraRepository repository() {
-    //     CameraRepository cameraRepository = BackendApplication.applicationContext.getBean(
-    //         CameraRepository.class
-    //     );
-    //     return cameraRepository;
-    // }
+
 }
 //>>> DDD / Aggregate Root

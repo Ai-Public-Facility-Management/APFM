@@ -12,6 +12,7 @@ import server.repository.UsersRepository;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
+
     private final UsersRepository userRepository;
 
     @Override
