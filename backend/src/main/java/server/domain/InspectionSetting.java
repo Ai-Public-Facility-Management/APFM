@@ -1,10 +1,9 @@
 package server.domain;
 
+import lombok.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "InspectionSetting")
@@ -18,6 +17,8 @@ public class InspectionSetting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String email;
+
     // 시작 날짜 (ex: "2024-12-12")
     private String startDate;
 
@@ -29,5 +30,8 @@ public class InspectionSetting {
 
     // 지도 주소 (선택사항, 추후 사용)
     private String address;
+
+    // ✅ 마지막 점검 실행 시각 (nullable 가능)
+    private LocalDateTime lastInspectedDate;
 
 }
