@@ -118,15 +118,30 @@
 }
 
 .link-terms {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
   font-weight: 500;
   text-decoration: none;
   color: #333;
+  cursor: pointer;
 }
 
 .link-privacy {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
   font-weight: bold;
   color: #002f6c;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.link-terms:hover,
+.link-privacy:hover {
+  text-decoration: underline;
 }
 
 .accessibility-mark {
@@ -140,3 +155,45 @@
   margin-top: 10px;
   font-size: 12px;
 }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 60%;
+  max-height: 80vh;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.modal-button {
+  float: right;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-button:hover {
+  background-color: #0056b3;
+}
+
+.markdown-box {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
