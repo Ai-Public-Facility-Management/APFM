@@ -19,33 +19,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-<<<<<<< HEAD
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/h2-console/**", "/api/auth/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())  // H2 콘솔 iframe 허용
-                )
-                .formLogin(login -> login.disable()) // 🔒 Postman 무한 리다이렉트 방지
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setContentType("text/plain;charset=UTF-8");
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            response.getWriter().write("로그아웃 성공");
-                        })
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-=======
             .csrf().disable()
             .cors().disable()
         //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
@@ -67,7 +40,7 @@ public class SecurityConfig {
         //         .logoutSuccessUrl("/login")
         //         .invalidateHttpSession(true)
         //         .deleteCookies("JSESSIONID");
->>>>>>> main
+        return http.build();
     }
 
     @Bean

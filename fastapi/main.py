@@ -7,7 +7,7 @@ from langchain_community.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings  # ✅ 변경된 임베딩
 
 # .env 로부터 환경변수 로딩
-load_dotenv()
+load_dotenv(dotenv_path="fast.env")
 
 app = FastAPI()
 

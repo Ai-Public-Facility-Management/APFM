@@ -4,7 +4,7 @@ import requests
 url = "http://localhost:8000/estimate"
 
 # 보낼 이미지 파일 경로
-image_path = "/Users/ohjimin/apfm_fastapi/APFM/fastapi/sample_image.png"  # 실제 이미지 경로로 변경하세요
+image_path = "sample_image.png"  # 실제 이미지 경로로 변경하세요
 
 # 파일 열어서 POST 요청
 with open(image_path, "rb") as image_file:

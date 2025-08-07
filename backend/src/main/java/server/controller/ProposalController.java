@@ -1,11 +1,6 @@
 package server.controller;
 
-<<<<<<< HEAD
 import jakarta.transaction.Transactional;
-=======
-import javax.transaction.Transactional;
-
->>>>>>> main
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import server.repository.*;
