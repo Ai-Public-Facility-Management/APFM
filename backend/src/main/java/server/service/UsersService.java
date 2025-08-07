@@ -33,6 +33,10 @@ public class UsersService {
             throw new RuntimeException("이미 가입된 사용자입니다.");
         }
 
+        if (!isValidPassword(request.getPassword())) {
+            throw new IllegalArgumentException("비밀번호는 10자 이상이며 특수문자 1개 이상을 포함해야 합니다.");
+        }
+
         Users user = new Users();
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
@@ -41,6 +45,13 @@ public class UsersService {
         user.setDepartment(Department.valueOf(String.valueOf(request.getDepartment())));
 
         usersRepository.save(user);
+    }
+
+    // 비밀번호 조건
+    public boolean isValidPassword(String password) {
+        // 정규식: 최소 10자, 특수문자 1개 이상 포함
+        String pattern = "^(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{10,}$";
+        return password != null && password.matches(pattern);
     }
 
     // 기타 기본 기능 유지
