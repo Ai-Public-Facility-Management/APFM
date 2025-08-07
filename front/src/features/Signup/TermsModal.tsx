@@ -17,14 +17,22 @@ export default function TermsModal({ onClose }: TermsModalProps) {
 
   const [activeClause, setActiveClause] = useState<string | null>(null);
   const [clauseContent, setClauseContent] = useState<string>("");
+   const [loading, setLoading] = useState(false);
 
    // ✅ 약관 파일 불러오기
   useEffect(() => {
     if (activeClause) {
+      setLoading(true);
       import(`../../assets/terms/${activeClause}.md`)
         .then((res) => fetch(res.default).then((r) => r.text()))
-        .then((text) => setClauseContent(text))
-        .catch(() => setClauseContent("약관 내용을 불러오는 데 실패했습니다."));
+        .then((text) => {
+          setClauseContent(text);
+          setLoading(false);
+        })
+        .catch(() => {
+          setClauseContent("약관 내용을 불러오는 데 실패했습니다.");
+          setLoading(false);
+        });
     }
   }, [activeClause]);
 
@@ -136,7 +144,11 @@ export default function TermsModal({ onClose }: TermsModalProps) {
             <div className="clause-content">
               <h3>약관 상세 보기</h3>
               <div className="clause-scroll-box">
-                <ReactMarkdown>{clauseContent}</ReactMarkdown>
+                {loading ? (
+                  <div className="spinner" />
+                ) : (
+                  <ReactMarkdown>{clauseContent}</ReactMarkdown>
+                )}
               </div>
               <button onClick={closeClause}>닫기</button>
             </div>
