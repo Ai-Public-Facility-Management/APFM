@@ -15,7 +15,7 @@ import server.dto.IssueDTO;
 public class Issue {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long resultId;

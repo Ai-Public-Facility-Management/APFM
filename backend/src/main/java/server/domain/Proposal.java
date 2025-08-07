@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "Proposal_table")
+@Table(name = "Proposal")
 @Data
 public class Proposal {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 고유 식별자
 
     private Integer totalEstimate;
