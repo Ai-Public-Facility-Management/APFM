@@ -1,6 +1,5 @@
 package server.controller;
 
-import lombok.RequiredArgsConstructor;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -9,11 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.domain.PublicFa;
 import server.dto.PublicFaDTO;
-import server.dto.ResponseFa;
 import server.service.PublicFaService;
 
 import java.util.HashMap;
-
 import java.util.Map;
 
 

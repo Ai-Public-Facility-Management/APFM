@@ -1,6 +1,6 @@
 package server.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -26,7 +26,7 @@ public class Inspection {
     @OneToMany(mappedBy = "inspection",fetch = FetchType.LAZY)
     private List<Issue> issues;
 
-    @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL)
     private Report report;
 
 

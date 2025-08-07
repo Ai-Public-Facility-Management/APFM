@@ -45,11 +45,7 @@ public class InspectionSchedulerService {
 
         if (isDue(setting, now)) {
             // FastAPI 요청
-            List<Camera> cameras = cameraRepository.findAll();
-
-
             callDetect();
-
             // 마지막 점검일 갱신
             setting.setLastInspectedDate(now);
             inspectionSettingRepository.save(setting);

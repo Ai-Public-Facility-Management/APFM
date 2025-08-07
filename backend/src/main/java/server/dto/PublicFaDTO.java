@@ -2,7 +2,6 @@ package server.dto;
 
 import lombok.Data;
 import server.domain.FacilityStatus;
-import server.domain.PublicFaStatus;
 import server.domain.PublicFaType;
 import server.domain.Section;
 

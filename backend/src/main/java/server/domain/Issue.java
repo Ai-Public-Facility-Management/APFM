@@ -1,12 +1,11 @@
 package server.domain;
 
-import java.util.Base64;
-import java.util.Date;
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.dto.IssueDTO;
+
+import java.util.Date;
 
 
 @Entity

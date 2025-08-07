@@ -2,11 +2,7 @@ package server.dto;
 
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
-
-import server.domain.IssueStatus;
-import server.domain.ApprovalStatus;
 
 @Data
 public class InspectionResultDTO {

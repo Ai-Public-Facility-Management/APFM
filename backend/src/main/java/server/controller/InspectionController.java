@@ -8,9 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.dto.InspectionReportDTO;
 import server.dto.InspectionSettingDTO;
-import server.dto.InspectionSummary;
-import server.dto.InspectionResultDTO;
-import server.repository.InspectionSettingRepository;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
 
