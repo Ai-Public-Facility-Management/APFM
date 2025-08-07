@@ -1,21 +1,17 @@
 import requests
+import base64
+from PIL import Image
+import io
 
-# FastAPI 서버 주소
-url = "http://localhost:8000/estimate"
-
-# 보낼 이미지 파일 경로
-image_path = "/Users/ohjimin/apfm_fastapi/APFM/fastapi/sample_image.png"  # 실제 이미지 경로로 변경하세요
-
-# 파일 열어서 POST 요청
-with open(image_path, "rb") as image_file:
-    files = {"image": image_file}
-    response = requests.post(url, files=files)
-
-# 결과 출력
-if response.status_code == 200:
-    data = response.json()
-    print("📷 시설 분석 결과:", data["vision_analysis"])
-    print("💰 견적 결과:", data["cost_estimate"])
-else:
-    print("❌ 요청 실패:", response.status_code)
-    print(response.text)
+# 예시: 서버에 이미지 업로드 후 받은 response
+url = 'http://localhost:8080/predict'
+with open('testimg/sample_image.png', 'rb') as f:
+    response = requests.post(url, files={'image': f})
+res_json = response.json()
+print(res_json["detections"])
+# crops를 순회하며 이미지로 저장/띄우기
+for idx, b64_img in enumerate(res_json['crops']):
+    img_bytes = base64.b64decode(b64_img)
+    img = Image.open(io.BytesIO(img_bytes))
+    img.save(f'crop_{idx}.jpeg')    # 파일로 저장
+    img.show()                     # 바로 보기 (윈도우라면 이미지 뷰어로 뜸)
