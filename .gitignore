@@ -38,3 +38,8 @@ out/
 
 **/venv/
 **/.venv/
+
+__pycache__/
+*.pyc
+*.bin
+chroma/
