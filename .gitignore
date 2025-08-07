@@ -42,4 +42,4 @@ out/
 __pycache__/
 *.pyc
 *.bin
-chroma/
+chroma.sqlite3
