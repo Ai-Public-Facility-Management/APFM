@@ -16,9 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.domain.InspectionSetting;
 import server.repository.InspectionSettingRepository;
+import server.service.*;
+import server.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.io.File;
 
 @Slf4j
 @Service
@@ -27,6 +30,7 @@ public class InspectionSchedulerService {
 
     private final InspectionSettingRepository inspectionSettingRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final InspectionService inspectionService;
 
     // ✅ [1] 주기적으로 점검 수행 (매시 정각 실행)
     @Scheduled(cron = "0 0 * * * *")
@@ -92,4 +96,5 @@ public class InspectionSchedulerService {
         } catch (Exception e) {
             log.error("❌ FastAPI 호출 실패 ({}): {}", email, e.getMessage());
     }
+}
 }
