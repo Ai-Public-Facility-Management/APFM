@@ -1,48 +1,73 @@
 package server.controller;
 
-import java.util.Optional;
-
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.RestController;
-import server.domain.*;
+import server.dto.InspectionReportDTO;
+import server.dto.InspectionSettingDTO;
+import server.dto.InspectionSummary;
+import server.dto.InspectionResultDTO;
+import server.repository.InspectionSettingRepository;
+import server.service.InspectionReportService;
+import server.service.InspectionService;
 
-//<<< Clean Arch / Inbound Adaptor
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-// @RequestMapping(value="/inspections")
-@Transactional
+@RequestMapping("/api/inspection")
+@RequiredArgsConstructor
 public class InspectionController {
 
-    @Autowired
-    InspectionService inspectionService;
+    private final InspectionService inspectionService;
+    private final InspectionReportService inspectionReportService;
 
-    @PostMapping("/inspections")
-    public Inspection create(@RequestBody Inspection inspection) {
-        return inspectionService.createInspection(
-            inspection.getCreateDate(), inspection.getIsinspected()
-        );
+    // ✅ 정기점검 리스트 조회 (페이징 포함)
+    @GetMapping("/all")
+    public ResponseEntity<Map<String, Object>> getInspectionList(
+        @PageableDefault(size = 10, sort = "createDate", direction = Sort.Direction.DESC)
+        Pageable pageable
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", inspectionService.getInspectionSummary(pageable));
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/inspections")
-    public Iterable<Inspection> getAll() {
-        return inspectionService.getAllInspections();
+    // ✅ 정기점검 리스트 조회 (메인페이지)
+    @GetMapping("/dashboard")
+    public ResponseEntity<Map<String, Object>> getDashboardInspections(
+        @RequestParam(defaultValue = "5") int count) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", inspectionService.getDashboardInspections(count));
+
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/inspections/{id}")
-    public Optional<Inspection> getOne(@PathVariable("id") Long id) {
-        return inspectionService.getInspection(id);
+    // ✅ 점검 주기 설정 저장
+    @PutMapping("/setting")
+    public ResponseEntity<Map<String, Object>> saveSetting(@RequestBody InspectionSettingDTO dto) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", inspectionService.setInspectionSetting(dto));
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/inspections/{id}")
-    public Inspection update(@PathVariable("id") Long id, @RequestBody Inspection updated) {
-        return inspectionService.updateInspection(id, updated.getIsinspected());
+    // ✅ 점검 보고서 생성 요청 (LLM)
+    @PostMapping("/generate")
+    public ResponseEntity<InspectionReportDTO> generateReport(
+            @RequestBody InspectionReportDTO requestDTO) {
+        InspectionReportDTO response = inspectionReportService.generateReport(requestDTO.getIssueIds());
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/inspections/{id}")
-    public void delete(@PathVariable("id") Long id) {
-        inspectionService.deleteInspection(id);
+    // ✅ FastAPI 점검 결과 저장
+    //점검 정보 저장
+    @PostMapping("/result")
+    public ResponseEntity<Void> saveInspectionResult(@RequestBody InspectionResultDTO dto) {
+        inspectionService.saveInspectionResult(dto);
+        return ResponseEntity.ok().build(); // 저장만 하고 응답은 200 OK
     }
+
 }
-//>>> Clean Arch / Inbound Adaptor

@@ -1,0 +1,134 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: white;
+  padding: 24px;
+  width: 90%;
+  max-width: 640px;
+  border-radius: 10px;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+.agreement-all {
+  margin-bottom: 16px;
+}
+
+.agree-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.agree-description {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+}
+
+
+.agreement-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.agreement-item {
+  border: 1px solid #ccc;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.agreement-title {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.agreement-title button {
+  background: #eee;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.modal-buttons {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  background: #0069e0;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 약관 상세 모달 전체 백그라운드 */
+.clause-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+/* 약관 상세 내용 박스 */
+.clause-content {
+  background: white;
+  width: 70%; /* 충분히 넓게 */
+  max-height: 80vh; /* 너무 커지지 않도록 제한 */
+  overflow-y: auto; /* 스크롤 */
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: relative;
+  display: flex; 
+  flex-direction: column;
+}
+
+/* 닫기 버튼 위치 */
+.clause-content button {
+  align-self: flex-end;
+  background-color: #007bff;
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.clause-content button:hover {
+  background-color: #0056b3;  /* hover 효과 */
+}
+

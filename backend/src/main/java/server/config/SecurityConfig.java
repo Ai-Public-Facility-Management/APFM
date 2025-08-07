@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import server.domain.JwtUtil;
 import server.service.CustomUserDetailsService;
 import server.service.TokenBlacklistService;
@@ -18,28 +19,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-        http
-            .csrf().disable()
-            .cors().disable()
-        //     .formLogin().disable() // 기본 HTML 로그인 폼 비활성화
-            .httpBasic().disable()
-            .authorizeRequests()
-                // .antMatchers(
-                //     "/h2-console/**", "/api/auth/**","/api/users/check-email", "/api/admin/**",
-                //     "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/issues/**")
-                // .permitAll()
-                // .anyRequest().authenticated()
-                .anyRequest().permitAll()
-            .and()
-            .headers().frameOptions().sameOrigin();
-        //     .and()
-        //     .formLogin()
-        //     .and()
-        //     .logout()
-        //         .logoutUrl("/api/auth/logout")
-        //         .logoutSuccessUrl("/login")
-        //         .invalidateHttpSession(true)
-        //         .deleteCookies("JSESSIONID");
+
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(
+                                 "/api/auth/**","/api/publicfa/**","/api/issue/**",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())  // H2 콘솔 iframe 허용
+                )
+                .formLogin(login -> login.disable()) // 🔒 Postman 무한 리다이렉트 방지
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setContentType("text/plain;charset=UTF-8");
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.getWriter().write("로그아웃 성공");
+                        })
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
