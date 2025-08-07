@@ -7,6 +7,7 @@ import server.domain.*;
 import server.service.UsersService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -46,4 +47,19 @@ public class UsersController {
         boolean isDuplicated = usersService.isEmailDuplicated(email);
         return ResponseEntity.ok(isDuplicated);
     } //email 중복 확인 api
+
+    //비밀번호 초기화 요청
+    @GetMapping("/reset")
+    public ResponseEntity<Boolean> reqestReset(@RequestParam String email) {
+
+        usersService.resetEmail(email);
+        return ResponseEntity.ok(true);
+    }
+
+    //비밀번호 초기화
+    @PostMapping("/reset-confime")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> payload) {
+        return ResponseEntity.ok(usersService.resetPassword(payload));
+    }
+
 }
