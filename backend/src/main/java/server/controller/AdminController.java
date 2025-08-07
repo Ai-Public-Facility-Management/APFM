@@ -2,15 +2,14 @@ package server.controller;
 
 import server.domain.ApprovalStatus;
 import server.domain.Users;
-import server.dto.UserAdminResponseDTO;
 import server.repository.UsersRepository;
+import server.dto.UserAdminResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/api/admin")
@@ -49,7 +48,6 @@ public class AdminController {
     }
 
 
-    // Controller
     @GetMapping("/pending")
     public List<UserAdminResponseDTO> getPendingUsers() {
         return usersRepository.findAllByApprovalStatus(ApprovalStatus.PENDING)
