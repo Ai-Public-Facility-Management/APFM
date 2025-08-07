@@ -50,11 +50,11 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping()
-    @ResponseBody
-    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
-        return publicFaService.addPublicFa(publicFaDTO);
-    }
+//    @PostMapping()
+//    @ResponseBody
+//    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
+//        return publicFaService.addPublicFa(publicFaDTO);
+//    }
 
     @PostMapping("/approve")
     public PublicFa approveBox(@RequestParam Long id) {

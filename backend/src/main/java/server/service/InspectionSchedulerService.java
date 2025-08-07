@@ -2,26 +2,27 @@
 
 package server.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import org.springframework.web.client.RestTemplate;
+import server.domain.Camera;
 import server.domain.InspectionSetting;
+import server.dto.InspectionResultDTO;
+import server.repository.CameraRepository;
 import server.repository.InspectionSettingRepository;
-import server.service.*;
-import server.dto.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -31,25 +32,29 @@ public class InspectionSchedulerService {
     private final InspectionSettingRepository inspectionSettingRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final InspectionService inspectionService;
+    private final CameraRepository  cameraRepository;
 
     // ✅ [1] 주기적으로 점검 수행 (매시 정각 실행)
     @Scheduled(cron = "0 0 * * * *")
     public void performScheduledInspections() {
         log.info("🕒 주기적 점검 시작");
 
-        List<InspectionSetting> allSettings = inspectionSettingRepository.findAll();
+        InspectionSetting setting = inspectionSettingRepository.findById(1L).orElseThrow();
         LocalDateTime now = LocalDateTime.now();
 
-        for (InspectionSetting setting : allSettings) {
-            if (isDue(setting, now)) {
-                // FastAPI 요청
-                callFastApi(setting.getEmail());
 
-                // 마지막 점검일 갱신
-                setting.setLastInspectedDate(now);
-                inspectionSettingRepository.save(setting);
-            }
+        if (isDue(setting, now)) {
+            // FastAPI 요청
+            List<Camera> cameras = cameraRepository.findAll();
+
+
+            callDetect();
+
+            // 마지막 점검일 갱신
+            setting.setLastInspectedDate(now);
+            inspectionSettingRepository.save(setting);
         }
+
     }
 
     // ✅ [2] 점검 도래 여부: 마지막 점검일 + 주기 ≤ 현재
@@ -57,25 +62,25 @@ public class InspectionSchedulerService {
         if (setting.getInspectionCycle() == null) return false;
 
         LocalDateTime last = setting.getLastInspectedDate();
-        if (last == null) return true;  // 첫 점검
+        if (last == null) return true;
 
         return !now.isBefore(last.plusDays(setting.getInspectionCycle()));
     }
 
     // ✅ [3] FastAPI 점검 요청
-    public void callFastApi(String email) {
+    public void callDetect() {
         try {
             // 1️⃣ FastAPI 서버 URL
+            List<Camera> cameras = cameraRepository.findAll();
             String fastapiUrl = "http://localhost:8000/predict";
 
-            // 2️⃣ 이미지 파일 준비 (나중에 CCTV 캡처 이미지로 교체)
-            File imageFile = new File("AI/testimg/sample_image.png"); // 실제 경로로 수정 필요
-            FileSystemResource fileResource = new FileSystemResource(imageFile);
+//            // 2️⃣ 이미지 파일 준비 (나중에 CCTV 캡처 이미지로 교체)
+//            File imageFile = new File("AI/testimg/sample_image.png"); // 실제 경로로 수정 필요
+//            FileSystemResource fileResource = new FileSystemResource(imageFile);
 
             // 3️⃣ Multipart Form 구성
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("image", fileResource);
-            body.add("email", email);
+            body.add("cctv", cameras);
 
             // 4️⃣ HTTP Header 설정
             HttpHeaders headers = new HttpHeaders();
@@ -86,15 +91,15 @@ public class InspectionSchedulerService {
     
             // 6️⃣ 요청 전송
             ResponseEntity<String> response = restTemplate.postForEntity(fastapiUrl, requestEntity, String.class);
-            log.info("✅ FastAPI 응답 수신 ({}): {}", email, response.getBody());
-    
+            log.info("✅ FastAPI 응답 수신 : {}", response.getBody());
+
             // 7️⃣ 결과 DTO로 파싱 후 저장
             ObjectMapper objectMapper = new ObjectMapper();
-            InspectionResultDTO dto = objectMapper.readValue(response.getBody(), InspectionResultDTO.class);
-            inspectionService.saveInspectionResult(dto);
+            List<InspectionResultDTO> dtos = Collections.singletonList(objectMapper.readValue(response.getBody(), InspectionResultDTO.class));
+            inspectionService.saveInspectionResult(dtos);
     
         } catch (Exception e) {
-            log.error("❌ FastAPI 호출 실패 ({}): {}", email, e.getMessage());
+            log.error("❌ FastAPI 호출 실패 : {}",e.getMessage());
     }
 }
 }

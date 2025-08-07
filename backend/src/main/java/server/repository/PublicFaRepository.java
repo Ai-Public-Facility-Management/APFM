@@ -14,7 +14,7 @@ import java.util.List;
 public interface PublicFaRepository
     extends JpaRepository<PublicFa, Long> {
 
-    List<PublicFa> findByStatusAndCameraId(FacilityStatus status, Long cameraId);
+    List<PublicFa> findByCameraId(Long cameraId);
 
     List<PublicFa> findByStatusOrderByIdDesc(Pageable pageable,FacilityStatus status);
 

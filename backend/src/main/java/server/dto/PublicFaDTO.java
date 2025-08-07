@@ -18,4 +18,13 @@ public class PublicFaDTO {
     private Date lastRepair;
     private FacilityStatus status;
     private Long obstruction;
+
+    public PublicFaDTO(PublicFaType type, Section section, FacilityStatus status) {
+        this.setType(type);
+        this.setSection(section);
+        this.setStatus(status);
+        this.setInstallDate(null);
+        this.setLastRepair(null);
+        this.setObstruction(null);
+    }
 }

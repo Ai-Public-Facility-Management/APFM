@@ -16,6 +16,7 @@ import server.dto.*;
 import server.repository.*;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
@@ -26,9 +27,8 @@ public class InspectionService {
 
     private final InspectionRepository inspectionRepository;
     private final InspectionSettingRepository settingRepository;
-    private final IssueRepository issueRepository;
-    private final UsersRepository usersRepository;
-    private final PublicFaRepository publicFaRepository;
+    private final IssueService issueService;
+    private final PublicFaService publicFaService;
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)
     public Page<InspectionSummary> getInspectionSummary(Pageable pageable) {
@@ -40,7 +40,7 @@ public class InspectionService {
             String formattedDate = formatter.format(inspection.getCreateDate());
 
             // Issue 조회
-            List<Issue> issues = issueRepository.findByInspection_Id(inspectionId);
+            List<Issue> issues = inspection.getIssues();
 
             int repairCount = (int) issues.stream()
                 .filter(i -> i.getStatus() == IssueStatus.REPAIR)
@@ -113,40 +113,30 @@ public class InspectionService {
 
     // ✅ FastAPI 응답 결과를 저장하는 메서드
     @Transactional
-    public void saveInspectionResult(InspectionResultDTO result) {
-        // 1️⃣ 사용자 조회
-        Users user = usersRepository.findByEmail(result.getEmail())
-            .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " + result.getEmail()));
+    public void saveInspectionResult(List<InspectionResultDTO> results) {
 
-        // 2️⃣ Inspection 생성
+//        // 1️⃣ 사용자 조회
+//        Users user = usersRepository.findByEmail(result.getEmail())
+//            .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " + result.getEmail()));
+
+        // Inspection 생성
         Inspection inspection = new Inspection();
-        inspection.setUser(user);
-        inspection.setCreateDate(result.getInspectionDate());
-        inspection.setReportUrl(result.getReportUrl());
+        inspection.setCreateDate(new Date());
+        inspection.setReportUrl(null);
         inspection.setIsinspected(true); // 점검 완료 상태
         inspectionRepository.save(inspection);
 
-        // 3️⃣ 이슈 리스트 순회하여 저장
-        for (InspectionResultDTO.IssueDTO issueDto : result.getIssues()) {
-            PublicFa facility = publicFaRepository.findById(issueDto.getFacilityId())
-                .orElseThrow(() -> new IllegalArgumentException("시설물 정보가 없습니다: ID " + issueDto.getFacilityId()));
+        //리스트 순회하여 저장
+        for (InspectionResultDTO dto : results) {
+            if(dto.getDetections().getStatus().equals("NOMAL")) {
+                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "NORMAL");
+            }else{
+                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
+                Issue issue = issueService.addIssue(dto.getDetections().getStatus(),1L,dto.getDetections().getCost_estimate(),dto.getOriginal_image(),publicFa,inspection);
+                publicFa.setIssue(issue);
+                inspection.getIssues().add(issue);
+            }
 
-            // imageUrl을 기반으로 Photo 객체 생성
-            Photo photo = new Photo();
-            photo.setUrl(issueDto.getImageUrl());
-
-            Issue issue = new Issue();
-            issue.setInspection(inspection);
-            issue.setPublicFa(facility);
-            issue.setImage(photo);
-            issue.setStatus(issueDto.getStatus());
-            issue.setContent(issueDto.getContent());
-            issue.setLocation(issueDto.getLocation());
-            issue.setObstructionLevel(issueDto.getObstructionLevel());
-            issue.setDescription(issueDto.getDescription());
-            issue.setCreationDate(result.getInspectionDate());
-
-            issueRepository.save(issue);
         }
     }
 

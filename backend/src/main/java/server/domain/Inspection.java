@@ -1,5 +1,6 @@
 package server.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,15 +23,12 @@ public class Inspection {
     private Boolean isinspected;
 
     // ✅ 연관관계 추가
-    @OneToMany(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "inspection",fetch = FetchType.LAZY)
     private List<Issue> issues;
 
     @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Report report;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_email") 
-    private Users user;
 
     private String reportUrl;
 }

@@ -4,6 +4,8 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 
 @Entity
 @Table(name = "Camera")
@@ -18,6 +20,9 @@ public class Camera {
     private String location;
 
     private String ip;
+
+    @OneToMany(mappedBy = "camera",cascade = CascadeType.ALL)
+    private List<PublicFa>  publicFa;
 
 
 }

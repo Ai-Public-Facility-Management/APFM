@@ -1,5 +1,6 @@
 package server.domain;
 
+import java.util.Base64;
 import java.util.Date;
 
 import jakarta.persistence.*;
@@ -45,11 +46,12 @@ public class Issue {
 
     private String location;
 
-    @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "publicFa_id", unique = true)
     private PublicFa publicFa;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name = "inspection_id")
+    @ManyToOne
+    @JoinColumn(name="inspection_id")
     private Inspection inspection;
 
     public Issue(IssueDTO issueDTO) {
@@ -58,6 +60,14 @@ public class Issue {
         this.image = issueDTO.getImage();
         this.estimateBasis = issueDTO.getEstimateBasis();
         this.estimate = issueDTO.getEstimate();
+    }
+
+    public Issue(IssueType type,Long estimate,String estimateBasis,String image) {
+        this.creationDate = new Date();
+        this.type = type;
+        this.image = new Photo(image);
+        this.estimateBasis = estimateBasis;
+        this.estimate = estimate;
     }
 
     private String content;

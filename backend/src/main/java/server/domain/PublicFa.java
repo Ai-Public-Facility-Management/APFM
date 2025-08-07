@@ -38,14 +38,16 @@ public class PublicFa {
 
     private Long obstruction;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "camera_id")
     private Camera camera;
 
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "issue_id", unique = true)
+    @OneToOne(mappedBy = "publicFa",cascade = CascadeType.ALL)
     private Issue issue;
 
+    //    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
+//    @JoinColumn(name = "inspection_id")
+//    private Inspection inspection;
 
     public PublicFa updateFa(PublicFaDTO publicFaDTO) {
         this.setStatus(publicFaDTO.getStatus());
@@ -65,13 +67,13 @@ public class PublicFa {
 
     public PublicFa(PublicFaDTO publicFaDTO,Camera camera) {
         //수정 필요
-        this.setStatus(FacilityStatus.NORMAL);
-        this.setObstruction(publicFaDTO.getObstruction());
-        this.setLastRepair(publicFaDTO.getLastRepair());
+        this.setStatus(publicFaDTO.getStatus());
         this.setType(publicFaDTO.getType());
         this.setSection(publicFaDTO.getSection());
-        this.setInstallDate(publicFaDTO.getInstallDate());
         this.setCamera(camera);
+        this.setInstallDate(publicFaDTO.getInstallDate());
+        this.setLastRepair(publicFaDTO.getLastRepair());
+        this.setObstruction(publicFaDTO.getObstruction());
     }
 }
 
