@@ -1,0 +1,10 @@
+from parse_report_sections import parse_report_sections
+
+def parse_report_node(state: dict) -> dict:
+    report_text = state.get("final_report")
+    if not report_text:
+        raise ValueError("final_report가 state에 없습니다.")
+
+    parsed = parse_report_sections(report_text)
+    state["parsed_sections"] = parsed
+    return state

@@ -25,3 +25,4 @@ requests
 python-dotenv
 sentence-transformers
 openai
+reportlab

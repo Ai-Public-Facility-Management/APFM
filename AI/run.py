@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Request
 from ultralytics import YOLO
 from PIL import Image
 import io
@@ -13,7 +13,10 @@ from dotenv import load_dotenv
 from estimate_util import run_estimate  # 별도 정의한 견적 함수
 from proposal.generate import generate_proposal
 from proposal.word import convert_to_word
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
+import asyncio
+
+from report_graph import graph
 
 load_dotenv()
 app = FastAPI()
@@ -177,6 +180,23 @@ async def proposal_to_docx_api(request: dict):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": f"attachment; filename=proposal.docx"}
     )
+
+@app.post("/run-report-graph")
+async def run_report_graph(request: Request):
+    """
+    요청 예시:
+    {
+        "inspection_date": "...",
+        "facilities": [ ... ]  # facilities 리스트와 비용 근거 포함
+    }
+    """
+    state = await request.json()
+    try:
+        result_state = await asyncio.to_thread(graph.run, state)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return JSONResponse(content=result_state)
 
 # 실행:
 # uvicorn run:app --host 0.0.0.0 --port 8080 --reload
