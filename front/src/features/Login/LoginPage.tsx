@@ -67,9 +67,14 @@ export default function LoginPage() {
       alert("로그인 성공!");
       navigate("/");
     } catch (error: any) {
-      setForm((prev) => ({ ...prev, password: "" }));
       if (error.response) {
         alert("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
+
+        setForm((prev) => ({
+          ...prev,
+          password: "",
+          email: prev.rememberId ? prev.email : "", // ✅ 체크 안 되어 있으면 email 초기화
+        }));
       } else {
         alert("서버 오류: 로그인 요청 중 문제가 발생했습니다.");
       }
@@ -120,8 +125,6 @@ export default function LoginPage() {
           <button type="submit" className="loginButton">로그인</button>
         </form>
         <div className="loginLinks">
-          <Link to="/find-id">아이디 찾기</Link>
-          <span>|</span>
           <Link to="/find-password">비밀번호 찾기</Link>
           <span>|</span>
           <Link to="/signup">회원가입</Link>
