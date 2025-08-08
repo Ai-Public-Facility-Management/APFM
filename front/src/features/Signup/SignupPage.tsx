@@ -1,12 +1,13 @@
 // src/features/Signup/SignupPage.tsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate } from "react-router-dom";
 import axios from "axios";
 import Layout from "../../components/Layout";
 import TermsModal from "./TermsModal";
 import "./SignupPage.css";
 
 export default function SignUpPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -80,6 +81,7 @@ export default function SignUpPage() {
         department: form.department,
       });
       alert("회원가입이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.");
+      setTimeout(() => navigate("/login"), 0);
     } catch (error: any) {
       console.error("회원가입 에러:", error); // 👈 로그 찍기
       setForm((prev) => ({ ...prev, password: "", confirmPassword: "" }));
@@ -139,13 +141,12 @@ export default function SignUpPage() {
               <label>소속 부서</label>
               <select name="department" value={form.department} onChange={handleChange} required>
                 <option value="">선택해주세요</option>
-                <option value="FACILITY">시설관리과</option>
-                <option value="SAFETY">안전관리과</option>
-                <option value="URBAN">도시계획과</option>
-                <option value="CONSTRUCTION">건설과</option>
-                <option value="ENVIRONMENT">환경과</option>
+                <option value="DEVELOPMENT">개발부서</option>
+                <option value="DESIGN">디지인부서</option>
+                <option value="MARKETING">마케팅부서</option>
+                <option value="SALES">영업부서</option>
+                <option value="HR">인사과</option>
                 <option value="FINANCE">재무과</option>
-                <option value="CIVIL">민원과</option>
               </select>
 
               <label>비밀번호</label>
