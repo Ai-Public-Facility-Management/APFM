@@ -9,12 +9,19 @@ import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import server.domain.InspectionSetting;
 import server.repository.InspectionSettingRepository;
+import server.service.*;
+import server.dto.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.io.File;
 
 @Slf4j
 @Service
@@ -23,6 +30,7 @@ public class InspectionSchedulerService {
 
     private final InspectionSettingRepository inspectionSettingRepository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final InspectionService inspectionService;
 
     // ✅ [1] 주기적으로 점검 수행 (매시 정각 실행)
     @Scheduled(cron = "0 0 * * * *")
@@ -56,26 +64,37 @@ public class InspectionSchedulerService {
 
     // ✅ [3] FastAPI 점검 요청
     public void callFastApi(String email) {
-        String fastapiUrl = "http://localhost:8000/ai/inspect";
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("email", email);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(fastapiUrl, entity, String.class);
+            // 1️⃣ FastAPI 서버 URL
+            String fastapiUrl = "http://localhost:8000/predict";
+
+            // 2️⃣ 이미지 파일 준비 (나중에 CCTV 캡처 이미지로 교체)
+            File imageFile = new File("AI/testimg/sample_image.png"); // 실제 경로로 수정 필요
+            FileSystemResource fileResource = new FileSystemResource(imageFile);
+
+            // 3️⃣ Multipart Form 구성
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("image", fileResource);
+            body.add("email", email);
+
+            // 4️⃣ HTTP Header 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // 5️⃣ 요청 Entity 생성
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+    
+            // 6️⃣ 요청 전송
+            ResponseEntity<String> response = restTemplate.postForEntity(fastapiUrl, requestEntity, String.class);
             log.info("✅ FastAPI 응답 수신 ({}): {}", email, response.getBody());
-
-            // 📌 필요 시 response.getBody() -> DTO 변환 + 저장
-            // InspectionResultDTO dto = objectMapper.readValue(response.getBody(), InspectionResultDTO.class);
-            // inspectionService.saveInspectionResult(dto);
-
+    
+            // 7️⃣ 결과 DTO로 파싱 후 저장
+            ObjectMapper objectMapper = new ObjectMapper();
+            InspectionResultDTO dto = objectMapper.readValue(response.getBody(), InspectionResultDTO.class);
+            inspectionService.saveInspectionResult(dto);
+    
         } catch (Exception e) {
             log.error("❌ FastAPI 호출 실패 ({}): {}", email, e.getMessage());
-        }
     }
+}
 }

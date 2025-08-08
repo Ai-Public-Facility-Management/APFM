@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile
 from ultralytics import YOLO
 from PIL import Image
 import io
@@ -64,7 +64,7 @@ def pil_to_base64(pil_img, prefix=""):
     return prefix + b64
 
 @app.post("/predict")
-async def predict(image: UploadFile = File(...)):
+async def predict(image: UploadFile = File(...), email: str = Form(...)):
     image_path = save_upload_file(image, folder="temp")
     try:
         img = Image.open(image_path).convert('RGB')
