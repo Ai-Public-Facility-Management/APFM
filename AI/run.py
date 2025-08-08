@@ -61,7 +61,7 @@ def pil_to_base64(pil_img, prefix=""):
     return prefix + b64
 
 @app.post("/predict")
-async def predict(image: UploadFile = File(...), email: str = Form(...)):
+async def predict(image: UploadFile = File(...)):
     image_path = save_upload_file(image, folder="temp")
     try:
         img = Image.open(image_path).convert('RGB')
