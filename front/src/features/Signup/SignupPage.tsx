@@ -40,7 +40,6 @@ export default function SignUpPage() {
       await axios.post(`/api/auth/send-code?email=${form.email}`);
       alert("인증번호가 발송되었습니다.");
       setEmailSent(true);
-      setTimeout(() => setEmailSendDisabled(false), 60000); // 60초 후 재전송 가능
     } catch (error) {
       alert("이메일 인증번호 발송에 실패했습니다.");
     }
@@ -51,7 +50,8 @@ export default function SignUpPage() {
       const res = await axios.post(
         `/api/auth/verify-code?email=${form.email}&code=${form.authCode}`
       );
-      if (res.data === true || res.data.verified === true) {
+
+      if (res.status === 200 && res.data === "인증 성공") {
         alert("이메일 인증이 완료되었습니다.");
         setEmailVerified(true);
       } else {
@@ -81,8 +81,11 @@ export default function SignUpPage() {
       });
       alert("회원가입이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.");
     } catch (error: any) {
-      if (error.response?.data?.message) {
-        alert("회원가입에 실패했습니다. 다시 시도해주세요.");
+      console.error("회원가입 에러:", error); // 👈 로그 찍기
+      setForm((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+
+      if (error.response?.data) {
+        alert(`회원가입에 실패했습니다: ${error.response.data}`);
       } else {
         alert("서버 오류: 회원가입 요청 중 문제가 발생했습니다.");
       }
