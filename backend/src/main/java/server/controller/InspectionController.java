@@ -8,9 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.dto.InspectionReportDTO;
 import server.dto.InspectionSettingDTO;
-import server.dto.InspectionSummary;
-import server.dto.InspectionResultDTO;
-import server.repository.InspectionSettingRepository;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
 
@@ -62,12 +59,13 @@ public class InspectionController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ FastAPI 점검 결과 저장
-    //점검 정보 저장
-    @PostMapping("/result")
-    public ResponseEntity<Void> saveInspectionResult(@RequestBody InspectionResultDTO dto) {
-        inspectionService.saveInspectionResult(dto);
-        return ResponseEntity.ok().build(); // 저장만 하고 응답은 200 OK
-    }
+    //매 주기 마다 자동 실행됨
+//    // ✅ FastAPI 점검 결과 저장
+//    //점검 정보 저장
+//    @PostMapping("/result")
+//    public ResponseEntity<Void> saveInspectionResult(@RequestBody InspectionResultDTO dto) {
+//        inspectionService.saveInspectionResult(dto);
+//        return ResponseEntity.ok().build(); // 저장만 하고 응답은 200 OK
+//    }
 
 }

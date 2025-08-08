@@ -1,6 +1,5 @@
 package server.controller;
 
-import lombok.RequiredArgsConstructor;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -9,11 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.domain.PublicFa;
 import server.dto.PublicFaDTO;
-import server.dto.ResponseFa;
 import server.service.PublicFaService;
 
 import java.util.HashMap;
-
 import java.util.Map;
 
 
@@ -50,11 +47,11 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping()
-    @ResponseBody
-    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
-        return publicFaService.addPublicFa(publicFaDTO);
-    }
+//    @PostMapping()
+//    @ResponseBody
+//    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
+//        return publicFaService.addPublicFa(publicFaDTO);
+//    }
 
     @PostMapping("/approve")
     public PublicFa approveBox(@RequestParam Long id) {
