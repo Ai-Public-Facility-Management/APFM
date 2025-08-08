@@ -57,8 +57,8 @@ export default function AdminPage() {
           name={u.username}
           email={u.email}
           department={u.department}
-          onApprove={() => handleApprove(`${u.email} 승인`)}
-          onReject={() => handleReject(`${u.email} 거절`)}
+          onApprove={() => handleApprove(u.email)}
+          onReject={() => handleReject(u.email)}
         />
       ))}
     </div>
