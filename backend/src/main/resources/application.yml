@@ -18,13 +18,9 @@ spring:
 
 
   datasource:
-#    url: jdbc:h2:mem:testdb
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&serverTimezone=UTC
-    username: root
-    password: root1234
+    url: jdbc:mysql://apfm-mysql-server.mysql.database.azure.com:3306/testdb?useSSL=true&requireSSL=false&serverTimezone=UTC
+    username: mysqladmin
+    password: root1234!
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 #  h2:
