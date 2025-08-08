@@ -1,6 +1,8 @@
 from draw_report import draw_report
+from report_state import ReportState
 
-def draw_report_node(state: dict) -> dict:
+
+def draw_report_node(state: ReportState) -> ReportState:
     parsed_sections = state.get("parsed_sections")
     inspection_date = state.get("inspection_date")
     facilities = state.get("facilities")

@@ -62,8 +62,10 @@ report_prompt = """
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain.chains import LLMChain
+from report_state import ReportState
 
-def generate_report_node(state: dict) -> dict:
+
+def generate_report_node(state: ReportState) -> ReportState:
     facilities = state["facilities"]
     facility_text = "\n".join([
         f"- {f['name']} / {f['damage']} / 방해도: {f['hindrance_level']} / 민원: {f['complaints']}건 / 마지막 수리일: {f['last_repair_date']} / 견적: {f['estimated_cost']}원 / 우선순위 점수: {f['priority_score']:.1f} / 근거: {f.get('cost_basis', 'N/A')}"
