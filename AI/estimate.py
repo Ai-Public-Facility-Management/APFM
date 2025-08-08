@@ -42,12 +42,23 @@ def run_hybrid_rag_query(vectordb, query):
 """.strip()
     )
 
-    llm = ChatOpenAI(model_name="gpt-4o", temperature=0)
+    llm = ChatOpenAI(model_name="gpt-5")
 
     llm_chain = LLMChain(llm=llm, prompt=prompt_template)
     stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="context")
 
-    return stuff_chain.invoke({
+    answer = stuff_chain.invoke({
         "input_documents": docs,
         "question": query
     })
+
+    # 상태에 저장할 문서 리스트는 page_content 없이 메타데이터만 저장
+    meta_docs = [
+        {
+            "id": getattr(doc, "id", None),
+            "metadata": doc.metadata
+        }
+        for doc in docs
+    ]
+
+    return answer, meta_docs
