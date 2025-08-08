@@ -19,9 +19,10 @@ numpy
 torch>=2.6.0
 torchvision
 ultralytics                
-clip    
+clip @ git+https://github.com/openai/CLIP.git    
 opencv-python              
 requests
 python-dotenv
 sentence-transformers
 openai
+reportlab
