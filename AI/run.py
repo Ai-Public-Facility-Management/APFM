@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
 from ultralytics import YOLO
 from PIL import Image
 import io
@@ -11,6 +11,9 @@ import shutil
 import uuid
 from dotenv import load_dotenv
 from estimate_util import run_estimate  # 별도 정의한 견적 함수
+from proposal.generate import generate_proposal
+from proposal.word import convert_to_word
+from fastapi.responses import StreamingResponse
 
 load_dotenv()
 app = FastAPI()
@@ -118,14 +121,14 @@ async def predict(image: UploadFile = File(...)):
                     cost_estimate = None
 
             detection_results.append({
-                "class": class_name,
-                "confidence": float(score),
-                "box": [int(x1), int(y1), int(x2), int(y2)],
-                "expand_box": [int(x1e), int(y1e), int(x2e), int(y2e)],
-                "status": status,
-                "status_conf": status_prob,
-                "vision_analysis": vision_analysis,
-                "cost_estimate": cost_estimate
+                "class": class_name, #시설물 이름
+                "confidence": float(score), #시설물 확률
+                "box": [int(x1), int(y1), int(x2), int(y2)], #시설물 이미지 좌표
+                "expand_box": [int(x1e), int(y1e), int(x2e), int(y2e)], #주변 시설물 확장 좌표
+                "status": status, #상태
+                "status_conf": status_prob, #상태 확률
+                "vision_analysis": vision_analysis, #영상 이미지 분석
+                "cost_estimate": cost_estimate #견적 산정 및 근거
             })
             # base64에 prefix 붙여서 프론트에서 바로 써도 됨 (여기선 prefix 안 붙임)
             crop_images.append(b64_cropped)
@@ -137,6 +140,43 @@ async def predict(image: UploadFile = File(...)):
         }
     finally:
         remove_file_safely(image_path)
+
+@app.post("/generate-proposal")
+async def generate_proposal_api(request: dict):
+    """
+    요청 예시:
+    {
+        "estimations": [...]
+    }
+    """
+    estimations = request.get("estimations", [])
+    proposal = generate_proposal(estimations)  # 딕트 하나 반환
+    return {"proposal": proposal}
+
+@app.post("/proposal-to-docx")
+async def proposal_to_docx_api(request: dict):
+    """
+    요청 예시:
+    {
+        "proposal": { ... }  # generate_proposal의 출력값 그대로
+    }
+    """
+    proposal_dict = request.get("proposal")
+    if not proposal_dict:
+        raise HTTPException(status_code=400, detail="proposal 정보 필요")
+
+    # 실제 docx 생성
+    docx_path = convert_to_word(proposal_dict)  # 경로 반환
+
+    if not docx_path or not os.path.exists(docx_path):
+        raise HTTPException(status_code=500, detail="docx 파일 생성 실패")
+    with open(docx_path, "rb") as f:
+        file_bytes = f.read()
+    return StreamingResponse(
+        io.BytesIO(file_bytes),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename=proposal.docx"}
+    )
 
 # 실행:
 # uvicorn run:app --host 0.0.0.0 --port 8080 --reload
