@@ -1,13 +1,13 @@
 package server.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import server.domain.Users;
-import server.repository.UsersRepository;
-import server.domain.ApprovalStatus;
 
-import java.util.Optional;
-import java.util.List;
+import server.domain.ApprovalStatus;
+import server.domain.Users;
 
 
 @Repository

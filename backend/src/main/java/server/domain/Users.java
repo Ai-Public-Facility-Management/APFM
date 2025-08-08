@@ -3,10 +3,12 @@ package server.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Users")
 @Data
+@NoArgsConstructor
 //<<< DDD / Aggregate Root
 public class Users {
 
@@ -28,6 +30,14 @@ public class Users {
 
     private Long level;
 
-
+    public Users(String email,String paasword){
+        this.email = email;
+        this.password = paasword;
+        this.username = "Admin";
+        this.department = null;
+        this.approvalStatus = ApprovalStatus.APPROVED;
+        this.type = UserType.ADMIN;
+        this.level = 0L;
+    }
 }
 
