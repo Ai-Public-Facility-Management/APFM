@@ -8,4 +8,12 @@ import lombok.Data;
 public class Photo {
     private String url;
     private String description;
+
+    public Photo(String url) {
+        this.url = url;
+    }
+
+    public Photo() {
+
+    }
 }

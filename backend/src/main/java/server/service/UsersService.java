@@ -1,6 +1,8 @@
 package server.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,18 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final EmailService emailService;
+
+    @Value("${my.admin_mail}")
+    private String admin_email;
+
+    @Value("${my.admin_password}")
+    private String admin_password;
+
+    @PostConstruct
+    public void init() {
+        Users user = new Users(admin_email,passwordEncoder.encode(admin_password));
+        usersRepository.save(user);
+    }
 
     // 회원가입 처리
     public void signup(SignupRequestDTO request) {

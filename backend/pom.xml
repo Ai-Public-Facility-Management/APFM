@@ -191,6 +191,15 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<environmentVariables>
+						<MAIL_PASSWORD>ujwakyhssptwhzsa</MAIL_PASSWORD>
+						<MAIL_USERNAME>ohgongjuu0406@gmail.com</MAIL_USERNAME>>
+						<SECRET_KEY>1a7a5bc2f747c3ddd6bbe906b792077faf907ea50bea213f705a6bad2b21f7b50882303805a1256d6c979f462410774b9b8b1b9973dc4fcdd18fab51f54d8576</SECRET_KEY>
+						<ADMIN_EMAIL>admin@gmail.com</ADMIN_EMAIL>
+						<ADMIN_PASSWORD>123456789!</ADMIN_PASSWORD>
+					</environmentVariables>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

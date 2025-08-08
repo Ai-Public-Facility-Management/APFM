@@ -9,10 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import server.domain.Camera;
-import server.domain.FacilityStatus;
-import server.domain.PublicFa;
-import server.domain.Section;
+import server.domain.*;
 import server.dto.*;
 import server.repository.CameraRepository;
 import server.repository.PublicFaRepository;
@@ -32,28 +29,25 @@ public class PublicFaService {
 
     // 수정 필요
     @Transactional
-    public ResponseFa addPublicFa(PublicFaDTO publicFaDTO) {
+    public PublicFa addPublicFa(Long cameraId, String publicFaType,List<Integer> box,String publicFaStatus) {
         // 저장된 상태인 객체들만 조회
-        List<PublicFa> savedFas = publicFaRepository.findByStatusAndCameraId(FacilityStatus.NORMAL,publicFaDTO.getCameraId());
-        Camera camera = cameraRepository.findById(publicFaDTO.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        List<PublicFa> savedFas = publicFaRepository.findByCameraId(cameraId);
+        Camera camera = cameraRepository.findById(cameraId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        PublicFaType type = PublicFaType.valueOf(publicFaType);
+        Section section = new Section(box);
+        PublicFaDTO dto = new PublicFaDTO(type,section,FacilityStatus.valueOf(publicFaStatus));
         for (PublicFa savedFa : savedFas) {
-            double iou = calculateIoU(publicFaDTO.getSection(), savedFa.getSection());
+            double iou = calculateIoU(section, savedFa.getSection());
             double IOU_THRESHOLD = 0.5;
             if (iou >= IOU_THRESHOLD) {
-                if (savedFa.getType() == publicFaDTO.getType()) {
-                    return new ResponseFa("이미 존재하는 객체입니다.",new PublicFa());
-                }
-                else {
-                    // IoU 임계값 이상 + 클래스 다름 → 사용자 판단 필요 대기
-                    PublicFa publicFa = new PublicFa(publicFaDTO,camera);
-                    publicFaRepository.save(publicFa);
-                    return new ResponseFa("중복 판단이 모호한 객체가 있습니다. 승인 필요합니다.",publicFaRepository.save(publicFa));
-                }
+                if (savedFa.getType() == type)
+                    return savedFa;
+                else
+                    return publicFaRepository.save(new PublicFa(dto,camera));
             }
         }
         // 중복 아닌 경우 저장
-        PublicFa publicFa = new PublicFa(publicFaDTO,camera);
-        return new ResponseFa("새로운 객체로 등록되었습니다.",publicFaRepository.save(publicFa));
+        return publicFaRepository.save(new PublicFa(dto,camera));
     }
 
 

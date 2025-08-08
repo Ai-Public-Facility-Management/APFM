@@ -71,6 +71,13 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
+    public Issue addIssue(String status,Long estimate,String estimateBasis,String image,PublicFa publicFa,Inspection inspection) {
+        Issue issue = new Issue(IssueType.valueOf(status),estimate,estimateBasis,image);
+        issue.setPublicFa(publicFa);
+        issue.setInspection(inspection);
+        return issueRepository.save(issue);
+    }
+
     public void deleteIssue(IssueDTO issueDTO) {
         issueRepository.deleteById(issueDTO.getId());
     }
