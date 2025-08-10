@@ -4,8 +4,7 @@ import { createBrowserRouter, redirect } from "react-router-dom";
 import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
-// ✅ 당신의 토큰 읽는 함수로 교체하세요.
-//    api/login에 getToken이 있다면 그걸 import해서 쓰면 베스트.
+import MainPage from "../features/Main/MainPage";
 import { getToken } from "../api/login";
 
 // 토큰이 있어야 접근 가능
@@ -30,7 +29,7 @@ export const router = createBrowserRouter([
   // 메인 페이지: 토큰 없으면 /login으로 튕김
   {
     path: "/",
-    element: <AdminPage />,   // 👉 실제 메인 컴포넌트로 바꿔도 됨
+    element: <MainPage />,   // 👉 실제 메인 컴포넌트로 바꿔도 됨
     loader: requireAuth,
   },
   // 관리자 페이지도 보호
