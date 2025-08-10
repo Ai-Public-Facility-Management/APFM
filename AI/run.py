@@ -9,14 +9,23 @@ import clip
 import os
 import shutil
 import uuid
+import copy
 from dotenv import load_dotenv
 from estimate_util import run_estimate  # 별도 정의한 견적 함수
 from proposal.generate import generate_proposal
 from proposal.word import convert_to_word
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse, JSONResponse
+
+from pydantic import BaseModel
+from typing import List, Optional
+from starlette.concurrency import run_in_threadpool
+import logging
+
+from priority_graph import run_priority_graph
 
 load_dotenv()
 app = FastAPI()
+logger = logging.getLogger("uvicorn.error")
 
 # YOLO 모델 (global)
 yolo_model = YOLO('weights/yolo/v8/best.pt')
@@ -177,6 +186,32 @@ async def proposal_to_docx_api(request: dict):
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": f"attachment; filename=proposal.docx"}
     )
+
+
+# 우선순위 추가 내용
+class Facility(BaseModel):
+    name: str
+    damage: str
+    estimated_cost: int
+    hindrance_level: str
+    complaints: int
+    last_repair_date: str
+    cost_basis: str = None
+    priority_score: float = 0.0
+
+class InspectionState(BaseModel):
+    inspection_date: str
+    facilities: list[Facility]
+
+@app.post("/priority/run")
+async def priority_run_api(state: InspectionState):
+    try:
+        # dict 형태로 변환
+        state_dict = state.dict()
+        result = run_priority_graph(state_dict)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"그래프 실행 실패: {str(e)}")
 
 # 실행:
 # uvicorn run:app --host 0.0.0.0 --port 8080 --reload
