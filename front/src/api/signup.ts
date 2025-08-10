@@ -1,4 +1,4 @@
-// signup.ts (API 함수 정의)
+// src/api/signup.ts
 import axios from "axios";
 
 export interface SignUpRequest {
@@ -8,14 +8,32 @@ export interface SignUpRequest {
   department: string;
 }
 
+/** 인증코드 발송: 문자열 메시지 반환 */
 export const sendVerificationCode = async (email: string) => {
-  return await axios.post(`/api/auth/send-code?email=${email}`);
+  const res = await axios.post<string>(
+    "/api/auth/send-code",
+    null,
+    { params: { email }, responseType: "text" }
+  );
+  return res.data; // "인증 코드 전송 완료"
 };
 
+/** 인증코드 검증: 문자열 메시지 반환 */
 export const verifyCode = async (email: string, code: string) => {
-  return await axios.post(`/api/auth/verify-code?email=${email}&code=${code}`);
+  const res = await axios.post<string>(
+    "/api/auth/verify-code",
+    null,
+    { params: { email, code }, responseType: "text" }
+  );
+  return res.data; // "인증 성공" or "인증 실패"
 };
 
+/** 회원가입 제출: 문자열 메시지 반환 */
 export const submitSignUp = async (data: SignUpRequest) => {
-  return await axios.post(`/api/auth/signup`, data);
+  const res = await axios.post<string>(
+    "/api/auth/signup",
+    data,
+    { responseType: "text" }
+  );
+  return res.data; // "회원가입 성공" or 에러 메시지
 };

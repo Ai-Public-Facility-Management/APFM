@@ -1,9 +1,15 @@
 // src/features/Login/LoginPage.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Layout from "../../components/Layout";
 import "./LoginPage.css";
+
+import {
+  loginAPI,
+  saveToken,
+  ID_KEY,
+  clearEmail,
+} from "../../api/login";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,13 +19,15 @@ export default function LoginPage() {
     rememberId: false,
   });
 
-  // 아이디 저장 불러오기
+  // 아이디 저장 불러오기 (기존 base64 방식 호환)
   useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail");
-    if (savedEmail) {
+    const saved = localStorage.getItem(ID_KEY);
+    if (saved) {
+      let decoded = saved;
+      try { decoded = atob(saved); } catch {}
       setForm((prev) => ({
         ...prev,
-        email: atob(savedEmail),
+        email: decoded,
         rememberId: true,
       }));
     }
@@ -44,40 +52,49 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await axios.post(
-        "/api/auth/login",
-        {
-          email: form.email,
-          password: form.password,
-        },
-        { withCredentials: true }
-      );
-      // 응답 메시지에서 토큰만 분리
-      const token = response.data.split("로그인 성공: ")[1];
-      localStorage.setItem("token", token);
+      const token = await loginAPI(form); // 서버 에러는 여기서 axios 에러로 throw됨
+      saveToken(token);
 
-      // 아이디 저장 기능 처리
+      // 아이디 저장
       if (form.rememberId) {
-        localStorage.setItem("rememberedEmail", btoa(form.email));
+        localStorage.setItem(ID_KEY, btoa(form.email));
       } else {
-        localStorage.removeItem("rememberedEmail");
+        clearEmail();
       }
 
-      // 사용자에게 간단 메시지
       alert("로그인 성공!");
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (error: any) {
-      if (error.response) {
-        alert("로그인에 실패했습니다. 이메일 또는 비밀번호를 확인하세요.");
+      console.error("로그인 실패:", error);
 
-        setForm((prev) => ({
-          ...prev,
-          password: "",
-          email: prev.rememberId ? prev.email : "", // ✅ 체크 안 되어 있으면 email 초기화
-        }));
-      } else {
-        alert("서버 오류: 로그인 요청 중 문제가 발생했습니다.");
+      let errMsg = "로그인에 실패했습니다.";
+
+      const data = error?.response?.data;
+
+      if (typeof data === "string") {
+        // 문자열이면 JSON 파싱 시도
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.message) {
+            errMsg = parsed.message;
+          }
+        } catch {
+          errMsg = data; // 그냥 일반 문자열이면 그대로 사용
+        }
+      } else if (typeof data === "object" && data?.message) {
+        // JSON 객체면 바로 사용
+        errMsg = data.message;
+      } else if (error?.message) {
+        errMsg = error.message;
       }
+
+      alert(errMsg);
+
+      setForm((prev) => ({
+        ...prev,
+        password: "",
+        email: prev.rememberId ? prev.email : "",
+      }));
     }
   };
 

@@ -80,6 +80,15 @@
   height: 22px;
   margin-bottom: 5px;
 }
+/* 유저 아이템만 세로 정렬 */
+.headerIcons .userItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #000;
+  font-weight: bold;
+}
 
 /* ───── Footer ───── */
 .footer {
