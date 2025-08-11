@@ -2,14 +2,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import koreaLogo from "../assets/korea1.png";
-import search from "../assets/search.png";
-import loginImg from "../assets/login.png";
-import signup from "../assets/signup.png";
+import search from "../assets/ico_sch.svg";
+import loginImg from "../assets/ico_login.svg";
+import signup from "../assets/ico_join.svg";
 
 // 로그인 후에 쓸 PNG 아이콘 (네가 만든 파일 경로/이름에 맞춰 수정)
-import settings from "../assets/settings.png";
-import userIcon from "../assets/user.png";
-import logoutIcon from "../assets/logout.png";
+import settings from "../assets/ico_calendar.svg";
+import userIcon from "../assets/ico_my.svg";
+import logoutIcon from "../assets/ico_logout.svg";
 
 import {
   getToken,
@@ -75,10 +75,6 @@ const Header: React.FC = () => {
         {/* 오른쪽 아이콘들: 기존 디자인 유지 (세로 배치) */}
         {!authed ? (
           <div className="headerIcons">
-            <Link to="/search">
-              <img src={search} alt="검색" className="search-image" />
-              <span>통합검색</span>
-            </Link>
             <Link to="/login">
               <img src={loginImg} alt="로그인" className="login-image" />
               <span>로그인</span>
