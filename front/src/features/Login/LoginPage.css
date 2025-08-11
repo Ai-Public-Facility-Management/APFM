@@ -1,6 +1,6 @@
 /* src/features/Login/LoginPage.css */
 
-.mainContent {
+.loginMain {
   flex: 1;
   display: flex;
   justify-content: center;
