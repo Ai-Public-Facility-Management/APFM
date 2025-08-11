@@ -52,7 +52,7 @@ export default function LoginPage() {
     }
 
     try {
-      const token = await loginAPI(form); // 서버 에러는 여기서 axios 에러로 throw됨
+      const { token, userType, message } = await loginAPI(form);
       saveToken(token);
 
       // 아이디 저장
@@ -62,8 +62,8 @@ export default function LoginPage() {
         clearEmail();
       }
 
-      alert("로그인 성공!");
-      navigate("/", { replace: true });
+      alert(message); // "관리자로 로그인되었습니다." 또는 "로그인 성공."
+      navigate(userType === "ADMIN" ? "/admin" : "/", { replace: true });
     } catch (error: any) {
       console.error("로그인 실패:", error);
 

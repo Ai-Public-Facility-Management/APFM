@@ -51,6 +51,10 @@ public class LoginService {
 
         System.out.println("✅ 로그인 성공: " + user.getUsername());
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(user.getEmail(), user.getType().name());
+    }
+    public Users getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
     }
 }

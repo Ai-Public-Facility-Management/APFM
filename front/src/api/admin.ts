@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "./http";
 
 export interface PendingUser {
   email: string;
@@ -7,14 +7,14 @@ export interface PendingUser {
 }
 
 export const getPendingUsers = async (): Promise<PendingUser[]> => {
-  const response = await axios.get("http://localhost:8082/api/admin/pending");
-  return response.data;
+  const { data } = await api.get("/api/admin/pending");
+  return data;
 };
 
 export const approveUser = async (email: string) => {
-  await axios.post(`http://localhost:8082/api/admin/approve/${email}`);
+  await api.post(`/api/admin/approve/${email}`);
 };
 
 export const rejectUser = async (email: string) => {
-  await axios.post(`http://localhost:8082/api/admin/reject/${email}`);
+  await api.post(`/api/admin/reject/${email}`);
 };

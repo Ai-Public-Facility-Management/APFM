@@ -58,6 +58,7 @@ public class UsersService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setApprovalStatus(ApprovalStatus.PENDING);
         user.setDepartment(Department.valueOf(String.valueOf(request.getDepartment())));
+        user.setType(UserType.INSPECTOR);
 
         usersRepository.save(user);
     }
