@@ -38,7 +38,7 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/dashbord")
+    @GetMapping("/dashboard")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> viewTopPublicFas( @RequestParam(defaultValue = "5") int count) {
         Map<String, Object> response = new HashMap<>();
