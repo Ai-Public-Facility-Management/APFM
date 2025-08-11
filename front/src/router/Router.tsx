@@ -5,14 +5,21 @@ import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
-import { getToken } from "../api/login";
+import {getRoleFromToken, getToken} from "../api/login";
 
 // 토큰이 있어야 접근 가능
 const requireAuth = () => {
-  const token = getToken?.() ?? null; // getToken이 없으면 직접 localStorage에서 읽어도 됨
-  if (!token) {
-    throw redirect("/login");
-  }
+  const token = getToken?.() ?? null;
+  if (!token) throw redirect("/login");
+  return null;
+};
+
+// 관리자만 접근 가능
+const requireAdmin = () => {
+  const token = getToken?.() ?? null;
+  if (!token) throw redirect("/login");
+  const role = getRoleFromToken?.();
+  if (role !== "ADMIN") throw redirect("/"); // 일반 유저는 메인으로
   return null;
 };
 
@@ -36,7 +43,7 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: <AdminPage />,
-    loader: requireAuth,
+    loader: requireAdmin,
   },
   // 로그인/회원가입: 토큰 있으면 / 로 리다이렉트
   {
