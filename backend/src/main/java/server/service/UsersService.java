@@ -36,8 +36,10 @@ public class UsersService {
 
     @PostConstruct
     public void init() {
-        Users user = new Users(admin_email,passwordEncoder.encode(admin_password));
-        usersRepository.save(user);
+        if (!usersRepository.existsById(admin_email)) {
+            Users user = new Users(admin_email, passwordEncoder.encode(admin_password));
+            usersRepository.save(user);
+        }
     }
 
     // 회원가입 처리
@@ -63,40 +65,53 @@ public class UsersService {
         usersRepository.save(user);
     }
 
-    //이메일에 비밀번호 초기화 링크 전송
-    public void resetEmail(String email) {
-        if (!isEmailDuplicated(email)){
-            System.out.println("일치하는 이메일이 없습니다");
-            return;
+    /* ================ 비밀번호 재설정(코드 방식) ================ */
+
+    /** 1) 재설정 코드 요청 */
+    public void requestPasswordReset(String email) {
+        // 프라이버시 보호: 존재 여부 노출 X. 존재하면만 전송, 없으면 조용히 종료.
+        if (usersRepository.existsByEmail(email)) {
+            emailService.sendResetCode(email);
         }
-        System.out.println("일치하는 이메일이 있습니다");
-        emailService.resetPW(email);
     }
 
-    @Transactional
-    public String resetPassword(Map<String, String> payload) {
-        String email = emailService.verifyResetToken(payload.get("token"));
-        if (email == null) {
-            return "유효하지 않거나 만료된 인증코드입니다.";
+    /** 2) (선택) 코드 검증만 */
+    public boolean verifyResetCode(String email, String code) {
+        return emailService.verifyResetCode(email, code);
+    }
+
+    /** 3) 이메일 + 코드 + 새비번으로 최종 변경 */
+    public String resetPasswordWithCode(String email, String code, String newPassword) {
+        if (!usersRepository.existsByEmail(email)) {
+            // 존재 안 해도 같은 메시지(프라이버시 보호)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "코드가 유효하지 않거나 만료되었습니다.");
         }
-        Users user = usersRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        isValidPassword(payload.get("password"));
-        user.setPassword(passwordEncoder.encode(payload.get("password")));
+        boolean ok = emailService.verifyResetCode(email, code);
+        if (!ok) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "코드가 유효하지 않거나 만료되었습니다.");
+        }
+
+        isValidPassword(newPassword);
+
+        Users user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        user.setPassword(passwordEncoder.encode(newPassword));
         usersRepository.save(user);
-        emailService.removeToken(payload.get("token"));
+
+        emailService.consumeResetCode(email);
         return "비밀번호 변경 완료";
     }
 
-    // 기타 기본 기능 유지
+    /* ================ 기타 공통 ================ */
+
     public Users createUser(Users user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return usersRepository.save(user);
     }
 
     public void isValidPassword(String password) {
-        // 정규식: 최소 10자, 특수문자 1개 이상 포함
         String pattern = "^(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{10,}$";
-        if(!(password != null && password.matches(pattern)))
+        if (!(password != null && password.matches(pattern)))
             throw new IllegalArgumentException("비밀번호는 10자 이상이며 특수문자 1개 이상을 포함해야 합니다.");
     }
 
