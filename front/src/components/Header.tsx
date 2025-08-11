@@ -52,7 +52,7 @@ const Header: React.FC = () => {
       const token = getToken();
       if (token) {
         // 백엔드에 실제 로그아웃(블랙리스트) 요청
-        await logoutAPI(token);
+        await logoutAPI();
       }
     } catch {
       // 서버 에러여도 UX 위해 로컬 토큰은 지움
