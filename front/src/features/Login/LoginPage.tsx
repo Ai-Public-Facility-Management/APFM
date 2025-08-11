@@ -99,7 +99,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Layout>
+    <Layout mainClassName="loginMain">
       <div className="loginBox">
         <p className="loginSubTitle">공공시설물 관리자 로그인</p>
         <h1 className="loginTitle">아이디/비밀번호 로그인</h1>
