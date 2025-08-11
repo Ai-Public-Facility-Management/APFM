@@ -8,7 +8,9 @@ import server.dto.LoginRequestDTO;
 import org.springframework.http.ResponseEntity;
 import server.service.LoginService;
 import server.service.TokenBlacklistService;
-
+import server.domain.UserType;
+import server.domain.Users;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,9 +22,17 @@ public class LoginController {
     private final TokenBlacklistService tokenBlacklistService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDTO request) {
-        String token = authService.login(request);  // 토큰 반환받기
-        return ResponseEntity.ok("로그인 성공: " + token);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequestDTO request) {
+        String token = authService.login(request);
+        Users user = authService.getUserByEmail(request.getEmail());
+
+        String message = user.getType() == UserType.ADMIN ? "관리자로 로그인되었습니다." : "로그인 성공.";
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("userType", user.getType().name());
+        response.put("message", message);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
@@ -37,8 +47,6 @@ public class LoginController {
 
         return ResponseEntity.badRequest().body("유효하지 않은 토큰");
     }
-
-
 }
 
 

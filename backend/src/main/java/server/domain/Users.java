@@ -26,7 +26,7 @@ public class Users {
     private ApprovalStatus approvalStatus = ApprovalStatus.PENDING; // 기본값: 대기중
 
     @Enumerated(EnumType.STRING)
-    private UserType type;
+    private UserType type = UserType.INSPECTOR;
 
     private Long level;
 
