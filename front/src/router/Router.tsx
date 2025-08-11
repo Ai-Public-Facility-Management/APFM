@@ -6,7 +6,6 @@ import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
 import {getRoleFromToken, getToken} from "../api/login";
-import IntervalModal from "../features/schedule/IntervalModal";
 
 // 토큰이 있어야 접근 가능
 const requireAuth = () => {
@@ -57,12 +56,6 @@ export const router = createBrowserRouter([
     element: <SignupPage />,
     loader: onlyGuest,
   },
-
-  {
-  path: "/inspection/interval",
-  element: <IntervalModal />,
-  loader: requireAuth,  // 로그인 필요하면 그대로
-},
   // 그 외 -> 메인으로
   {
     path: "*",
