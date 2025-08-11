@@ -1,5 +1,4 @@
-import axios from "axios";
-import { getToken } from "./login";
+import { api } from "./http";
 
 export interface Facility {
   id: number;
@@ -23,10 +22,11 @@ export interface FacilityPage {
  * @returns 페이지 데이터
  */
 export async function fetchFacilities(page: number, size: number): Promise<FacilityPage> {
-    const token = getToken();
-    const response = await axios.get("/api/publicfa/all", {
-        params: { page, size },
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    });
-    return response.data.publicFas;
+    const response = await api.get("/api/publicfa/all", { params: { page, size } });
+    return {
+        content: response.data.publicFas.content,
+        totalElements: response.data.publicFas.totalElements,
+        totalPages: response.data.publicFas.totalPages
+    };
 }
+

@@ -5,6 +5,7 @@ import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
+import FacilityList from "../features/Facility/FacilityList";
 import {getRoleFromToken, getToken} from "../api/login";
 
 // 토큰이 있어야 접근 가능

@@ -1,6 +1,5 @@
 // src/pages/FacilityList.tsx
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Layout from "../../components/Layout";
 import "./FacilityList.css";
 import { fetchFacilities, Facility } from "../../api/publicFa";
