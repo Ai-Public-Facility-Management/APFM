@@ -6,6 +6,7 @@ import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
 import { getToken } from "../api/login";
+import FacilityList from "../features/Facility/FacilityList";
 
 // 토큰이 있어야 접근 가능
 const requireAuth = () => {
@@ -48,6 +49,11 @@ export const router = createBrowserRouter([
     path: "/signup",
     element: <SignupPage />,
     loader: onlyGuest,
+  },
+  {
+    path: "/facility-list",
+    element: <FacilityList />,
+    loader: requireAuth,
   },
   // 그 외 -> 메인으로
   {
