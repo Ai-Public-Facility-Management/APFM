@@ -45,6 +45,8 @@ public class Issue {
 
     private String location;
 
+    private String content;
+
     @OneToOne
     @JoinColumn(name = "publicFa_id", unique = true)
     private PublicFa publicFa;
@@ -69,7 +71,7 @@ public class Issue {
         this.estimate = estimate;
     }
 
-    private String content;
+
     
 }
 
