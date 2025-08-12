@@ -5,6 +5,8 @@ import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
+import FindPasswordPage from "../features/Findpassword/Findpasswordpage";
+
 import {getRoleFromToken, getToken} from "../api/login";
 
 // 토큰이 있어야 접근 가능
@@ -54,6 +56,12 @@ export const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignupPage />,
+    loader: onlyGuest,
+  },
+
+  {
+    path: "/find-password",
+    element: <FindPasswordPage />,
     loader: onlyGuest,
   },
   // 그 외 -> 메인으로
