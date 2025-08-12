@@ -177,12 +177,10 @@ async def proposal_to_docx_api(request: dict):
     # 실제 docx 생성
     docx_path = convert_to_word(proposal_dict)  # 경로 반환
 
-    if not docx_path or not os.path.exists(docx_path):
+    if not docx_path :
         raise HTTPException(status_code=500, detail="docx 파일 생성 실패")
-    with open(docx_path, "rb") as f:
-        file_bytes = f.read()
     return StreamingResponse(
-        io.BytesIO(file_bytes),
+        docx_path,
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         headers={"Content-Disposition": f"attachment; filename=proposal.docx"}
     )
