@@ -91,26 +91,20 @@
   border-radius: 12px;
   margin-bottom: 10px;
 }
-
-/* 정상: 회색, 비활성 */
 .status-normal {
-  background: #f3f4f6; /* 연회색 */
-  color: #9ca3af;      /* 글자도 흐리게 */
-  pointer-events: none; /* 클릭 불가 */
+  background: #f3f4f6;
+  color: #9ca3af;
+  pointer-events: none;
   opacity: 0.7;
 }
-
-/* 공사중: 회색 배경, 진한 글씨 (클릭 가능) */
 .status-processing {
-  background: #e5e7eb; /* 중간 회색 */
-  color: #374151;      /* 짙은 회색 글씨 */
+  background: #e5e7eb;
+  color: #374151;
   cursor: pointer;
 }
-
-/* 수리 필요: 하늘색 (클릭 가능) */
 .status-repair {
-  background: #e0f2fe; /* 연하늘 */
-  color: #0284c7;      /* 진한 하늘 글씨 */
+  background: #e0f2fe;
+  color: #0284c7;
   cursor: pointer;
 }
 
