@@ -27,7 +27,7 @@ public class InspectionSetting {
     private Integer inspectionCycle;
 
     // 지도 주소 (선택사항, 추후 사용)
-    private String address;
+    // private String address;
 
     // ✅ 마지막 점검 실행 시각 (nullable 가능)
     private LocalDateTime lastInspectedDate;
