@@ -1,6 +1,7 @@
 # estimate_util.py
 from langchain_community.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
+# 변경
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from graph import graph  # graph.py에서 정의한 graph 객체
 
 def run_estimate(original_b64: str, crop_b64: str, box: list):
