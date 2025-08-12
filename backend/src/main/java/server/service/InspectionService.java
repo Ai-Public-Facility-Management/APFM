@@ -138,7 +138,7 @@ public class InspectionService {
         Inspection inspection = inspectionRepository.findWithIssuesById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inspection not found"));
 
-        String status = Boolean.TRUE.equals(inspection.getIsinspected()) ? "작성 완료" : "작성중";
+        String status = inspection.getReport() != null ? "작성 완료" : "작성중";
 
         InspectionDetailDTO dto = new InspectionDetailDTO();
         dto.setId(inspection.getId());
