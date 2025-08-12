@@ -10,7 +10,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.util.Base64;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -34,11 +33,14 @@ public class EmailService {
     @Value("${custom.auth-code-expiration-millis:1800000}")
     private long authCodeExpirationMillis;
 
-    @Value("${custom.auth-code-expiration-millis:10800000}")
+    @Value("${custom.auth-code-expiration-millis:600000}")
     private long resetCodeExpirationMillis;
 
     private final Map<String, AuthCodeEntry> authCodeStore = new ConcurrentHashMap<>();
     private final Set<String> verifiedEmails = ConcurrentHashMap.newKeySet();
+
+    // 비번재설정용: email -> code  (링크/토큰 X, 코드 방식)
+    private final Map<String, AuthCodeEntry> resetCodeStore = new ConcurrentHashMap<>();
 
     public void sendAuthCode(String toEmail) {
         System.out.println("📨 인증코드 발송 시도 대상: " + toEmail);
@@ -69,51 +71,46 @@ public class EmailService {
         return false;
     }
 
-    public void resetPW(String email) {
-        String token = Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes());
+    /* ================= 비밀번호 재설정 코드 ================= */
+    public void sendResetCode(String email) {
+        String code = generateAuthCode();
+        resetCodeStore.put(email, new AuthCodeEntry(code, System.currentTimeMillis()));
 
-        authCodeStore.put(token, new AuthCodeEntry(email, System.currentTimeMillis()));
-
-        String resetUrl = "https://localhost:8082/reset-password?token=" + token;
-        String content = "<h1>비밀번호 재설정</h1><p>아래 링크를 클릭해 비밀번호를 재설정하세요.</p>" +
-                "<a href=\"" + resetUrl + "\">비밀번호 재설정하기</a>";
+        // HTML 메일로 깔끔하게
+        String content = "<h2>비밀번호 재설정 코드</h2>"
+                + "<p>아래 6자리 코드를 비밀번호 재설정 페이지에 입력하세요.</p>"
+                + "<div style='font-size:22px;font-weight:bold;letter-spacing:3px;'>" + code + "</div>"
+                + "<p style='color:#888'>코드 유효기간: " + (resetCodeExpirationMillis/60000) + "분</p>";
 
         MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setTo(email);
-            helper.setSubject("APFM 비밀번호 초기화");
+            helper.setSubject("APFM 비밀번호 재설정 코드");
             helper.setText(content, true);
             System.out.println("📤 메일 전송 시작...");
             mailSender.send(message);
             System.out.println("✅ 메일 전송 성공!");
         } catch (MessagingException e) {
-            throw new RuntimeException("이메일 전송 실패", e);
+            throw new RuntimeException("메일 전송 실패", e);
         }
-
     }
 
-    //비밀번호 변경 토큰이 유효한지 확인
-    public String verifyResetToken(String token) {
-        AuthCodeEntry entry = authCodeStore.get(token);
-        if (entry != null) {
-            long now = System.currentTimeMillis();
-            //
-            if (now - entry.createdAt <= resetCodeExpirationMillis) {
-                return entry.code;
-            }
-            else{
-                authCodeStore.remove(token);
-                return null;
-            }
+    /** 코드 검증만 (선택 단계) */
+    public boolean verifyResetCode(String email, String inputCode) {
+        AuthCodeEntry entry = resetCodeStore.get(email);
+        if (entry == null) return false;
+        long now = System.currentTimeMillis();
+        if (now - entry.createdAt > resetCodeExpirationMillis) {
+            resetCodeStore.remove(email);
+            return false;
         }
-        return null;
+        return inputCode.equals(entry.code);
     }
-
-    public void removeToken(String token) {
-        authCodeStore.remove(token);
+    /** 비밀번호 변경 성공 시 코드 폐기 */
+    public void consumeResetCode(String email) {
+        resetCodeStore.remove(email);
     }
-
 
     public boolean isEmailVerified(String email) {
         return verifiedEmails.contains(email);
