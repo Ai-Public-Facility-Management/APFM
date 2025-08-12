@@ -16,5 +16,4 @@ public class InspectionSummary {
     private int removalCount;         // 철거 필요 항목 수
 
     private boolean hasIssue;         // 이상 있음 여부 (issue 존재 여부)
-    private boolean hasReport;        // 보고서 존재 여부
 }

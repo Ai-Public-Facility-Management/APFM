@@ -47,11 +47,11 @@ public class Issue {
 
     private String content;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publicFa_id", unique = true)
     private PublicFa publicFa;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="inspection_id")
     private Inspection inspection;
 
