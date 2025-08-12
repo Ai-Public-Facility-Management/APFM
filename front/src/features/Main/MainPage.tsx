@@ -240,7 +240,7 @@ export default function MainPage() {
             <div className="table-card">
               <div className="table-card__head">
                 <h3>시설물 대시보드</h3>
-                <button className="icon-btn" title="전체보기" onClick={() => navigate("/publicfa/list")}>
+                <button className="icon-btn" title="전체보기" onClick={() => navigate("/facility-list")}>
                   +
                 </button>
               </div>
@@ -261,7 +261,14 @@ export default function MainPage() {
 
                 {publicFas.map((fa, i) => (
                   <div key={i} className="table__row">
-                    <div className="table__cell w-120">{fa.publicFaType}</div>
+                    <div
+                      className="table__cell w-120 link-like"  // 클릭 가능 스타일 있으면 추가
+                      onClick={() => navigate(`/detail/${fa.publicFaId}`)}
+                      style={{ cursor: "pointer" }} // 마우스 커서 변경 (선택사항)
+                      title="상세 보기"
+                    >
+                      {fa.publicFaType}
+                    </div>
                     <div className="table__cell w-220 ellipsis">{fa.cameraName}</div>
                     <div className="table__cell w-120">{fa.issueType}</div>
                     <div className="table__cell w-120">{fa.isProcessing ? "처리중" : "미처리"}</div>
