@@ -44,7 +44,7 @@ export interface InspectionSettingDTO {
   startDate: string;        // "YYYY-MM-DD"
   startTime: string;        // "HH:mm" 또는 "HH:mm:ss"
   inspectionCycle: number;  // 주기(정수)
-  address: string;
+  //address: string;
 }
 
 // [기능 요약] 점검 리스트 조회 (백엔드: /api/inspection/all, 응답 {data: Page})

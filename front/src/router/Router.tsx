@@ -9,6 +9,8 @@ import FindPasswordPage from "../features/Findpassword/Findpasswordpage";
 
 import InspectionListPage from "../features/Inspections/InspectionListPage";
 import InspectionDetailPage from "../features/Inspections/InspectionDetailPage";
+import DetailPublicFa from "../features/PublicFa/DetailPublicFa";
+import FacilityList from "../features/Facility/FacilityList";
 import {getRoleFromToken, getToken} from "../api/login";
 
 // 토큰이 있어야 접근 가능
@@ -76,9 +78,22 @@ export const router = createBrowserRouter([
     element: <FindPasswordPage />,
     loader: onlyGuest,
   },
+
+  {
+    path: "/detail/:id",
+    element: <DetailPublicFa/>,
+    loader: requireAuth,
+  },
+
+  {
+    path: "/facility-list",
+    element: <FacilityList />,
+    loader: requireAuth,
+  },
   // 그 외 -> 메인으로
   {
     path: "*",
     loader: () => redirect("/"),
-  },
+  }
+
 ]);

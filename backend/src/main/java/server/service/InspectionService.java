@@ -43,12 +43,12 @@ public class InspectionService {
             List<Issue> issues = inspection.getIssues();
 
             int repairCount = (int) issues.stream()
-                .filter(i -> i.getStatus() == IssueStatus.REPAIR)
-                .count();
+                    .filter(i -> i.getStatus() == IssueStatus.REPAIR)
+                    .count();
 
             int removalCount = (int) issues.stream()
-                .filter(i -> i.getStatus() == IssueStatus.REMOVE)
-                .count();
+                    .filter(i -> i.getStatus() == IssueStatus.REMOVE)
+                    .count();
 
             boolean hasIssue = !issues.isEmpty();
 
@@ -56,13 +56,12 @@ public class InspectionService {
             String status = inspection.getReport() != null ? "작성 완료" : "작성중";
 
             return new InspectionSummary(
-                inspectionId,
-                formattedDate,
-                status,
-                repairCount,
-                removalCount,
-                hasIssue
-            );
+                    inspectionId,
+                    formattedDate,
+                    status,
+                    repairCount,
+                    removalCount,
+                    hasIssue);
         });
     }
 
@@ -72,17 +71,16 @@ public class InspectionService {
         List<Inspection> inspections = inspectionRepository.findByOrderByCreateDateDesc(pageRequest);
         List<DashboardInspection> dashboardInspections = new ArrayList<>();
         inspections.forEach(inspection -> {
-            DashboardInspection ins =  new DashboardInspection();
+            DashboardInspection ins = new DashboardInspection();
             ins.setInspectionId(inspection.getId());
             ins.setInspectionDate(inspection.getCreateDate());
-            if(!inspection.getIssues().isEmpty()) {
+            if (!inspection.getIssues().isEmpty()) {
                 List<Issue> issues = inspection.getIssues();
-                Issue issue = issues.get(issues.size()-1);
+                Issue issue = issues.get(issues.size() - 1);
                 ins.setCameraName(issue.getPublicFa().getCamera().getLocation());
                 ins.setPublicFaType(issue.getPublicFa().getType());
                 ins.setIssueType(issue.getType());
-            }
-            else{
+            } else {
                 ins.setCameraName(null);
                 ins.setPublicFaType(null);
                 ins.setIssueType(null);
@@ -93,12 +91,12 @@ public class InspectionService {
         return dashboardInspections;
     }
 
-
     @Transactional
     public InspectionSettingDTO setInspectionSetting(InspectionSettingDTO dto) {
-        InspectionSetting setting = settingRepository.findById(1L).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        InspectionSetting setting = settingRepository.findById(1L)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         setting.setInspectionCycle(dto.getInspectionCycle());
-        setting.setAddress(dto.getAddress());
+        // setting.setAddress(dto.getAddress());
         setting.setStartTime(dto.getStartTime());
         setting.setStartDate(dto.getStartDate());
         settingRepository.save(setting);
@@ -109,22 +107,26 @@ public class InspectionService {
     @Transactional
     public void saveInspectionResult(List<InspectionResultDTO> results) {
 
-//        // 1️⃣ 사용자 조회
-//        Users user = usersRepository.findByEmail(result.getEmail())
-//            .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " + result.getEmail()));
+        // // 1️⃣ 사용자 조회
+        // Users user = usersRepository.findByEmail(result.getEmail())
+        // .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " +
+        // result.getEmail()));
 
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
         inspectionRepository.save(inspection);
 
-        //리스트 순회하여 저장
+        // 리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            if(dto.getDetections().getStatus().equals("NOMAL")) {
-                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "NORMAL");
-            }else{
-                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
-                Issue issue = issueService.addIssue(dto.getDetections().getStatus(),1L,dto.getDetections().getCost_estimate(),dto.getOriginal_image(),publicFa,inspection);
+            if (dto.getDetections().getStatus().equals("NOMAL")) {
+                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(),
+                        dto.getDetections().getBox(), "NORMAL");
+            } else {
+                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(),
+                        dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
+                Issue issue = issueService.addIssue(dto.getDetections().getStatus(), 1L,
+                        dto.getDetections().getCost_estimate(), dto.getOriginal_image(), publicFa, inspection);
                 publicFa.setIssue(issue);
                 inspection.getIssues().add(issue);
             }
