@@ -3,6 +3,9 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.shared import Pt
+from io import BytesIO
+
+from azure_save import savefile
 
 def set_cell_bg_color(cell, fill):
     """cell 배경색 지정 (fill: HEX 문자열 예 'D9D9D9')"""
@@ -13,12 +16,13 @@ def set_cell_bg_color(cell, fill):
     shd.set(qn('w:fill'), fill)
     tc_pr.append(shd)
 
-def convert_to_word(proposal: dict, output_path: str = "proposal.docx") -> str:
+def convert_to_word(proposal: dict) -> str:
     """
     proposal(dict): ProposalTemplate 형식의 dict (filled_proposal)
     output_path(str): 저장할 docx 경로
     return: 실제 저장된 파일 경로 (string)
     """
+    buffer = BytesIO()
     doc = Document()
 
     # 제목 박스
@@ -124,6 +128,8 @@ def convert_to_word(proposal: dict, output_path: str = "proposal.docx") -> str:
                     p.runs[0]._element.rPr.rFonts.set(qn('w:eastAsia'), '휴먼명조')
 
                 doc.add_paragraph()  # 항목 간 한 줄 띄우기
+    doc.save(buffer)
+    buffer.seek(0)
+    path = savefile(buffer,'.docx')
 
-    doc.save(output_path)
-    return output_path
+    return path
