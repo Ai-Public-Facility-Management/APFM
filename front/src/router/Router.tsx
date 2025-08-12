@@ -5,6 +5,7 @@ import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
+import DetailPublicFa from "../features/PublicFa/DetailPublicFa";
 import FacilityList from "../features/Facility/FacilityList";
 import {getRoleFromToken, getToken} from "../api/login";
 
@@ -57,6 +58,13 @@ export const router = createBrowserRouter([
     element: <SignupPage />,
     loader: onlyGuest,
   },
+
+  {
+    path: "/detail",
+    element: <DetailPublicFa/>,
+    loader: requireAuth,
+  },
+
   {
     path: "/facility-list",
     element: <FacilityList />,
@@ -66,5 +74,6 @@ export const router = createBrowserRouter([
   {
     path: "*",
     loader: () => redirect("/"),
-  },
+  }
+
 ]);
