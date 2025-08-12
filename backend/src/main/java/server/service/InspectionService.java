@@ -13,6 +13,7 @@ import server.dto.DashboardInspection;
 import server.dto.InspectionResultDTO;
 import server.dto.InspectionSettingDTO;
 import server.dto.InspectionSummary;
+import server.dto.InspectionDetailDTO;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
@@ -29,6 +30,9 @@ public class InspectionService {
     private final InspectionSettingRepository settingRepository;
     private final IssueService issueService;
     private final PublicFaService publicFaService;
+
+    private static final SimpleDateFormat DETAIL_FMT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)
     public Page<InspectionSummary> getInspectionSummary(Pageable pageable) {
@@ -138,6 +142,68 @@ public class InspectionService {
             }
 
         }
+    }
+
+    // 점검 상세 추가
+    @Transactional(readOnly = true)
+    public InspectionDetailDTO getInspectionDetail(Long id) {
+        Inspection inspection = inspectionRepository.findWithIssuesById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inspection not found"));
+
+        String status = Boolean.TRUE.equals(inspection.getIsinspected()) ? "작성 완료" : "작성중";
+
+        InspectionDetailDTO dto = new InspectionDetailDTO();
+        dto.setId(inspection.getId());
+        dto.setCreateDate(inspection.getCreateDate() != null ? DETAIL_FMT.format(inspection.getCreateDate()) : null);
+        dto.setStatus(status);
+
+        // (옵션) 상단 요약 필드 - 현재 도메인에 따라 값이 없을 수 있음 → 일단 null
+        dto.setFacilityName(null);
+        dto.setLocation(null);
+
+        // (옵션) 본문/요약 - 도메인에 있다면 매핑하세요. 없으면 null 유지
+        dto.setDescription(null);
+        dto.setContent(null);
+
+        // (옵션) 상단 이미지 목록 - 도메인에 저장된 리스트가 있으면 매핑. 지금은 빈 리스트
+        dto.setImageUrlList(List.of());
+
+        // 이슈 매핑
+        List<InspectionDetailDTO.IssueItem> items = new ArrayList<>();
+        if (inspection.getIssues() != null) {
+            for (Issue issue : inspection.getIssues()) {
+                InspectionDetailDTO.IssueItem it = new InspectionDetailDTO.IssueItem();
+                it.setId(issue.getId());
+                it.setFacilityCategory(issue.getPublicFa() != null ? issue.getPublicFa().getType().name() : null);
+                it.setType(issue.getType() != null ? issue.getType().name() : null);
+                it.setStatus(issue.getStatus() != null ? issue.getStatus().name() : null);
+
+                // 발생도/레벨/카운트 값이 도메인에 없다면 일단 null로 둠
+                it.setSeverity(null);
+                it.setLevel(null);
+                it.setCount(null);
+
+                it.setEstimate(issue.getEstimate());
+                it.setEstimateBasis(issue.getEstimateBasis());
+                it.setDescription(issue.getDescription());
+                it.setContent(issue.getContent());
+
+                // 임베디드 Photo가 있다면 URL 매핑
+                if (issue.getImage() != null) {
+                    it.setImageUrl(issue.getImage().getUrl());
+                } else {
+                    it.setImageUrl(null);
+                }
+
+                // FastAPI로부터 받은 상대 경로가 따로 있다면 여기에 매핑
+                it.setAiImagePath(null);
+
+                items.add(it);
+            }
+        }
+        dto.setIssues(items);
+
+        return dto;
     }
 
     
