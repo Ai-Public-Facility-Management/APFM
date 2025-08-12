@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Transactional
 public class UsersController {
 
@@ -54,9 +54,8 @@ public class UsersController {
     @PostMapping("/reset-code")
     public ResponseEntity<Void> requestResetCode(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
-        usersService.requestPasswordReset(email);
-        // 존재여부와 무관하게 항상 200
-        return ResponseEntity.ok().build();
+        usersService.sendResetCodeToMember(email);
+        return ResponseEntity.noContent().build();
     }
 
     // (2) (선택) 코드 검증만
@@ -75,5 +74,4 @@ public class UsersController {
         String newPassword = payload.get("password");
         return ResponseEntity.ok(usersService.resetPasswordWithCode(email, code, newPassword));
     }
-
 }

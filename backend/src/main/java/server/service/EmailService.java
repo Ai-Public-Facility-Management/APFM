@@ -33,7 +33,7 @@ public class EmailService {
     @Value("${custom.auth-code-expiration-millis:1800000}")
     private long authCodeExpirationMillis;
 
-    @Value("${custom.auth-code-expiration-millis:10800000}")
+    @Value("${custom.auth-code-expiration-millis:600000}")
     private long resetCodeExpirationMillis;
 
     private final Map<String, AuthCodeEntry> authCodeStore = new ConcurrentHashMap<>();
@@ -107,7 +107,6 @@ public class EmailService {
         }
         return inputCode.equals(entry.code);
     }
-
     /** 비밀번호 변경 성공 시 코드 폐기 */
     public void consumeResetCode(String email) {
         resetCodeStore.remove(email);

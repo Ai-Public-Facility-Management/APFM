@@ -66,13 +66,12 @@ public class UsersService {
     }
 
     /* ================ 비밀번호 재설정(코드 방식) ================ */
-
-    /** 1) 재설정 코드 요청 */
-    public void requestPasswordReset(String email) {
-        // 프라이버시 보호: 존재 여부 노출 X. 존재하면만 전송, 없으면 조용히 종료.
-        if (usersRepository.existsByEmail(email)) {
-            emailService.sendResetCode(email);
+    /** 가입자만 인증코드 발송 */
+    public void sendResetCodeToMember(String email) {
+        if (!usersRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "가입 이력이 없습니다.");
         }
+        emailService.sendResetCode(email);
     }
 
     /** 2) (선택) 코드 검증만 */
@@ -84,13 +83,12 @@ public class UsersService {
     public String resetPasswordWithCode(String email, String code, String newPassword) {
         if (!usersRepository.existsByEmail(email)) {
             // 존재 안 해도 같은 메시지(프라이버시 보호)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "코드가 유효하지 않거나 만료되었습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "가입 이력이 없습니다.");
         }
         boolean ok = emailService.verifyResetCode(email, code);
         if (!ok) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "코드가 유효하지 않거나 만료되었습니다.");
         }
-
         isValidPassword(newPassword);
 
         Users user = usersRepository.findByEmail(email)

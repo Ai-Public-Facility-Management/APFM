@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import { requestResetCodeAPI, verifyResetCodeAPI, resetPasswordAPI } from "../../api/pw";
 
@@ -6,6 +7,8 @@ import "../../components/Common.css";
 import "./Findpasswordpage.css";
 
 export default function Findpasswordpage() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -45,63 +48,71 @@ export default function Findpasswordpage() {
     timerRef.current = window.setInterval(() => setCooldown((c) => c - 1), 1000);
   };
 
-  const clearAlerts = () => { setMsg(""); setErr(""); };
+  // 팝업 헬퍼
+  const alertInfo = (m: string) => window.alert(m);
+  const alertError = (m: string) => window.alert(m);
 
   const onSendCode = async () => {
-    clearAlerts();
-    if (!name.trim()) { setErr("이름을 입력해주세요."); return; }
-    if (!isEmailValid) { setErr("올바른 이메일을 입력해주세요."); return; }
-    try {
-      setSending(true);
-      await requestResetCodeAPI({ email });
-      setCodeSent(true);
-      setMsg("인증코드를 이메일로 발송했습니다. 메일함을 확인해주세요.");
-      startCooldown();
-    } catch {
-      setErr("인증코드 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
-    } finally {
-      setSending(false);
-    }
+      if (!name.trim()) return setErr("이름을 입력해주세요.");
+      if (!isEmailValid) return setErr("올바른 이메일을 입력해주세요.");
+
+      try {
+        setSending(true);
+        const res = await requestResetCodeAPI({ email });
+        if (res.status === 204) {
+          setCodeSent(true);
+          alertInfo("인증코드를 이메일로 발송했습니다. 메일함을 확인해주세요.");
+          startCooldown();
+        }
+      } catch (e: any) {
+        if (e?.response?.status === 404) {
+          alertError("가입 이력이 없습니다.");
+        } else {
+          alertError("인증코드 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        }
+      } finally {
+        setSending(false);
+      }
   };
 
   const onResend = async () => {
-    clearAlerts();
-    if (cooldown > 0) return;
-    try {
-      setLoading(true);
-      await requestResetCodeAPI({ email });
-      setCodeSent(true);
-      setMsg("인증코드를 다시 발송했습니다.");
-      startCooldown();
-    } catch {
-      setErr("코드 재전송에 실패했습니다.");
-    } finally {
-      setLoading(false);
-    }
+      if (cooldown > 0) return;
+      try {
+        setLoading(true);
+        const res = await requestResetCodeAPI({ email });
+        if (res.status === 204) {
+          setCodeSent(true);
+          alertInfo("인증코드를 다시 발송했습니다.");
+          startCooldown();
+        }
+      } catch {
+        alertError("코드 재전송에 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
   };
 
   const onVerifyCode = async () => {
-    clearAlerts();
-    if (!isEmailValid) { setErr("이메일을 확인해주세요."); return; }
-    if (!isCodeValid) { setErr("6자리 숫자 코드를 입력하세요."); return; }
+    if (!isEmailValid) { alertError("이메일을 확인해주세요."); return; }
+    if (!isCodeValid) { alertError("6자리 숫자 코드를 입력하세요."); return; }
     try {
       setLoading(true);
       const { data } = await verifyResetCodeAPI({ email, code: code.trim() });
       if (data) {
         setCodeVerified(true);
-        setMsg("코드 인증 완료! 새 비밀번호를 입력하세요.");
+        alertInfo("코드 인증 완료! 새 비밀번호를 입력하세요.");
+        setCodeSent(false); // ✅ 인증 완료 후 재전송 버튼 숨기기
       } else {
-        setErr("코드가 유효하지 않거나 만료되었습니다.");
+        alertError("코드가 유효하지 않거나 만료되었습니다.");
       }
     } catch {
-      setErr("코드 확인 중 오류가 발생했습니다.");
+      alertError("코드 확인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
   const onSubmitNewPassword = async () => {
-    clearAlerts();
     if (!isEmailValid) { setErr("이메일을 확인해주세요."); return; }
     if (!isCodeValid) { setErr("6자리 숫자 코드를 입력하세요."); return; }
     if (!isPwPolicyOk) { setErr("비밀번호는 10자 이상이며 특수문자 1개 이상을 포함해야 합니다."); return; }
@@ -110,13 +121,10 @@ export default function Findpasswordpage() {
     try {
       setLoading(true);
       const { data } = await resetPasswordAPI({ email, code: code.trim(), password: pw1 });
-      setMsg(data || "비밀번호 변경 완료!");
-      setCodeVerified(false);
-      setCodeSent(false);
-      setName(""); setEmail(""); setCode(""); setPw1(""); setPw2("");
-      setCooldown(0);
+      alertInfo(data || "비밀번호 변경 완료!");
+      navigate("/login");
     } catch {
-      setErr("비밀번호 변경에 실패했습니다.");
+      alertError("비밀번호 변경에 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -129,16 +137,12 @@ export default function Findpasswordpage() {
     <Layout>
       {/* 변수와 스타일은 컨테이너에 직접 선언된 값으로 강제 적용 */}
       <div className="fp-container">
-        <h1 className="fp-title">비밀번호 찾기 / 재설정</h1>
-
-        <div className={`fp-alert ${alertClass}`} role="status" aria-live="polite">
-          {alertText}
-        </div>
+        <h2 className="fp-title">비밀번호 찾기 / 재설정</h2>
 
         <section className="fp-card">
           <h2 className="fp-subtitle">이름 / 이메일 확인</h2>
 
-          <label className="fp-label" htmlFor="fp-name">아이디(이름)</label>
+          <label className="fp-label" htmlFor="fp-name">이름</label>
           <input
             id="fp-name"
             className="fp-input"
@@ -232,8 +236,10 @@ export default function Findpasswordpage() {
             autoComplete="new-password"
           />
 
-          <div className={`fp-pwcheck ${!pw1 && !pw2 ? "empty" : pw1 === pw2 ? "match" : "warn"}`}>
-            {pw1 && pw2 ? (pw1 === pw2 ? "비밀번호가 일치합니다." : "동일한 비밀번호를 입력하세요") : " "}
+          <div className={`fp-pwcheck ${pw1 === pw2 && pw1 ? "match" : "warn"}`}>
+            {pw1 === pw2 && pw1
+              ? "💡 비밀번호가 일치합니다."
+              : "⚠️ 동일한 비밀번호를 입력하세요"}
           </div>
 
           <button
@@ -251,4 +257,5 @@ export default function Findpasswordpage() {
       </div>
     </Layout>
   );
+
 }
