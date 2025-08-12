@@ -19,8 +19,6 @@ public class Inspection {
     @Column(name = "create_date", nullable = false)
     private Date createDate;
 
-    @Column(name = "is_inspected", nullable = false)
-    private Boolean isinspected;
 
     // ✅ 연관관계 추가
     @OneToMany(mappedBy = "inspection",fetch = FetchType.LAZY)
@@ -29,6 +27,4 @@ public class Inspection {
     @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL)
     private Report report;
 
-
-    private String reportUrl;
 }

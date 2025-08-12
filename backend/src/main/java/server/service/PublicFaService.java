@@ -64,6 +64,7 @@ public class PublicFaService {
             DashboardIssue issue = new DashboardIssue();
             issue.setPublicFaId(fas.getId());
             issue.setPublicFaType(fas.getType());
+            issue.setCameraName(fas.getCamera().getLocation());
             if(fas.getStatus().equals(FacilityStatus.ABNORMAL) && fas.getIssue() != null) {
                 issue.setIssueType(fas.getIssue().getType());
                 if (fas.getIssue().getProposal() != null)

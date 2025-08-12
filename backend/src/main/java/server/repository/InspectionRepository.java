@@ -18,6 +18,6 @@ public interface InspectionRepository extends JpaRepository<Inspection, Long> {
     Page<Inspection> findAll(Pageable pageable);
 
     // ✅ 메인 대시보드용 최근 점검 리스트 (유동적 count 사용)
-    List<Inspection> findByIsinspectedTrueOrderByCreateDateDesc(Pageable pageable);
+    List<Inspection> findByOrderByCreateDateDesc(Pageable pageable);
 }
 
