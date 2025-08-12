@@ -1,91 +1,181 @@
-/* 페이지 폭/여백 */
-.page-wrap { background: #f5f6fa; min-height: 100vh; display:flex; flex-direction:column; }
-.main-wrap {
-  max-width: 1120px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 20px 16px 48px;
-}
-
-/* 상단 두 칼럼 */
-.grid-2col {
+/* ----- 레이아웃 ----- */
+.main-wrap { padding: 16px; }
+.main-container { display: grid; gap: 16px; }
+.tables-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-/* 카드 패널 */
-.panel {
+/* ----- 카드 ----- */
+.table-card {
   background: #fff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e7ebf3;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(12, 20, 56, 0.04);
+  overflow: hidden;
+}
+.table-card__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: #f6f8fc;        /* 표 제목 부분 색상 */
+  border-bottom: 1px solid #e9eef6;
+}
+.table-card__head h3 { margin: 0; font-size: 16px; font-weight: 700; color: #28324a; }
+
+/* ----- 테이블 모양(div table) ----- */
+.table { width: 100%; }
+.table__row {
+  display: grid;
+  grid-template-columns: 160px 1fr 120px 120px 1fr; /* 기본 5열 형태 */
+  border-bottom: 1px solid #f0f3f9;
+}
+.table__row:last-child { border-bottom: none; }
+
+.table__row--cols {
+  background: #eef3fb;        /* 칼럼 헤더 행 색상 (제목과 톤은 비슷하지만 더 진함) */
+  font-weight: 600;
+}
+
+.table__cell {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #2f3b57;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  /* min-height: 40px; ← 이 줄은 삭제 또는 주석 처리 */
+}
+
+.table__row--cols .table__cell {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+/* width helper */
+.w-160 { width: 160px; }
+.w-220 { width: 220px; }
+.w-120 { width: 120px; }
+
+/* 상태/경고 */
+.color-danger { color: #d93025; }
+
+/* ----- 지도 + CCTV 패널 ----- */
+.map-wrap {
+  background: #fff;
+  border: 1px solid #e7ebf3;
   border-radius: 12px;
   overflow: hidden;
 }
 
-/* 패널 헤더 */
-.panel-head {
+.map-grid { display: grid; grid-template-columns: 1fr 300px; gap: 0; min-height: 520px; }
+.map { width: 100%; height: 100%; min-height: 520px; }
+
+/* CCTV 사이드 패널 */
+.cctv-panel {
+  border-left: 1px solid #e7ebf3;
+  background: #fbfcff;
   display: grid;
-  align-items: center;
-  gap: 8px;
+  grid-template-rows: auto 1fr;
+}
+
+.cctv-panel__head {
   padding: 12px 14px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
   font-weight: 700;
-  color: #111827;
-  position: relative;
+  color: #2b3551;
+  background: #f6f8fc;
+  border-bottom: 1px solid #e9eef6;
 }
 
-.panel-head.two-col { grid-template-columns: 1fr 2fr; }
-.panel-head.three-col { grid-template-columns: 1fr 0.5fr 1fr; }
-
-.panel-tools {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  display: flex;
-  gap: 6px;
+.cctv-panel__list {
+  padding: 10px;
+  overflow: auto;
 }
 
-.icon-btn {
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  border-radius: 8px;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-/* 표(간단 그리드) */
-.table .row {
-  display: grid;
-  gap: 8px;
-  border-bottom: 1px solid #f3f4f6;
-  padding: 12px 14px;
-}
-.row:last-child { border-bottom: none; }
-
-.row.two-col { grid-template-columns: 1fr 2fr; }
-.row.three-col { grid-template-columns: 1fr 0.5fr 1fr; }
-
-.cell.date { color: #374151; font-weight: 600; }
-.cell.detail { color: #6b7280; }
-
-.badge {
-  margin-left: 8px;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: #fff7ed;
-  border: 1px solid #fdba74;
-}
-
-/* 지도 영역 */
-.map-wrap { margin-top: 20px; }
-.map {
+.cctv-item {
   width: 100%;
-  height: 380px;   /* ← 이것 필수 */
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+  text-align: left;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border: 1px solid #e6ecf5;
+  border-radius: 10px;
+  box-shadow: 0 1px 1px rgba(15, 23, 42, 0.03);
+  cursor: pointer;
+  transition: box-shadow .12s ease, border-color .12s ease, transform .05s ease;
+}
+.cctv-item:hover {
+  border-color: #cdd6e6;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+.cctv-item.is-active {
+  border-color: #2573ff;
+  box-shadow: 0 2px 8px rgba(37, 115, 255, 0.16);
+}
+
+.cctv-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  margin-top: 4px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.cctv-item__text { overflow: hidden; }
+.cctv-item__name {
+  font-weight: 600; color: #2b3551; margin-bottom: 2px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.cctv-item__coord {
+  font-size: 12px; color: #6b7280;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+.cctv-empty {
+  padding: 16px; font-size: 14px; color: #9097a5;
+  background: #f8fafc; border: 1px dashed #d9e2f0; border-radius: 10px;
+}
+
+/* 반응형 */
+@media (max-width: 1200px) {
+  .tables-wrap { grid-template-columns: 1fr; }
+  .map-grid { grid-template-columns: 1fr; }
+  .cctv-panel { border-left: none; border-top: 1px solid #e7ebf3; }
+}
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #e9eef6;
+  border: none;
+  border-radius: 50%;
+  color: #2a354d;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.icon-btn:hover {
+  background: #d6deeb;
+}
+
+.ellipsis {
   overflow: hidden;
-  background: #eef2ff; /* SDK 로딩 전에도 영역 보이도록 */
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.link-like {
+  cursor: pointer;
+  color: #2f3b57; /* 검정에 가까운 기본 텍스트 색상 유지 */
+  transition: opacity 0.1s;
+}
+.link-like:hover {
+  opacity: 0.7;
+  text-decoration: none;
 }
