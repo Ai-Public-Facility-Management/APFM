@@ -106,10 +106,6 @@ public class InspectionService {
     @Transactional
     public void saveInspectionResult(List<InspectionResultDTO> results) {
 
-//        // 1️⃣ 사용자 조회
-//        Users user = usersRepository.findByEmail(result.getEmail())
-//            .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " + result.getEmail()));
-
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
@@ -118,10 +114,10 @@ public class InspectionService {
         //리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
             if(dto.getDetections().getStatus().equals("NOMAL")) {
-                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "NORMAL");
+                publicFaService.addPublicFa(dto);
             }else{
-                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
-                Issue issue = issueService.addIssue(dto.getDetections().getStatus(),1L,dto.getDetections().getCost_estimate(),dto.getOriginal_image(),publicFa,inspection);
+                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL",dto.getOriginal_image());
+                Issue issue = issueService.addIssue(dto.getDetections().getStatus(),1L,dto.getDetections().getCost_estimate(),publicFa,inspection);
                 publicFa.setIssue(issue);
                 inspection.getIssues().add(issue);
             }

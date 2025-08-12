@@ -29,9 +29,9 @@ public class PublicFaService {
 
     // 수정 필요
     @Transactional
-    public PublicFa addPublicFa(Long cameraId, String publicFaType,List<Integer> box,String publicFaStatus) {
+    public PublicFa addPublicFa(InspectionResultDTO dto) {
         // 저장된 상태인 객체들만 조회
-        List<PublicFa> savedFas = publicFaRepository.findByCameraId(cameraId);
+        List<PublicFa> savedFas = publicFaRepository.findByCameraId(dto.getCameraId());
         Camera camera = cameraRepository.findById(cameraId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         PublicFaType type = PublicFaType.valueOf(publicFaType);
         Section section = new Section(box);
@@ -49,6 +49,28 @@ public class PublicFaService {
         // 중복 아닌 경우 저장
         return publicFaRepository.save(new PublicFa(dto,camera));
     }
+
+//    @Transactional
+//    public PublicFa addPublicFa(Long cameraId, String publicFaType,List<Integer> box,String publicFaStatus,String image) {
+//        // 저장된 상태인 객체들만 조회
+//        List<PublicFa> savedFas = publicFaRepository.findByCameraId(cameraId);
+//        Camera camera = cameraRepository.findById(cameraId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+//        PublicFaType type = PublicFaType.valueOf(publicFaType);
+//        Section section = new Section(box);
+//        PublicFaDTO dto = new PublicFaDTO(type,section,FacilityStatus.valueOf(publicFaStatus));
+//        for (PublicFa savedFa : savedFas) {
+//            double iou = calculateIoU(section, savedFa.getSection());
+//            double IOU_THRESHOLD = 0.5;
+//            if (iou >= IOU_THRESHOLD) {
+//                if (savedFa.getType() == type)
+//                    return savedFa;
+//                else
+//                    return publicFaRepository.save(new PublicFa(dto,camera));
+//            }
+//        }
+//        // 중복 아닌 경우 저장
+//        return publicFaRepository.save(new PublicFa(dto,camera));
+//    }
 
 
     public PublicFaDetail viewFa(Long id){

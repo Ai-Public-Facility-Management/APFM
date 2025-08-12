@@ -11,7 +11,7 @@ public class PublicFaDetail {
     private Long id;
     private String cameraName;
     private PublicFaType type;
-    private Photo image;
+    private File image;
     private Section section;
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date installDate;

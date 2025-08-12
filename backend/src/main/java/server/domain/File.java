@@ -5,15 +5,15 @@ import lombok.Data;
 
 @Embeddable
 @Data
-public class Photo {
+public class File {
     private String url;
     private String description;
 
-    public Photo(String url) {
+    public File(String url) {
         this.url = url;
     }
 
-    public Photo() {
+    public File() {
 
     }
 }

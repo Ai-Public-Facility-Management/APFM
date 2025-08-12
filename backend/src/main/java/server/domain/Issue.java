@@ -31,8 +31,6 @@ public class Issue {
     @Enumerated(EnumType.STRING)
     private IssueStatus status;
 
-    @Embedded
-    private Photo image;
 
     private Long estimate;
 
@@ -55,23 +53,20 @@ public class Issue {
     @JoinColumn(name="inspection_id")
     private Inspection inspection;
 
-    public Issue(IssueDTO issueDTO) {
-        this.creationDate = issueDTO.getCreationDate();
-        this.type = issueDTO.getType();
-        this.image = issueDTO.getImage();
-        this.estimateBasis = issueDTO.getEstimateBasis();
-        this.estimate = issueDTO.getEstimate();
-    }
+//    public Issue(IssueDTO issueDTO) {
+//        this.creationDate = issueDTO.getCreationDate();
+//        this.type = issueDTO.getType();
+//        this.image = issueDTO.getImage();
+//        this.estimateBasis = issueDTO.getEstimateBasis();
+//        this.estimate = issueDTO.getEstimate();
+//    }
 
-    public Issue(IssueType type,Long estimate,String estimateBasis,String image) {
+    public Issue(IssueType type,Long estimate,String estimateBasis) {
         this.creationDate = new Date();
         this.type = type;
-        this.image = new Photo(image);
         this.estimateBasis = estimateBasis;
         this.estimate = estimate;
     }
 
-
-    
 }
 

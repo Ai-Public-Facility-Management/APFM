@@ -64,15 +64,9 @@ public class IssueService {
         return issueRepository.findByInspection_Id(inspectionId);
     }
 
-    public Issue createIssue(IssueDTO issueDTO) {
-        Issue issue = new Issue(issueDTO);
-        issue.setPublicFa(publicFaRepository.findById(issueDTO.getPublicFaId()).orElse(new PublicFa()));
 
-        return issueRepository.save(issue);
-    }
-
-    public Issue addIssue(String status,Long estimate,String estimateBasis,String image,PublicFa publicFa,Inspection inspection) {
-        Issue issue = new Issue(IssueType.valueOf(status),estimate,estimateBasis,image);
+    public Issue addIssue(String status,Long estimate,String estimateBasis,PublicFa publicFa,Inspection inspection) {
+        Issue issue = new Issue(IssueType.valueOf(status),estimate,estimateBasis);
         issue.setPublicFa(publicFa);
         issue.setInspection(inspection);
         return issueRepository.save(issue);
@@ -106,7 +100,7 @@ public class IssueService {
             detail.setCameraName(publicFa.getCamera().getLocation());
             detail.setCondition(issue.getType());
             detail.setObstruction(publicFa.getObstruction());
-            detail.setImage(issue.getImage());
+            detail.setImage(issue.getPublicFa().getImage());
             detail.setEstimate(issue.getEstimate());
             detail.setEstimateBasis(issue.getEstimateBasis());
 

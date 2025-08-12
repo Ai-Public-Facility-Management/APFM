@@ -23,6 +23,9 @@ public class PublicFa {
     @Enumerated(EnumType.STRING)
     private PublicFaType type;
 
+    @Embedded
+    private File image;
+
     //이미지상 좌표값
     @Embedded
     private Section section;
