@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import server.service.LoginAttemptService;
-import server.domain.UserType;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +51,7 @@ public class LoginService {
 
         System.out.println("✅ 로그인 성공: " + user.getUsername());
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(user.getEmail(), user.getType().name());
     }
     public Users getUserByEmail(String email) {
         return userRepository.findByEmail(email)

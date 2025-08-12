@@ -1,9 +1,13 @@
 package server.domain;
 
+import jakarta.persistence.Embeddable;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@Embeddable
+@NoArgsConstructor
 @Data
 public class Section {
     private double xCenter;
@@ -17,4 +21,5 @@ public class Section {
         this.xCenter = box.get(0) + width / 2.0;
         this.yCenter = box.get(1) + height / 2.0;
     }
+
 }

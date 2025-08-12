@@ -10,6 +10,7 @@ import signup from "../assets/ico_join.svg";
 import settings from "../assets/ico_calendar.svg";
 import userIcon from "../assets/ico_my.svg";
 import logoutIcon from "../assets/ico_logout.svg";
+import { useScheduleModal } from "../features/schedule/ScheduleModalProvider";
 
 import {
   getToken,
@@ -26,6 +27,9 @@ const Header: React.FC = () => {
   const [authed, setAuthed] = useState<boolean>(!!getToken());
   const [userName, setUserName] = useState<string>("사용자");
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
+
+  const { open } = useScheduleModal();
+  
 
   // 라우트 이동 시 토큰 상태 재확인
   useEffect(() => {
@@ -52,7 +56,7 @@ const Header: React.FC = () => {
       const token = getToken();
       if (token) {
         // 백엔드에 실제 로그아웃(블랙리스트) 요청
-        await logoutAPI(token);
+        await logoutAPI();
       }
     } catch {
       // 서버 에러여도 UX 위해 로컬 토큰은 지움
@@ -92,12 +96,34 @@ const Header: React.FC = () => {
               <img src={search} alt="검색" className="search-image" />
               <span>통합검색</span>
             </Link>
-
-            {/* 점검 주기 설정 */}
+          {/* 페이지 띄어서 하는 점검 주기 나중에 모달 신경 안쓰면 지워도됨
+            
             <Link to="/inspection/interval">
               <img src={settings} alt="설정" className="search-image" />
               <span>점검 주기 설정</span>
-            </Link>
+            </Link> */}
+
+                        {/* 점검 주기 설정 (메인 위에 모달) */}
+          <button
+              type="button"
+              onClick={() => open()}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                background: "none",
+                border: 0,
+                padding: 0,
+                color: "#000",
+                font: "inherit",
+                fontWeight: "bold",
+                cursor: "pointer",
+                textDecoration: "none",
+              }}
+          >
+              <img src={settings} alt="설정" className="search-image" />
+              <span>점검 주기 설정</span>
+          </button>
 
             {/* 사용자명 */}
             <div className="userItem">

@@ -45,11 +45,13 @@ public class Issue {
 
     private String location;
 
-    @OneToOne
+    private String content;
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publicFa_id", unique = true)
     private PublicFa publicFa;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="inspection_id")
     private Inspection inspection;
 
@@ -69,7 +71,7 @@ public class Issue {
         this.estimate = estimate;
     }
 
-    private String content;
+
     
 }
 

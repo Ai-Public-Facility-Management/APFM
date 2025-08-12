@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -14,13 +15,13 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import server.domain.JwtUtil;
-import server.service.CustomUserDetailsService;
 import server.service.TokenBlacklistService;
 
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     // ✅ CORS 설정 Bean (필수)
@@ -53,10 +54,10 @@ public class SecurityConfig {
 
                         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(
-
                                  "/api/auth/**","/api/publicfa/**","/api/issue/**","/users/reset","/users/reset-confime",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**", "/api/admin/**"
+                                "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**"
                         ).permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 iframe 허용
@@ -80,8 +81,7 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtUtil jwtUtil,
-            CustomUserDetailsService customUserDetailsService,
             TokenBlacklistService tokenBlacklistService) {
-        return new JwtAuthenticationFilter(jwtUtil, customUserDetailsService, tokenBlacklistService);
+        return new JwtAuthenticationFilter(jwtUtil, tokenBlacklistService);
     }
 }

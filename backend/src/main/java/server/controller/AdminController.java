@@ -1,5 +1,6 @@
 package server.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import server.domain.ApprovalStatus;
 import server.domain.Users;
 import server.repository.UsersRepository;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 public class AdminController {

@@ -63,13 +63,20 @@ public class PublicFaService {
         Fas.forEach(fas->{
             DashboardIssue issue = new DashboardIssue();
             issue.setPublicFaId(fas.getId());
-            issue.setIssueType(fas.getIssue().getType());
             issue.setPublicFaType(fas.getType());
-            //이슈사항에 제안서가 작성되어 있으면 공사중 표시
-            if(fas.getIssue().getProposal() != null)
-                issue.setIsProcessing(Boolean.TRUE);
+            issue.setCameraName(fas.getCamera().getLocation());
+            if(fas.getStatus().equals(FacilityStatus.ABNORMAL) && fas.getIssue() != null) {
+                issue.setIssueType(fas.getIssue().getType());
+                if (fas.getIssue().getProposal() != null)
+                    issue.setIsProcessing(Boolean.TRUE);
+                else
+                    issue.setIsProcessing(Boolean.FALSE);
+            }
             else
-                issue.setIsProcessing(Boolean.FALSE);
+                issue.setIssueType(null);
+
+            //이슈사항에 제안서가 작성되어 있으면 공사중 표시
+
             issues.add(issue);
         });
         return issues;
