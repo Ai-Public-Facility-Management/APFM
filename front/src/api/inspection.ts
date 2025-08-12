@@ -8,7 +8,7 @@ export interface InspectionSettingDTO {
   startDate: string;        // "YYYY-MM-DD"
   startTime: string;        // "HH:mm" 또는 "HH:mm:ss"
   inspectionCycle: number;  // 주기(정수)
-  address: string;
+  //address: string;
 }
 
 export const saveInspectionSetting = (payload: InspectionSettingDTO) =>
