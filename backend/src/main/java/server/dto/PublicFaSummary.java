@@ -18,16 +18,17 @@ public class PublicFaSummary {
 
     public PublicFaSummary(PublicFa fa){
         this.publicFaId = fa.getId();
-        this.issueId = fa.getIssue().getId();
         this.cameraName = fa.getCamera().getLocation();
         this.publicFaType = fa.getType();
-        this.condition = fa.getIssue().getType();
+        if(fa.getIssue() != null){
+            this.issueId = fa.getIssue().getId();
+            this.condition = fa.getIssue().getType();
+            if(fa.getIssue().getProposal() != null)
+                this.isProcessing = Boolean.TRUE;
+            else
+                this.isProcessing = Boolean.FALSE;
+        }
         this.status = fa.getStatus();
-        if(fa.getIssue().getProposal() != null)
-            this.isProcessing = Boolean.TRUE;
-        else
-            this.isProcessing = Boolean.FALSE;
-
     }
 }
 
