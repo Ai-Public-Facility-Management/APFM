@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    path: "/detail",
+    path: "/detail/:id",
     element: <DetailPublicFa/>,
     loader: requireAuth,
   },

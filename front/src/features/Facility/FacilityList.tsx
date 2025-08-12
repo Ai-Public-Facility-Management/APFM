@@ -1,5 +1,6 @@
 // src/pages/FacilityList.tsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import "./FacilityList.css";
 import { fetchFacilities, Facility } from "../../api/publicFa";
@@ -42,6 +43,8 @@ const FacilityList = () => {
       .includes(searchTerm.toLowerCase())
   );
 
+  const navigate = useNavigate();
+
   return (
     <Layout>
       <div className="facility-page">
@@ -79,14 +82,16 @@ const FacilityList = () => {
               <div
                 key={`facility-${fa.publicFaId}`}
                 className={`facility-card-item ${
-                  selectedIds.includes(fa.publicFaId) ? "selected" : ""
-                }`}
+                  selectedIds.includes(fa.publicFaId) ? "selected" : ""}`}
+                  onClick={() => navigate(`/detail/${fa.publicFaId}`)}
+                  style={{ cursor: "pointer" }}
               >
                 <div className="facility-card-header">
                   <div className="header-left">
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(fa.publicFaId)}
+                      onClick={e => e.stopPropagation()}
                       onChange={() => toggleSelect(fa.publicFaId)}
                       className="facility-checkbox"
                     />
