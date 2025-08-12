@@ -5,14 +5,10 @@ export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
 
 // 백엔드 InspectionSettingDTO와 키가 다르면 여기서만 이름 바꾸면 됨
 export interface InspectionSettingDTO {
-  facilityId: number;
-  frequency: Frequency;
-  hour: number;
-  minute: number;
-  startAt: string;       // ISO: "2025-08-12T00:00:00Z"
-  dayOfWeek?: number;    // WEEKLY: 1~7 (Mon=1)
-  dayOfMonth?: number;   // MONTHLY: 1~28
-  enabled: boolean;
+  startDate: string;        // "YYYY-MM-DD"
+  startTime: string;        // "HH:mm" 또는 "HH:mm:ss"
+  inspectionCycle: number;  // 주기(정수)
+  address: string;
 }
 
 export const saveInspectionSetting = (payload: InspectionSettingDTO) =>
