@@ -2,7 +2,6 @@
 import { api } from "./http";
 import type { PageResponse } from "../types/paging";
 
-// === 타입들은 기존 것 유지 ===
 export type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
 
 export type InspectionSummary = {
@@ -42,14 +41,10 @@ export type InspectionDetail = {
 };
 
 export interface InspectionSettingDTO {
-  facilityId: number;
-  frequency: Frequency;
-  hour: number;
-  minute: number;
-  startAt: string;
-  dayOfWeek?: number;
-  dayOfMonth?: number;
-  enabled: boolean;
+  startDate: string;        // "YYYY-MM-DD"
+  startTime: string;        // "HH:mm" 또는 "HH:mm:ss"
+  inspectionCycle: number;  // 주기(정수)
+  address: string;
 }
 
 // [기능 요약] 점검 리스트 조회 (백엔드: /api/inspection/all, 응답 {data: Page})
@@ -68,9 +63,8 @@ export const fetchInspectionDetail = async (inspectionId: number) => {
 };
 
 // [기능 요약] 점검 주기 설정 저장
-export const saveInspectionSetting = async (payload: InspectionSettingDTO) => {
-  const { data } = await api.put("/api/inspection/setting", payload);
-  return data.data;
+export const saveInspectionSetting = (payload: InspectionSettingDTO) => {
+  api.put("/api/inspection/setting", payload).then(res => res.data);
 };
 
 // [기능 요약] 보고서 생성 (LLM)

@@ -9,5 +9,6 @@ public class DashboardIssue {
     private Long publicFaId;
     private PublicFaType publicFaType;
     private IssueType issueType;
+    private String cameraName;
     private Boolean isProcessing;
 }

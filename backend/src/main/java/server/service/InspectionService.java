@@ -9,11 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.*;
-import server.dto.DashboardInspection;
-import server.dto.InspectionResultDTO;
-import server.dto.InspectionSettingDTO;
-import server.dto.InspectionSummary;
-import server.dto.InspectionDetailDTO;
+import server.dto.*;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
@@ -55,11 +51,9 @@ public class InspectionService {
                 .count();
 
             boolean hasIssue = !issues.isEmpty();
-            boolean hasReport = inspection.getReport() != null;
 
             // 상태 판별
-            Boolean isInspected = inspection.getIsinspected();
-            String status = Boolean.TRUE.equals(inspection.getIsinspected()) ? "작성 완료" : "작성중";
+            String status = inspection.getReport() != null ? "작성 완료" : "작성중";
 
             return new InspectionSummary(
                 inspectionId,
@@ -67,8 +61,7 @@ public class InspectionService {
                 status,
                 repairCount,
                 removalCount,
-                hasIssue,
-                hasReport
+                hasIssue
             );
         });
     }
@@ -76,15 +69,13 @@ public class InspectionService {
     // ✅ 점검 리스트 조회 (메인페이지 대쉬보드용)
     public List<DashboardInspection> getDashboardInspections(int count) {
         PageRequest pageRequest = PageRequest.of(0, count);
-        List<Inspection> inspections = inspectionRepository.findByIsinspectedTrueOrderByCreateDateDesc(pageRequest);
+        List<Inspection> inspections = inspectionRepository.findByOrderByCreateDateDesc(pageRequest);
         List<DashboardInspection> dashboardInspections = new ArrayList<>();
-        for (Inspection inspection : inspections) {
+        inspections.forEach(inspection -> {
             DashboardInspection ins =  new DashboardInspection();
-
             ins.setInspectionId(inspection.getId());
             ins.setInspectionDate(inspection.getCreateDate());
-
-            if(inspection.getIssues() != null ) {
+            if(!inspection.getIssues().isEmpty()) {
                 List<Issue> issues = inspection.getIssues();
                 Issue issue = issues.get(issues.size()-1);
                 ins.setCameraName(issue.getPublicFa().getCamera().getLocation());
@@ -96,13 +87,12 @@ public class InspectionService {
                 ins.setPublicFaType(null);
                 ins.setIssueType(null);
             }
-
             dashboardInspections.add(ins);
-        }
-
+        });
 
         return dashboardInspections;
     }
+
 
     @Transactional
     public InspectionSettingDTO setInspectionSetting(InspectionSettingDTO dto) {
@@ -126,8 +116,6 @@ public class InspectionService {
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
-        inspection.setReportUrl(null);
-        inspection.setIsinspected(true); // 점검 완료 상태
         inspectionRepository.save(inspection);
 
         //리스트 순회하여 저장
@@ -206,5 +194,5 @@ public class InspectionService {
         return dto;
     }
 
-    
+
 }

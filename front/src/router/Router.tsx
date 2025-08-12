@@ -5,6 +5,8 @@ import LoginPage from "../features/Login/LoginPage";
 import SignupPage from "../features/Signup/SignupPage";
 import AdminPage from "../features/Admin/AdminPage";
 import MainPage from "../features/Main/MainPage";
+import FindPasswordPage from "../features/Findpassword/Findpasswordpage";
+
 import InspectionListPage from "../features/Inspections/InspectionListPage";
 import InspectionDetailPage from "../features/Inspections/InspectionDetailPage";
 import {getRoleFromToken, getToken} from "../api/login";
@@ -67,6 +69,12 @@ export const router = createBrowserRouter([
     path: "/inspections/:id",
     element: <InspectionDetailPage />,
     loader: requireAuth,
+  },
+
+  {
+    path: "/find-password",
+    element: <FindPasswordPage />,
+    loader: onlyGuest,
   },
   // 그 외 -> 메인으로
   {

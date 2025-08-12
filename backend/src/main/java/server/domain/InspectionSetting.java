@@ -17,8 +17,6 @@ public class InspectionSetting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-
     // 시작 날짜 (ex: "2024-12-12")
     private String startDate;
 

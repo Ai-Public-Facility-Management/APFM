@@ -1,17 +1,32 @@
 import requests
-import base64
-from PIL import Image
-import io
+import json
+import os
 
-# 예시: 서버에 이미지 업로드 후 받은 response
-url = 'http://localhost:8080/predict'
-with open('testimg/sample_image.png', 'rb') as f:
-    response = requests.post(url, files={'image': f})
-res_json = response.json()
-print(res_json["detections"])
-# crops를 순회하며 이미지로 저장/띄우기
-for idx, b64_img in enumerate(res_json['crops']):
-    img_bytes = base64.b64decode(b64_img)
-    img = Image.open(io.BytesIO(img_bytes))
-    img.save(f'crop_{idx}.jpeg')    # 파일로 저장
-    img.show()                     # 바로 보기 (윈도우라면 이미지 뷰어로 뜸)
+# 서버 주소 (FastAPI 서버가 실행 중이어야 함)
+API_URL = "http://localhost:8080/predict"
+
+# 테스트할 이미지 폴더 경로 (실제 경로로 변경하세요)
+image_folder_path = "testimg"  # 예: "D:/cctv_images"
+
+# 폴더 존재 여부 확인
+if not os.path.isdir(image_folder_path):
+    print(f"❌ 유효하지 않은 경로입니다: {image_folder_path}")
+    exit()
+
+# 요청 payload 구성
+payload = {
+    "image_folder": image_folder_path
+}
+
+# POST 요청
+print(f"🚀 요청 중: {API_URL}")
+response = requests.post(API_URL, json=payload)
+
+# 응답 확인
+if response.status_code == 200:
+    result = response.json()
+    print("✅ 응답 결과:")
+    print(json.dumps(result, indent=2, ensure_ascii=False))  # 한글도 잘 보이게
+else:
+    print(f"❌ 오류 발생: {response.status_code}")
+    print(response.text)
