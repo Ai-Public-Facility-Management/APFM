@@ -16,7 +16,7 @@ public class Report {
     @Embedded
     private Photo content;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "inspection_id", unique = true)
     private Inspection inspection;
 

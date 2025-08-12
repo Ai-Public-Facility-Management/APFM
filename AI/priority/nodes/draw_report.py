@@ -74,12 +74,10 @@ def draw_wrapped_text(c, text, x, y, fontname, fontsize, max_width, line_spacing
     return y
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-FONTS_DIR = BASE_DIR / "assets" / "fonts"
-
-pdfmetrics.registerFont(TTFont('HeadlineM', str(FONTS_DIR / 'C:/Users/User/Desktop/빅프/APFM/AI/priority/assets/H2HDRM.TTF')))
-pdfmetrics.registerFont(TTFont('JungGothic', str(FONTS_DIR / 'C:/Users/User/Desktop/빅프/APFM/AI/priority/assets/H2GTRM.TTF')))
-pdfmetrics.registerFont(TTFont('Myungjo', str(FONTS_DIR / 'C:/Users/User/Desktop/빅프/APFM/AI/priority/assets/H2MJSM.TTF')))
-
+FONTS_DIR = BASE_DIR / "assets"
+pdfmetrics.registerFont(TTFont('HeadlineM', str(FONTS_DIR / 'H2HDRM.TTF')))
+pdfmetrics.registerFont(TTFont('JungGothic', str(FONTS_DIR / 'H2GTRM.TTF')))
+pdfmetrics.registerFont(TTFont('Myungjo', str(FONTS_DIR / 'H2MJSM.TTF')))
 LEFT_MARGIN = 50
 RIGHT_MARGIN = 50
 TOP_MARGIN = 60
