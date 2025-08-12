@@ -13,7 +13,6 @@ import {
 import { generateCCTVMarkerSvg } from "../../lib/markerSvg";
 import { useNavigate } from "react-router-dom";
 
-
 export default function MainPage() {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
@@ -200,7 +199,8 @@ export default function MainPage() {
             <div className="table-card">
               <div className="table-card__head">
                 <h3>정기점검 내역</h3>
-                <button className="icon-btn" onClick={() => navigate("/inspection/list")}>+</button>
+                {/* ✅ 변경: /inspection/list → /inspections */}
+                <button className="icon-btn" onClick={() => navigate("/inspections")}>+</button>
               </div>
               <div className="table">
                 {/* 헤더 행 */}
@@ -226,7 +226,8 @@ export default function MainPage() {
                       <div
                         className="table__cell ellipsis link-like"
                         title={detailText}
-                        onClick={() => navigate(`/inspection/${it.inspectionId}`)}
+                        // ✅ 변경: /inspection/{id} → /inspections/{id}
+                        onClick={() => navigate(`/inspections/${it.inspectionId}`)}
                       >
                         {detailText}...
                       </div>
@@ -262,9 +263,9 @@ export default function MainPage() {
                 {publicFas.map((fa, i) => (
                   <div key={i} className="table__row">
                     <div
-                      className="table__cell w-120 link-like"  // 클릭 가능 스타일 있으면 추가
+                      className="table__cell w-120 link-like"
                       onClick={() => navigate(`/detail/${fa.publicFaId}`)}
-                      style={{ cursor: "pointer" }} // 마우스 커서 변경 (선택사항)
+                      style={{ cursor: "pointer" }}
                       title="상세 보기"
                     >
                       {fa.publicFaType}
