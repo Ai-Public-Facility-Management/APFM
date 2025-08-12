@@ -1,11 +1,13 @@
 import { api } from "./http";
 
 export interface Facility {
-  id: number;
-  type: string;
-  section: string;
-  installDate: string;
+  publicFaId: number;
+  issueId: number;
+  cameraName: string;
+  publicFaType: string;
+  condition: string;
   status: string;
+  isProcessing: boolean;
 }
 
 export interface FacilityPage {

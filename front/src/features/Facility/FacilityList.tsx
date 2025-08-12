@@ -7,19 +7,40 @@ import { fetchFacilities, Facility } from "../../api/publicFa";
 const FacilityList = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    fetchFacilities(0, 15)
-        .then(data => setFacilities(data.content))
-        .catch(err => console.error("공공시설물 목록 로드 실패:", err));
-    }, []);
-
+    fetchFacilities(page - 1, 15)
+      .then((data) => setFacilities(data.content))
+      .catch((err) => console.error("공공시설물 목록 로드 실패:", err));
+  }, [page]);
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
     );
   };
+
+  const getStatusLabel = (status: string, isProcessing: boolean) => {
+    if (status === "NORMAL") {
+      return { text: "정상", className: "status-normal" };
+    }
+    if (status === "ABNORMAL" && isProcessing) {
+      return { text: "공사중", className: "status-processing" };
+    }
+    if (status === "ABNORMAL" && !isProcessing) {
+      return { text: "수리 필요", className: "status-repair" };
+    }
+    return { text: "-", className: "" };
+  };
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredFacilities = facilities.filter((fa) =>
+    `${fa.cameraName} ${fa.publicFaId}번 ${fa.publicFaType} ${fa.condition}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Layout>
@@ -33,8 +54,9 @@ const FacilityList = () => {
             type="text"
             placeholder="검색어를 입력해주세요."
             className="facility-search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button className="facility-advanced-btn">고급검색</button>
           <select className="facility-select">
             <option>종류</option>
             <option>전체</option>
@@ -51,34 +73,55 @@ const FacilityList = () => {
 
         {/* 카드 리스트 */}
         <div className="facility-card-grid">
-          {facilities.map((fa) => (
-            <div
-              key={fa.id}
-              className={`facility-card-item ${
-                selectedIds.includes(fa.id) ? "selected" : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(fa.id)}
-                onChange={() => toggleSelect(fa.id)}
-                className="facility-checkbox"
-              />
-              <div className={`facility-status ${fa.status}`}>{fa.status}</div>
-              <div className="facility-title">{fa.type}</div>
-              <div className="facility-desc">{fa.section}</div>
-              <div className="facility-period">{fa.installDate}</div>
-            </div>
-          ))}
+          {filteredFacilities.map((fa) => {
+            const label = getStatusLabel(fa.status, fa.isProcessing);
+            return (
+              <div
+                key={`facility-${fa.publicFaId}`}
+                className={`facility-card-item ${
+                  selectedIds.includes(fa.publicFaId) ? "selected" : ""
+                }`}
+              >
+                <div className="facility-card-header">
+                  <div className="header-left">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(fa.publicFaId)}
+                      onChange={() => toggleSelect(fa.publicFaId)}
+                      className="facility-checkbox"
+                    />
+                  </div>
+                  <div className="header-right">
+                    <span className={`status-label ${label.className}`}>{label.text}</span>
+                  </div>
+                </div>
+                <div className="facility-title">
+                  {fa.cameraName} {fa.publicFaId}번 {fa.publicFaType}
+                </div>
+                <div className="facility-desc">{fa.condition}</div>
+              </div>
+            );
+          })}
         </div>
 
         {/* 페이지네이션 */}
         <div className="pagination">
-          <button>이전</button>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            이전
+          </button>
           {[1, 2, 3, 4, 5].map((n) => (
-            <button key={n}>{n}</button>
+            <button
+              key={n}
+              className={page === n ? "active" : ""}
+              onClick={() => setPage(n)}
+            >
+              {n}
+            </button>
           ))}
-          <button>다음</button>
+          <button onClick={() => setPage((p) => p + 1)}>다음</button>
         </div>
 
         {/* 선택 영역 */}
