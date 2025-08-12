@@ -32,3 +32,29 @@ export async function fetchFacilities(page: number, size: number): Promise<Facil
     };
 }
 
+export interface FacilityDetail {
+  id: number;
+  cameraName: string;
+  type: string;
+  image: {
+    url: string;
+    description: string;
+  };
+  section: {
+    width: number;
+    height: number;
+    ycenter: number;
+    xcenter: number;
+  };
+  installDate: string;
+  lastRepair: string;
+  status: string;
+  obstruction: number;
+  estimate: number;
+  estimateBasis: string;
+}
+
+export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {
+  const response = await api.get("/api/publicfa/detail", { params: { id } });
+  return response.data.publicFa;
+}

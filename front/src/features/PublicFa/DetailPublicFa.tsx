@@ -1,27 +1,13 @@
 import Layout from "../../components/Layout";
+import { useParams } from "react-router-dom";
 import "./DetailPublicFa.css";
-import React, {useRef, useState} from "react";
-import benchImg from "../../assets/detail_test_img.jpeg";
+import { fetchFacilityDetail, FacilityDetail } from "../../api/publicFa";
+import React, { useEffect, useState, useRef } from "react";
 import {uploadResult} from "../../api/upload";
 
 export default function DetailPublicFa(){
-    const facilityDetailDummy = {
-        sectionName: "B구역 2번 벤치",
-        type: "벤치",
-        cctvNumber: "16번",
-        status: "파손",
-        installDate: "2023-12-11",
-        lastRepairDate: "2024-11-10",
-        estimate: {
-            description: [
-                "공사 필요 구간 면적 약 10.85㎡",
-                "필요 인력 건설기술(2인)",
-                "공사 기간 약 1일",
-                "필요 자재 나무 판재(480x80)",
-                "약 200,000원",
-            ],
-        }
-    };
+    const { id } = useParams<{ id: string }>();
+    const [detail, setDetail] = useState<FacilityDetail | null>(null);
 
     // 결과 보고서 상태
     type ReportRow = {
@@ -128,47 +114,61 @@ export default function DetailPublicFa(){
         setReports(prev => prev.filter(r => r.id !== id));
     };
 
+    useEffect(() => {
+    if (id) {
+      fetchFacilityDetail(Number(id))
+        .then((data) => setDetail(data))
+        .catch((err) => console.error("상세 조회 실패:", err));
+    }
+  }, [id]);
+
+  if (!detail) return <Layout mainClassName="detailMain">로딩 중...</Layout>;
+
 
     return (
         <Layout mainClassName="detailMain">
-            <h1>{facilityDetailDummy.sectionName}</h1>
-            <hr className="custom-hr"/>
+            <h1>{detail.cameraName}</h1>
+            <hr className="custom-hr" />
             <div className="detail-content">
                 <table className="detail-table">
-                    <tbody>
+                <tbody>
                     <tr>
                         <th>종류</th>
-                        <td>{facilityDetailDummy.type}</td>
-                    </tr>
-                    <tr>
-                        <th>CCTV</th>
-                        <td>{facilityDetailDummy.cctvNumber}</td>
+                        <td>{detail.type}</td>
                     </tr>
                     <tr>
                         <th>상태</th>
-                        <td>{facilityDetailDummy.status}</td>
+                        <td>{detail.status}</td>
                     </tr>
                     <tr>
                         <th>설치 날짜</th>
-                        <td>{facilityDetailDummy.installDate}</td>
+                        <td>{detail.installDate}</td>
                     </tr>
                     <tr>
                         <th>마지막 수리 날짜</th>
-                        <td>{facilityDetailDummy.lastRepairDate}</td>
+                        <td>{detail.lastRepair}</td>
+                    </tr>
+                    <tr>
+                        <th>차단 정도</th>
+                        <td>{detail.obstruction}</td>
                     </tr>
                     <tr>
                         <th>예상 견적</th>
-                        <td>
-                            {facilityDetailDummy.estimate.description.map((line, idx) => (
-                                <div key={idx}>{line}</div>
-                            ))}
-                        </td>
+                        <p>{detail.estimate?.toLocaleString?.() ?? "견적 없음"}</p>
                     </tr>
-                    </tbody>
-                </table>
+                    <tr>
+                        <th>견적 근거</th>
+                        <td>{detail.estimateBasis}</td>
+                    </tr>
+                </tbody>
+            </table>
 
                 <div className="detail-image">
-                    <img src={benchImg} alt={facilityDetailDummy.sectionName}/>
+                    {detail.image ? (
+                        <img src={detail.image.url} alt={detail.image.description || "이미지"} />
+                    ) : (
+                        <p>이미지 없음</p>
+                    )}
                 </div>
             </div>
             <hr className="custom-hr-2"/>

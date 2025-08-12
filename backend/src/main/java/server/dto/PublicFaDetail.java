@@ -26,13 +26,15 @@ public class PublicFaDetail {
         this.id = publicFa.getId();
         this.cameraName = publicFa.getCamera().getLocation();
         this.type = publicFa.getType();
-        this.image = publicFa.getIssue().getImage();
+        if (publicFa.getIssue() != null) {
+            this.image = publicFa.getIssue().getImage();
+            this.estimate = publicFa.getIssue().getEstimate();
+            this.estimateBasis = publicFa.getIssue().getEstimateBasis();
+        }
         this.section = publicFa.getSection();
         this.installDate = publicFa.getInstallDate();
         this.lastRepair = publicFa.getLastRepair();
         this.status = publicFa.getStatus();
         this.obstruction = publicFa.getObstruction();
-        this.estimate = publicFa.getIssue().getEstimate();
-        this.estimateBasis = publicFa.getIssue().getEstimateBasis();
     }
 }
