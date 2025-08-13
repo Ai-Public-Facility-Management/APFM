@@ -35,7 +35,7 @@ public class BoardService {
                 .content(req.content)
                 .isPinned(req.pinned)
                 .department(req.department)
-                .author(author) // Users 매핑
+                .author(author)
                 .build();
 
         if (req.attachments != null) {
@@ -55,11 +55,12 @@ public class BoardService {
 
     // [기능 요약] 게시글 단건 조회(+조회수 증가, 댓글수 포함)
     @Transactional
-    public PostResp getAndIncreaseView(Long id) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    public PostResp getAndIncreaseView(Long postId) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
         post.setViewCount(post.getViewCount() + 1);
-        long commentCount = commentRepo.countActiveByPostId(id);
+        long commentCount = commentRepo.countActiveByPostId(postId);
         return toPostResp(post, commentCount);
     }
 
@@ -77,13 +78,9 @@ public class BoardService {
         } else {
             String keyword = q.trim();
             if (type == null) {
-                posts = postRepo.findByDeletedAtIsNullAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndContentContainingIgnoreCase(
-                        keyword, keyword, pageable
-                );
+                posts = postRepo.findByDeletedAtIsNullAndTitleContainingIgnoreCase(keyword, pageable);
             } else {
-                posts = postRepo.findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndTypeAndContentContainingIgnoreCase(
-                        type, keyword, type, keyword, pageable
-                );
+                posts = postRepo.findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCase(type, keyword, pageable);
             }
         }
 
@@ -92,9 +89,9 @@ public class BoardService {
 
     // [기능 요약] 게시글 수정(작성자/관리자)
     @Transactional
-    public PostResp update(Long id, PostUpdateReq req) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    public PostResp update(Long postId, PostUpdateReq req) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
 
@@ -114,15 +111,16 @@ public class BoardService {
             }
         }
 
-        long commentCount = commentRepo.countActiveByPostId(id);
+        long commentCount = commentRepo.countActiveByPostId(postId);
         return toPostResp(post, commentCount);
     }
 
     // [기능 요약] 게시글 삭제(소프트)
     @Transactional
-    public void delete(Long id) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    public void delete(Long postId) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
         userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
         post.softDelete();
     }
@@ -141,19 +139,19 @@ public class BoardService {
         Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        BoardPost post = postRepo.findActiveById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         BoardComment c = commentRepo.save(BoardComment.builder()
                 .post(post)
-                .author(author) // Users 매핑
+                .author(author)
                 .content(req.getContent())
                 .edited(false)
                 .build());
         return toCommentResp(c);
     }
 
-    // [기능 요약] 댓글 수정 → (수정됨)
+    // [기능 요약] 댓글 수정
     @Transactional
     public CommentResp updateComment(Long commentId, String newContent) {
         BoardComment c = commentRepo.findById(commentId)
@@ -182,8 +180,8 @@ public class BoardService {
                 .content(p.getContent())
                 .pinned(p.isPinned())
                 .viewCount(p.getViewCount())
-                .authorEmail(p.getAuthor().getEmail())   // Users.email
-                .authorName(p.getAuthor().getUsername()) // Users.username
+                .authorEmail(p.getAuthor().getEmail())
+                .authorName(p.getAuthor().getUsername())
                 .department(p.getDepartment())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
@@ -194,8 +192,7 @@ public class BoardService {
                                         .id(a.getId())
                                         .originalName(a.getOriginalName())
                                         .storedUrl(a.getStoredUrl())
-                                        .build()
-                                )
+                                        .build())
                                 .collect(Collectors.toList())
                 )
                 .build();
@@ -205,8 +202,8 @@ public class BoardService {
         return CommentResp.builder()
                 .id(c.getId())
                 .content(c.getContent())
-                .authorEmail(c.getAuthor().getEmail())   // Users.email
-                .authorName(c.getAuthor().getUsername()) // Users.username
+                .authorEmail(c.getAuthor().getEmail())
+                .authorName(c.getAuthor().getUsername())
                 .edited(c.isEdited())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())

@@ -16,6 +16,7 @@ const BoardList = () => {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalPages, setTotalPages] = useState(1);
+  const [searchType, setSearchType] = useState("전체");
 
   useEffect(() => {
     const load = async () => {
@@ -32,9 +33,11 @@ const BoardList = () => {
     load();
   }, [page, searchTerm]);
 
-  const filteredPosts = posts.filter((post) =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredPosts = posts.filter((post) => {
+    const matchesTitle = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = searchType === "전체" || post.type === searchType; // type 비교
+    return matchesTitle && matchesType;
+    });
 
   return (
     <Layout>
@@ -49,6 +52,16 @@ const BoardList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          <select
+                className="facility-select"
+                value={searchType}
+                onChange={(e) => setSearchType(e.target.value)}
+            >
+                <option value="전체">전체</option>
+                <option value="NOTICE">공지</option>
+                <option value="FREE">자유</option>
+            </select>
+
           <button className="search-btn">검색</button>
         </div>
 

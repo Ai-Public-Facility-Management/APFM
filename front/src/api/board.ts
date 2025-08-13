@@ -3,6 +3,7 @@ import { api } from "./http";
 export interface BoardItem {
   id: number;
   title: string;
+  type: string;
   authorName: string;
   department: string;
   createdAt: string;
