@@ -51,9 +51,10 @@ public class BoardDTO {
         public String content;
         public boolean pinned;
         public long viewCount;
-        public String authorEmail;
+        public String authorEmail;   // Users.email
+        public String authorName;    // Users.username
         public String department;
-        public long commentCount;     // ← 목록/상세에서 뱃지용으로 권장
+        public long commentCount;    // 목록/상세에서 뱃지용
         public Instant createdAt;
         public Instant updatedAt;
         public List<AttachmentResp> attachments;
@@ -61,16 +62,21 @@ public class BoardDTO {
 
     // ====== Comment ======
     @Getter @Setter
-    public static class CommentCreateReq { public String content; }
+    public static class CommentCreateReq {
+        public String content;
+    }
 
     @Getter @Setter
-    public static class CommentUpdateReq { public String content; }
+    public static class CommentUpdateReq {
+        public String content;
+    }
 
     @Getter @Builder
     public static class CommentResp {
         public Long id;
         public String content;
-        public String authorEmail;
+        public String authorEmail;   // Users.email
+        public String authorName;    // Users.username
         public boolean edited;
         public Instant createdAt;
         public Instant updatedAt;

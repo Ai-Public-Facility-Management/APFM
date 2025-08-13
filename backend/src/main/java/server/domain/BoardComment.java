@@ -18,8 +18,13 @@ public class BoardComment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private BoardPost post;
 
-    @Column(nullable = false, length = 120)
-    private String authorEmail;
+    /**
+     * 작성자(User) 매핑
+     * Users.email과 FK(user_email)로 연결
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
+    private Users author;
 
     @Lob
     @Column(nullable = false)
