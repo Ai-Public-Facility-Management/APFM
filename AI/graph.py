@@ -1,8 +1,7 @@
 from langgraph.graph import StateGraph
-from typing import TypedDict
+from typing import TypedDict, List, Any
 from vision import vision_analysis_node
 from rag import rag_cost_estimate_node
-from typing import TypedDict, List, Dict, Any
 
 # 상태 스키마
 class EstimationState(TypedDict, total=False):
@@ -10,8 +9,9 @@ class EstimationState(TypedDict, total=False):
     crop_base64_image: str       # 크롭 이미지 (base64)
     box: List[int]               # [x1, y1, x2, y2]
     image_description: str
-    cost_estimate: Dict[str, Any]
     vision_analysis: str
+    estimate: int                # 견적 금액 (정수)
+    estimate_basis: str          # 계산 근거 + 참고 문서 요약
     vectordb: object
 
 # 그래프 정의
