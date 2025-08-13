@@ -20,7 +20,7 @@ export default function IntervalModal() {
   );
   const [hour, setHour] = useState(9);
   const [minute, setMinute] = useState(0);
-  const [address, setAddress] = useState("");
+  //const [address, setAddress] = useState("");
   const [freq, setFreq] = useState<Frequency>("DAILY");
   const [loading, setLoading] = useState(false);
 
@@ -41,15 +41,15 @@ export default function IntervalModal() {
 
   const onSave = async () => {
     if (!startDate) return alert("시작 날짜를 선택하세요.");
-    if (!address.trim()) return alert("주소를 입력하세요.");
+    //if (!address.trim()) return alert("주소를 입력하세요.");
 
     setLoading(true);
     try {
       const payload = {
         startDate,                                 // "YYYY-MM-DD"
         startTime: `${pad(hour)}:${pad(minute)}`,  // "HH:mm"
-        inspectionCycle: freqToCycle(freq),        // 정수(일 단위)
-        address,                                   // 문자열
+        inspectionCycle: freqToCycle(freq),      // 정수(일 단위)
+        
       };
       await saveInspectionSetting(payload);
       alert("저장되었습니다.");
@@ -103,16 +103,6 @@ export default function IntervalModal() {
               <input type="text" className="input" value={startDate} readOnly />
             </div>
 
-            <div className="form-group">
-              <span className="label">주소</span>
-              <input
-                className="input"
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="예: 부산광역시 ○○구 ○○로 123"
-              />
-            </div>
 
             <div className="form-group">
               <span className="label">주기</span>

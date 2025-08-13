@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.dto.InspectionReportDTO;
 import server.dto.InspectionSettingDTO;
+import server.dto.InspectionDetailDTO;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
 
@@ -57,6 +58,15 @@ public class InspectionController {
             @RequestBody InspectionReportDTO requestDTO) {
         InspectionReportDTO response = inspectionReportService.generateReport(requestDTO.getIssueIds());
         return ResponseEntity.ok(response);
+    }
+
+    // 점검 상세 페이지
+    @GetMapping("/{id}")
+    public ResponseEntity<Map<String, Object>> getInspectionDetail(@PathVariable Long id) {
+        InspectionDetailDTO data = inspectionService.getInspectionDetail(id);
+        Map<String, Object> res = new HashMap<>();
+        res.put("data", data);
+        return ResponseEntity.ok(res);
     }
 
     //매 주기 마다 자동 실행됨

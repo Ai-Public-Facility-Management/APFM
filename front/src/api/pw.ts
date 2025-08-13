@@ -16,12 +16,12 @@ export interface ResetPasswordRequest {
 
 // (1) 비번 재설정 코드 요청 (항상 200 OK 반환)
 export const requestResetCodeAPI = (payload: ResetCodeRequest) =>
-  api.post<void>("/users/reset-code", payload);
+  api.post<void>("/api/users/reset-code", payload);
 
 // (2) 코드 검증 (true/false)
 export const verifyResetCodeAPI = (payload: VerifyCodeRequest) =>
-  api.post<boolean>("/users/reset-code/verify", payload);
+  api.post<boolean>("/api/users/reset-code/verify", payload);
 
 // (3) 최종 비밀번호 변경
 export const resetPasswordAPI = (payload: ResetPasswordRequest) =>
-  api.post<string>("/users/reset-password", payload);
+  api.post<string>("/api/users/reset-password", payload);
