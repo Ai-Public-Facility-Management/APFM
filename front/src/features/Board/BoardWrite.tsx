@@ -1,18 +1,25 @@
 import React, { useState, FormEvent } from "react";
 import axios from "axios";
 import Layout from "../../components/Layout";
+import { useNavigate } from "react-router-dom";
 import "./BoardWrite.css";
 
-const API_BASE = "http://localhost:8082"; // 실제 API 서버 주소
+const API_BASE = "http://localhost:8082"; // API 서버 주소
 
 export default function BoardWrite() {
   const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
+  const [content, setContent] = useState("");
+  const [pinned, setPinned] = useState(false);
+  const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
+  const navigate = useNavigate();
 
   const resetForm = () => {
     setTitle("");
-    setSummary("");
+    setContent("");
+    setPinned(false);
+    setDepartment("");
     setFile(null);
   };
 
@@ -30,33 +37,49 @@ export default function BoardWrite() {
     setFile(selectedFile);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !summary.trim()) {
+
+    if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해주세요.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("summary", summary);
-    if (file) formData.append("file", file);
+    let attachments: { originalName: string; storedUrl: string }[] = [];
 
-    axios
-      .post(`${API_BASE}/api/boards`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(() => {
-        alert("글이 등록되었습니다.");
-        resetForm();
-      })
-      .catch((err) => {
-        console.error("등록 실패:", err);
-        alert("등록에 실패했습니다.");
+    if (file) {
+      // 실제 파일 업로드 API가 있다면 업로드 후 URL을 받아야 함
+      // 여기서는 예시로 storedUrl을 임시값으로 설정
+      attachments.push({
+        originalName: file.name,
+        storedUrl: `/uploads/${file.name}`, // 실제 업로드 서버에서 받은 경로로 대체
       });
+    }
+
+    const payload = {
+      type: "FREE", // 기본 게시판 타입 (백엔드 enum 값)
+      title,
+      content,
+      pinned,
+      department: department || null,
+      attachments,
+    };
+
+    try {
+      await axios.post(`${API_BASE}/api/boards`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      alert("글이 등록되었습니다.");
+      resetForm();
+      navigate("/board"); // ✅ 저장 후 자동 이동
+    } catch (err) {
+      console.error("등록 실패:", err);
+      alert("등록에 실패했습니다.");
+    }
   };
 
   return (
@@ -81,16 +104,15 @@ export default function BoardWrite() {
               <textarea
                 className="pw-textarea"
                 placeholder="내용을 입력하세요"
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 required
               />
             </div>
-
+            
             <div className="pw-form-group">
               <label className="pw-label">파일 업로드</label>
               <div className="pw-file-upload">
-                {/* 파일 input은 숨김 */}
                 <input
                   type="file"
                   id="file-upload"
@@ -100,7 +122,6 @@ export default function BoardWrite() {
                     handleFileChange(e.target.files?.[0] ?? null)
                   }
                 />
-                {/* label을 버튼처럼 */}
                 <label htmlFor="file-upload" className="pw-file-label">
                   파일 선택
                 </label>
