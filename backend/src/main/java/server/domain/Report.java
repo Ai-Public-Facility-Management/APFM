@@ -14,7 +14,7 @@ public class Report {
     private Date creationDate;
 
     @Embedded
-    private Photo content;
+    private File content;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "inspection_id", unique = true)

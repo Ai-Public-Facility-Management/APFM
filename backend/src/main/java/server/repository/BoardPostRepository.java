@@ -4,23 +4,24 @@ package server.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import server.domain.BoardPost;
 
 import java.util.Optional;
 
 public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
 
-    @Query("""
-           select p from BoardPost p
-           where p.deletedAt is null
-             and (:type is null or p.type = :type)
-             and (:q is null or (lower(p.title) like lower(concat('%', :q, '%'))
-                              or  lower(p.content) like lower(concat('%', :q, '%'))))
-           order by p.isPinned desc, p.id desc
-           """)
-    Page<BoardPost> search(BoardPost.PostType type, String q, Pageable pageable);
+    // 🔹 전체 목록 (type 조건 없이)
+    Page<BoardPost> findByDeletedAtIsNull(Pageable pageable);
 
-    @Query("select p from BoardPost p where p.id = :id and p.deletedAt is null")
-    Optional<BoardPost> findActiveById(Long id);
+    // 🔹 type 필터
+    Page<BoardPost> findByDeletedAtIsNullAndType(BoardPost.PostType type, Pageable pageable);
+
+    // 🔹 title만 검색
+    Page<BoardPost> findByDeletedAtIsNullAndTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    // 🔹 type 포함, title 검색
+    Page<BoardPost> findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCase(BoardPost.PostType type, String title, Pageable pageable);
+
+    // 🔹 단건 조회 (soft delete 제외)
+    Optional<BoardPost> findByIdAndDeletedAtIsNull(Long id);
 }

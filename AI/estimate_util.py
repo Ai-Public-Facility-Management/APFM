@@ -25,5 +25,6 @@ def run_estimate(original_b64: str, crop_b64: str, box: list):
     result = graph.invoke(state)
     return {
         "vision_analysis": result.get("vision_analysis"),
-        "cost_estimate": result.get("cost_estimate")
+        "estimate": result.get("estimate"),                 
+        "estimate_basis": result.get("estimate_basis")  
     }

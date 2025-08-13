@@ -1,6 +1,6 @@
 // src/pages/BoardDetail.tsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 
 import {
@@ -29,11 +29,15 @@ const maskAuthor = (value: string) => {
 
 export default function BoardDetail() {
   const { postId } = useParams<{ postId: string }>();
+  const navigate = useNavigate();
 
   const [post, setPost] = useState<PostDetail | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
+
+//   const currentUserEmail = localStorage.getItem("userEmail"); // 로그인 사용자
+//   const isAuthor = post?.authorEmail === currentUserEmail; // 작성자 여부
 
   // 데이터 로딩
   useEffect(() => {
@@ -62,6 +66,10 @@ export default function BoardDetail() {
       setNewComment("");
       const commentsRes = await getComments(postId!);
       setComments(commentsRes.data.content);
+      // ✅ 댓글 수 즉시 반영
+      setPost((prev) =>
+        prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev
+      );
     } catch (err) {
       console.error("댓글 작성 실패", err);
     }
@@ -74,6 +82,7 @@ export default function BoardDetail() {
     <Layout>
       <div className="board-detail">
         <h2 className="title">{post.title}</h2>
+
         <div className="meta">
           {/* ✅ 백엔드에서 authorEmail 내려주면 프론트에서 마스킹 */}
           <span>작성자: {maskAuthor(post.authorName || post.authorEmail)}</span>

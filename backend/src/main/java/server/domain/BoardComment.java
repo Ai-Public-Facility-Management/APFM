@@ -4,8 +4,6 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import server.domain.Users;
-
 @Entity
 @Table(name = "board_comment", indexes = {
         @Index(name = "idx_board_comment_post", columnList = "post_id"),
@@ -17,14 +15,15 @@ public class BoardComment extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ✅ 댓글이 속한 게시글
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id", nullable = false)
     private BoardPost post;
 
-    // ✅ 작성자 정보 (Users 매핑)
+    /**
+     * 작성자(User) 매핑
+     * Users.email과 FK(user_email)로 연결
+     */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
     private Users author;
 
     @Lob
@@ -35,14 +34,4 @@ public class BoardComment extends BaseTimeEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean edited = false;
-
-    // ✅ 작성자 이름 반환
-    public String getAuthorName() {
-        return author.getUsername();
-    }
-
-    // ✅ 작성자 이메일 반환
-    public String getAuthorEmail() {
-        return author.getEmail();
-    }
 }

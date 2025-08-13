@@ -1,4 +1,3 @@
-// [기능 요약] 게시글/댓글 비즈니스 로직 (검색, 조회수, (수정됨) 처리, 소프트삭제)
 package server.service;
 
 import lombok.RequiredArgsConstructor;
@@ -6,14 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.domain.BoardAttachment;
-import server.domain.BoardComment;
-import server.domain.BoardPost;
-import server.domain.Users;
+import server.domain.*;
 import server.dto.BoardDTO.*;
 import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
 import server.repository.UsersRepository;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +26,14 @@ public class BoardService {
     @Transactional
     public PostResp create(PostCreateReq req) {
         String email = userResolver.currentUserEmail();
-        Users author = usersRepo.findByEmail(email)
+        Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
                 .content(req.content)
+                .author(author) // Users 매핑
                 .isPinned(req.pinned)
                 .department(req.department)
                 .author(author)
@@ -58,28 +56,45 @@ public class BoardService {
 
     // [기능 요약] 게시글 단건 조회(+조회수 증가, 댓글수 포함)
     @Transactional
-    public PostResp getAndIncreaseView(Long id) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    public PostResp getAndIncreaseView(Long postId) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
         post.setViewCount(post.getViewCount() + 1);
-        long commentCount = commentRepo.countActiveByPostId(id);
+        long commentCount = commentRepo.countActiveByPostId(postId);
         return toPostResp(post, commentCount);
     }
 
-    // [기능 요약] 게시글 검색/목록
+    // [변경됨] 게시글 검색/목록
     @Transactional(readOnly = true)
     public Page<PostResp> search(BoardPost.PostType type, String q, Pageable pageable) {
-        return postRepo.search(type, q, pageable)
-                .map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId())));
+        Page<BoardPost> posts;
+
+        if (q == null || q.isBlank()) {
+            if (type == null) {
+                posts = postRepo.findByDeletedAtIsNull(pageable);
+            } else {
+                posts = postRepo.findByDeletedAtIsNullAndType(type, pageable);
+            }
+        } else {
+            String keyword = q.trim();
+            if (type == null) {
+                posts = postRepo.findByDeletedAtIsNullAndTitleContainingIgnoreCase(keyword, pageable);
+            } else {
+                posts = postRepo.findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCase(type, keyword, pageable);
+            }
+        }
+
+        return posts.map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId())));
     }
 
     // [기능 요약] 게시글 수정(작성자/관리자)
     @Transactional
-    public PostResp update(Long id, PostUpdateReq req) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+    public PostResp update(Long postId, PostUpdateReq req) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        userResolver.ensureOwnerOrAdmin(post.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
 
         if (req.title != null) post.setTitle(req.title);
         if (req.content != null) post.setContent(req.content);
@@ -97,16 +112,17 @@ public class BoardService {
             }
         }
 
-        long commentCount = commentRepo.countActiveByPostId(id);
+        long commentCount = commentRepo.countActiveByPostId(postId);
         return toPostResp(post, commentCount);
     }
 
     // [기능 요약] 게시글 삭제(소프트)
     @Transactional
-    public void delete(Long id) {
-        BoardPost post = postRepo.findActiveById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(post.getAuthorEmail());
+    public void delete(Long postId) {
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
         post.softDelete();
     }
 
@@ -121,10 +137,11 @@ public class BoardService {
     @Transactional
     public CommentResp addComment(Long postId, CommentCreateReq req) {
         String email = userResolver.currentUserEmail();
-        Users author = usersRepo.findByEmail(email)
+        Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        BoardPost post = postRepo.findActiveById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         BoardComment c = commentRepo.save(BoardComment.builder()
                 .post(post)
@@ -135,12 +152,12 @@ public class BoardService {
         return toCommentResp(c);
     }
 
-    // [기능 요약] 댓글 수정 → (수정됨)
+    // [기능 요약] 댓글 수정
     @Transactional
     public CommentResp updateComment(Long commentId, String newContent) {
         BoardComment c = commentRepo.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(c.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(c.getAuthor().getEmail());
         c.setContent(newContent);
         c.setEdited(true);
         return toCommentResp(c);
@@ -151,7 +168,7 @@ public class BoardService {
     public void deleteComment(Long commentId) {
         BoardComment c = commentRepo.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(c.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(c.getAuthor().getEmail());
         c.softDelete();
     }
 
@@ -164,8 +181,8 @@ public class BoardService {
                 .content(p.getContent())
                 .pinned(p.isPinned())
                 .viewCount(p.getViewCount())
-                .authorName(p.getAuthor().getUsername())
                 .authorEmail(p.getAuthor().getEmail())
+                .authorName(p.getAuthor().getUsername())
                 .department(p.getDepartment())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
@@ -176,9 +193,8 @@ public class BoardService {
                                         .id(a.getId())
                                         .originalName(a.getOriginalName())
                                         .storedUrl(a.getStoredUrl())
-                                        .build()
-                                )
-                                .collect(Collectors.toList())   // ← 자바 8/11
+                                        .build())
+                                .collect(Collectors.toList())
                 )
                 .build();
     }
@@ -187,8 +203,8 @@ public class BoardService {
         return CommentResp.builder()
                 .id(c.getId())
                 .content(c.getContent())
-                .authorName(c.getAuthor().getUsername())
                 .authorEmail(c.getAuthor().getEmail())
+                .authorName(c.getAuthor().getUsername())
                 .edited(c.isEdited())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())

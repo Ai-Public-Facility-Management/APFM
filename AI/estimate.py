@@ -1,3 +1,4 @@
+import re
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain.chains.llm import LLMChain
@@ -43,16 +44,51 @@ def run_hybrid_rag_query(vectordb, query):
     )
 
     llm = ChatOpenAI(model_name="gpt-5")
-
     llm_chain = LLMChain(llm=llm, prompt=prompt_template)
-    stuff_chain = StuffDocumentsChain(llm_chain=llm_chain, document_variable_name="context")
+    stuff_chain = StuffDocumentsChain(
+        llm_chain=llm_chain,
+        document_variable_name="context"
+    )
 
-    answer = stuff_chain.invoke({
+    raw_answer = stuff_chain.invoke({
         "input_documents": docs,
         "question": query
     })
 
-    # 상태에 저장할 문서 리스트는 page_content 없이 메타데이터만 저장
+    if isinstance(raw_answer, dict) and "output_text" in raw_answer:
+        output_text = raw_answer["output_text"]
+    elif isinstance(raw_answer, str):
+        output_text = raw_answer
+    else:
+        output_text = str(raw_answer)
+
+    # 견적 추출
+    estimate_match = re.search(r"예상\s*견적\s*\(원\)\s*[:：]\s*([\d,]+)", output_text)
+    try:
+        estimate_val = int(estimate_match.group(1).replace(",", "")) if estimate_match else None
+    except:
+        estimate_val = None
+
+    # 계산 근거 요약
+    basis_match = re.search(r"📌\s*계산\s*근거\s*요약\s*[:：]\s*(.+?)(?=\n📚|\Z)", output_text, re.S)
+    basis_text = basis_match.group(1).strip() if basis_match else ""
+
+    # 참고 문서 내용 요약
+    ref_match = re.search(r"📚\s*참고\s*문서\s*내용\s*요약\s*[:：]\s*(.+)", output_text, re.S)
+    ref_text = ref_match.group(1).strip() if ref_match else ""
+
+    # 📌 라벨 포함해서 합치기
+    if basis_text or ref_text:
+        estimate_basis = ""
+        if basis_text:
+            estimate_basis += "📌 계산 근거 요약:\n" + basis_text
+        if ref_text:
+            if estimate_basis:
+                estimate_basis += "\n\n"
+            estimate_basis += "📚 참고 문서 내용 요약:\n" + ref_text
+    else:
+        estimate_basis = ""
+
     meta_docs = [
         {
             "id": getattr(doc, "id", None),
@@ -61,4 +97,8 @@ def run_hybrid_rag_query(vectordb, query):
         for doc in docs
     ]
 
-    return answer, meta_docs
+    return {
+        "estimate": estimate_val,
+        "estimate_basis": estimate_basis,
+        "raw_answer": output_text
+    }, meta_docs
