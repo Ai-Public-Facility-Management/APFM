@@ -1,0 +1,107 @@
+// [기능 요약] 게시글/댓글 REST API (분리형, (수정됨) 지원)
+package server.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import server.domain.BoardPost;
+import server.dto.BoardDTO.*;
+import server.service.BoardService;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/boards")
+@RequiredArgsConstructor
+public class BoardController {
+
+    private final BoardService boardService;
+
+    // ===== 게시글 =====
+
+    // [기능 요약] 게시글 목록/검색
+    @GetMapping
+    public ResponseEntity<PageResp<PostResp>> list(
+            @RequestParam(required = false) BoardPost.PostType type,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String department,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // MVP: pinned desc, id desc 기준. 필요하면 sort 파라미터에 따라 동적 Sort 구성.
+        Pageable pageable = PageRequest.of(page, size);
+        var p = boardService.search(type, q, pageable);
+        return ResponseEntity.ok(PageResp.of(p));
+    }
+
+    // [기능 요약] 게시글 상세(+조회수 증가)
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResp> get(@PathVariable Long postId) {
+        return ResponseEntity.ok(boardService.getAndIncreaseView(postId));
+    }
+
+    // [기능 요약] 게시글 작성
+    @PostMapping
+    public ResponseEntity<PostResp> create(@RequestBody PostCreateReq req) {
+        return ResponseEntity.ok(boardService.create(req));
+    }
+
+    // [기능 요약] 게시글 수정
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostResp> update(@PathVariable Long postId, @RequestBody PostUpdateReq req) {
+        return ResponseEntity.ok(boardService.update(postId, req));
+    }
+
+    // [기능 요약] 게시글 삭제(소프트)
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId) {
+        boardService.delete(postId);
+        return ResponseEntity.ok(Map.of("deleted", true));
+    }
+
+    // ===== 댓글 =====
+
+    // [기능 요약] 댓글 목록(페이징)
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<PageResp<CommentResp>> comments(
+            @PathVariable Long postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
+        Sort s = "oldest".equalsIgnoreCase(sort)
+                ? Sort.by(Sort.Direction.ASC, "id")
+                : Sort.by(Sort.Direction.DESC, "id");
+        var p = boardService.getComments(postId, PageRequest.of(page, size, s));
+        return ResponseEntity.ok(PageResp.of(p));
+    }
+
+    // [기능 요약] 댓글 작성
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<CommentResp> addComment(
+            @PathVariable Long postId,
+            @RequestBody CommentCreateReq req
+    ) {
+        return ResponseEntity.ok(boardService.addComment(postId, req));
+    }
+
+    // [기능 요약] 댓글 수정 → (수정됨) 처리
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<CommentResp> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody CommentUpdateReq req
+    ) {
+        return ResponseEntity.ok(boardService.updateComment(commentId, req.getContent()));
+    }
+
+    // [기능 요약] 댓글 삭제(소프트)
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Map<String, Object>> deleteComment(@PathVariable Long commentId) {
+        boardService.deleteComment(commentId);
+        return ResponseEntity.ok(Map.of("deleted", true));
+    }
+}
