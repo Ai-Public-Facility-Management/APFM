@@ -67,7 +67,7 @@ const BoardList = () => {
               filteredPosts.map((post) => (
                 <tr key={post.id}>
                   <td className="title-cell">{post.title}</td>
-                  <td>{maskName(post.writerName)}</td>
+                  <td>{maskName(post.authorName)}</td>
                   <td>{post.department}</td>
                   <td>{post.createdAt.slice(0,10)}</td>
                 </tr>
