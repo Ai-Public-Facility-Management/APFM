@@ -4,9 +4,10 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import server.domain.Users;
 
 @Entity
 @Table(name = "board_post", indexes = {
@@ -22,6 +23,11 @@ public class BoardPost extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ 작성자 정보 매핑 (Users 엔티티 참조)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Users author;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     private PostType type;
@@ -33,9 +39,7 @@ public class BoardPost extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    // 정책: 로그인 식별자는 email 통일
-    @Column(nullable = false, length = 120)
-    private String authorEmail;
+
 
     @Column(length = 100)
     private String department;
@@ -55,4 +59,14 @@ public class BoardPost extends BaseTimeEntity {
     @OrderBy("id ASC")
     @Builder.Default
     private List<BoardComment> comments = new ArrayList<>();
+
+    // ✅ 작성자 이름 반환
+    public String getAuthorName() {
+        return author.getUsername();
+    }
+
+    // ✅ 작성자 이메일 반환
+    public String getAuthorEmail() {
+        return author.getEmail();
+    }
 }

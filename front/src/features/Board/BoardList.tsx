@@ -1,5 +1,6 @@
 // src/pages/Board.tsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import "./BoardList.css";
 
@@ -10,6 +11,7 @@ interface Post {
 }
 
 const BoardList = () => {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,7 +58,8 @@ const BoardList = () => {
           <tbody>
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
-                <tr key={post.id}>
+                <tr key={post.id}
+                    onClick={() => navigate(`/boards/${post.id}`)}>
                   <td>{post.id}</td>
                   <td className="title-cell">{post.title}</td>
                   <td>{post.date}</td>

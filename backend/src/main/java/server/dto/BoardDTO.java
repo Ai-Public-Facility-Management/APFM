@@ -51,6 +51,7 @@ public class BoardDTO {
         public String content;
         public boolean pinned;
         public long viewCount;
+        public String authorName;
         public String authorEmail;
         public String department;
         public long commentCount;     // ← 목록/상세에서 뱃지용으로 권장
@@ -70,6 +71,7 @@ public class BoardDTO {
     public static class CommentResp {
         public Long id;
         public String content;
+        public String authorName;
         public String authorEmail;
         public boolean edited;
         public Instant createdAt;

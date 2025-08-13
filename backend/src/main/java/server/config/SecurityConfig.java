@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(
 
-                                 "/api/auth/**","/api/publicfa/**","/api/issue/**","/api/users/**",
+                                 "/api/auth/**","/api/publicfa/**","/api/issue/**","/api/users/**","/api/boards/**",
                                 "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**"
 
                         ).permitAll()

@@ -2,8 +2,11 @@
 package server.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Getter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +14,7 @@ import java.time.Instant;
 
 @MappedSuperclass
 @Getter
+@Setter
 public abstract class BaseTimeEntity {
 
     @CreationTimestamp
@@ -22,6 +26,15 @@ public abstract class BaseTimeEntity {
 
     // 소프트 삭제(널이면 활성 상태)
     protected Instant deletedAt;
+
+    // ===== 작성자/수정자 공통 필드 =====
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_id")
+    protected Users createdBy; // 생성자
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by_id")
+    protected Users updatedBy; // 마지막 수정자
 
     public boolean isDeleted() { return deletedAt != null; }
 

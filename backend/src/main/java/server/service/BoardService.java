@@ -9,9 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import server.domain.BoardAttachment;
 import server.domain.BoardComment;
 import server.domain.BoardPost;
+import server.domain.Users;
 import server.dto.BoardDTO.*;
 import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
+import server.repository.UsersRepository;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,12 +22,15 @@ public class BoardService {
 
     private final BoardPostRepository postRepo;
     private final BoardCommentRepository commentRepo;
+    private final UsersRepository usersRepo;
     private final SecurityUserResolver userResolver;
 
     // [기능 요약] 게시글 생성
     @Transactional
     public PostResp create(PostCreateReq req) {
         String email = userResolver.currentUserEmail();
+        Users author = usersRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
@@ -33,7 +38,7 @@ public class BoardService {
                 .content(req.content)
                 .isPinned(req.pinned)
                 .department(req.department)
-                .authorEmail(email)
+                .author(author)
                 .build();
 
         if (req.attachments != null) {
@@ -116,12 +121,14 @@ public class BoardService {
     @Transactional
     public CommentResp addComment(Long postId, CommentCreateReq req) {
         String email = userResolver.currentUserEmail();
+        Users author = usersRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         BoardPost post = postRepo.findActiveById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         BoardComment c = commentRepo.save(BoardComment.builder()
                 .post(post)
-                .authorEmail(email)
+                .author(author)
                 .content(req.getContent())
                 .edited(false)
                 .build());
@@ -157,7 +164,8 @@ public class BoardService {
                 .content(p.getContent())
                 .pinned(p.isPinned())
                 .viewCount(p.getViewCount())
-                .authorEmail(p.getAuthorEmail())
+                .authorName(p.getAuthor().getUsername())
+                .authorEmail(p.getAuthor().getEmail())
                 .department(p.getDepartment())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
@@ -179,7 +187,8 @@ public class BoardService {
         return CommentResp.builder()
                 .id(c.getId())
                 .content(c.getContent())
-                .authorEmail(c.getAuthorEmail())
+                .authorName(c.getAuthor().getUsername())
+                .authorEmail(c.getAuthor().getEmail())
                 .edited(c.isEdited())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
