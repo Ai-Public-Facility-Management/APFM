@@ -4,8 +4,9 @@ def rag_cost_estimate_node(state):
     query = state["vision_analysis"]
     vectordb = state["vectordb"]
 
-    answer, meta_docs = run_hybrid_rag_query(vectordb, query)
+    parsed_result, _ = run_hybrid_rag_query(vectordb, query)
 
-    state["cost_estimate"] = answer
-    state["cost_estimate_docs"] = meta_docs
+    state["estimate"] = parsed_result.get("estimate")
+    state["estimate_basis"] = parsed_result.get("estimate_basis")
+
     return state
