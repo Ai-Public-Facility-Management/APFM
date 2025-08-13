@@ -1,0 +1,110 @@
+/* BoardWrite.css – 글작성 전용 폼 스타일 (정부 포털 톤)
+   - TSX에서 import "./BoardWrite.css" 로 불러와 사용
+   - 클래스 접두어: pw- */
+
+:root{
+  --pw-max: 56rem;              /* 896px */
+  --pw-gap: 1rem;
+  --pw-radius: 12px;
+  --pw-border: #e5e7eb;         /* gray-200 */
+  --pw-text: #111827;           /* gray-900 */
+  --pw-muted: #6b7280;          /* gray-600 */
+  --pw-bg: #ffffff;
+  --pw-primary: #2563eb;        /* blue-600 */
+  --pw-primary-h: #1d4ed8;      /* blue-700 */
+  --pw-ring: rgba(191,219,254,.6); /* blue-200 */
+}
+
+/* 컨테이너 */
+.pw-container{
+  max-width: var(--pw-max);
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2rem;
+}
+
+.pw-heading{
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--pw-text);
+}
+
+/* 카드형 폼 */
+.pw-form{
+  background: var(--pw-bg);
+  border: 1px solid var(--pw-border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.pw-form-group{ margin-bottom: 1rem; }
+
+.pw-label{
+  display:block;
+  font-size: .9rem;
+  color: var(--pw-muted);
+  margin-bottom: .35rem;
+}
+
+.pw-input,
+.pw-select,
+.pw-textarea{
+  width: 100%;
+  border: 1px solid var(--pw-border);
+  border-radius: var(--pw-radius);
+  padding: .65rem .9rem;
+  font-size: .95rem;
+  outline: none;
+  transition: box-shadow .15s ease, border-color .15s ease;
+  background: #fff;
+}
+
+.pw-textarea{ min-height: 10rem; resize: vertical; }
+
+.pw-input:focus,
+.pw-select:focus,
+.pw-textarea:focus{
+  border-color: #bfdbfe;              /* blue-200 */
+  box-shadow: 0 0 0 3px var(--pw-ring);
+}
+
+/* 2열 그리드 */
+.pw-grid-2{ display:grid; gap: var(--pw-gap); }
+@media (min-width: 640px){ .pw-grid-2{ grid-template-columns: 1fr 1fr; } }
+
+/* 태그 프리뷰 */
+.pw-tag-preview{ margin-top:.5rem; }
+.pw-tag{
+  display:inline-flex; align-items:center;
+  padding: .15rem .5rem; font-size: .75rem;
+  border-radius: 999px;
+  background: #eff6ff;                /* blue-50 */
+  color:#1d4ed8;                       /* blue-700 */
+  border:1px solid #dbeafe;            /* blue-100 */
+  margin-right:.35rem; margin-bottom:.35rem;
+}
+
+/* 파일 업로드 라인 */
+.pw-file-row{ display:flex; align-items:center; gap:.6rem; }
+.pw-file-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:.55rem 1rem; border:1px solid var(--pw-border); border-radius: var(--pw-radius);
+  background:#fff; cursor:pointer; user-select:none;
+}
+.pw-file-btn:hover{ background:#f9fafb; }
+.pw-file-name{ font-size:.9rem; color: var(--pw-muted); }
+.pw-help{ font-size:.8rem; color:#9ca3af; margin-top:.25rem; }
+
+/* 액션 버튼 */
+.pw-actions{ display:flex; justify-content:flex-end; gap:.5rem; margin-top: 1rem; }
+.pw-btn{ padding:.55rem 1rem; border:1px solid var(--pw-border); background:#fff; border-radius: var(--pw-radius); font-size:.95rem; cursor:pointer; }
+.pw-btn:hover{ background:#f9fafb; }
+.pw-btn-primary{ background: var(--pw-primary); color:#fff; border-color: transparent; }
+.pw-btn-primary:hover{ background: var(--pw-primary-h); }
+
+/* 접근성: 포커스 표시 (키보드 사용 시) */
+.pw-btn:focus, .pw-file-btn:focus{
+  outline: 3px solid var(--pw-ring);
+  outline-offset: 2px;
+}
