@@ -46,8 +46,8 @@ export default function BoardWrite() {
       .post(`${API_BASE}/api/boards`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data"
-        }
+          "Content-Type": "multipart/form-data",
+        },
       })
       .then(() => {
         alert("글이 등록되었습니다.");
@@ -62,25 +62,68 @@ export default function BoardWrite() {
   return (
     <Layout>
       <div className="pw-container">
-        <h1 className="pw-heading">프로젝트 글 작성</h1>
-        <form className="pw-form" onSubmit={handleSubmit}>
-          <div className="pw-form-group">
-            <label className="pw-label">제목 *</label>
-            <input className="pw-input" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          </div>
-          <div className="pw-form-group">
-            <label className="pw-label">내용 *</label>
-            <textarea className="pw-textarea" value={summary} onChange={(e) => setSummary(e.target.value)} required />
-          </div>
-          <div className="pw-form-group">
-            <label className="pw-label">파일 업로드</label>
-            <input type="file" accept=".jpg,.jpeg,.png" onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)} />
-          </div>
-          <div className="pw-actions">
-            <button type="button" onClick={resetForm} className="pw-btn">취소</button>
-            <button type="submit" className="pw-btn pw-btn-primary">저장</button>
-          </div>
-        </form>
+        <div className="pw-card">
+          <h1 className="pw-heading">글 작성</h1>
+          <form className="pw-form" onSubmit={handleSubmit}>
+            <div className="pw-form-group">
+              <label className="pw-label">제목 *</label>
+              <input
+                className="pw-input"
+                placeholder="제목을 입력하세요"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="pw-form-group">
+              <label className="pw-label">내용 *</label>
+              <textarea
+                className="pw-textarea"
+                placeholder="내용을 입력하세요"
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="pw-form-group">
+              <label className="pw-label">파일 업로드</label>
+              <div className="pw-file-upload">
+                {/* 파일 input은 숨김 */}
+                <input
+                  type="file"
+                  id="file-upload"
+                  accept=".jpg,.jpeg,.png"
+                  style={{ display: "none" }}
+                  onChange={(e) =>
+                    handleFileChange(e.target.files?.[0] ?? null)
+                  }
+                />
+                {/* label을 버튼처럼 */}
+                <label htmlFor="file-upload" className="pw-file-label">
+                  파일 선택
+                </label>
+                <span className="pw-file-name">
+                  {file ? file.name : "선택된 파일 없음"}
+                </span>
+              </div>
+            </div>
+
+            <div className="pw-actions">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="pw-btn pw-btn-cancel"
+              >
+                취소
+              </button>
+              <button type="submit" className="pw-btn pw-btn-primary">
+                저장
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </Layout>
   );
