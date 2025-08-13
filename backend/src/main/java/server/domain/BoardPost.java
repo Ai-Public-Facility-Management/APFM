@@ -11,7 +11,6 @@ import java.util.List;
 @Entity
 @Table(name = "board_post", indexes = {
         @Index(name = "idx_board_post_type", columnList = "type"),
-        @Index(name = "idx_board_post_pinned", columnList = "isPinned"),
         @Index(name = "idx_board_post_deleted", columnList = "deletedAt")
 })
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -40,12 +39,6 @@ public class BoardPost extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
     private Users author;
-
-    @Column(length = 100)
-    private String department;
-
-    @Comment("상단 고정(공지)")
-    private boolean isPinned;
 
     @Comment("조회수")
     private long viewCount;

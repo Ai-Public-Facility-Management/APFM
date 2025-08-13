@@ -33,8 +33,6 @@ public class BoardService {
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
                 .content(req.content)
-                .isPinned(req.pinned)
-                .department(req.department)
                 .author(author) // Users 매핑
                 .build();
 
@@ -100,8 +98,6 @@ public class BoardService {
 
         if (req.title != null) post.setTitle(req.title);
         if (req.content != null) post.setContent(req.content);
-        if (req.pinned != null) post.setPinned(req.pinned);
-        if (req.department != null) post.setDepartment(req.department);
 
         if (req.attachments != null) {
             post.getAttachments().clear();
@@ -180,11 +176,9 @@ public class BoardService {
                 .type(p.getType().name())
                 .title(p.getTitle())
                 .content(p.getContent())
-                .pinned(p.isPinned())
                 .viewCount(p.getViewCount())
                 .authorEmail(p.getAuthor().getEmail())   // Users.email
                 .authorName(p.getAuthor().getUsername()) // Users.username
-                .department(p.getDepartment())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
                 .updatedAt(p.getUpdatedAt())
