@@ -1,11 +1,8 @@
 package server.dto;
 
-import jakarta.persistence.*;
 import lombok.Data;
 import server.domain.IssueType;
-import server.domain.Photo;
-import server.domain.Proposal;
-import server.domain.PublicFa;
+import server.domain.File;
 
 import java.util.Date;
 
@@ -23,7 +20,7 @@ public class IssueDTO {
 
     private IssueType type;
 
-    private Photo image;
+    private File image;
 
     private Long estimate;
 

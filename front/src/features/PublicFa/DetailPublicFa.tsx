@@ -127,7 +127,16 @@ export default function DetailPublicFa(){
 
     return (
         <Layout mainClassName="detailMain">
+            <div className="detail-header">
             <h1>{detail.cameraName}</h1>
+            <button
+                className="back-to-list-btn"
+                onClick={() => window.location.href = "/facility-list"} // 라우팅 방식에 맞게 수정
+            >
+                시설물 목록으로
+            </button>
+        </div>
+        <hr className="custom-hr" />
             <hr className="custom-hr" />
             <div className="detail-content">
                 <table className="detail-table">

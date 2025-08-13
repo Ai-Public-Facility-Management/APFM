@@ -81,7 +81,6 @@ export default function InspectionDetailPage() {
   return (
     <Layout>
       <div className="inspDetail-wrap">
-        <div className="inspDetail-breadcrumb">홈</div>
         <h1 className="inspDetail-pageTitle">점검 보고</h1>
 
         {/* 안내 배너 */}

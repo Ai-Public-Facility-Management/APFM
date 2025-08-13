@@ -26,6 +26,12 @@ public class Camera {
     @OneToMany(mappedBy = "camera",cascade = CascadeType.ALL)
     private List<PublicFa>  publicFa;
 
+    @Embedded
+    private File image;
+
+    public void setImage(String path,String description) {
+        this.image = new File(path,description);
+    }
 
 }
 //>>> DDD / Aggregate Root

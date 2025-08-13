@@ -3,6 +3,28 @@
     flex-direction: column; /* 제목, 표+이미지 묶음은 세로 */
     align-items: flex-start;
 }
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 60%;         /* hr과 동일하게 맞추면 깔끔 */
+    margin-left: 25px;
+    margin-top: 10px;
+}
+
+.back-to-list-btn {
+    background: #0b63f6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.back-to-list-btn:hover {
+    background: #0954cf;
+}
+
 
 .detailMain h1 {
     align-self: flex-start;
