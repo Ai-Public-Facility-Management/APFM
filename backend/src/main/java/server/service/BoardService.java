@@ -1,4 +1,3 @@
-// [기능 요약] 게시글/댓글 비즈니스 로직 (검색, 조회수, (수정됨) 처리, 소프트삭제)
 package server.service;
 
 import lombok.RequiredArgsConstructor;
@@ -6,12 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.domain.BoardAttachment;
-import server.domain.BoardComment;
-import server.domain.BoardPost;
+import server.domain.*;
 import server.dto.BoardDTO.*;
 import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
+import server.repository.UsersRepository;
 
 import java.util.stream.Collectors;
 
@@ -21,12 +19,15 @@ public class BoardService {
 
     private final BoardPostRepository postRepo;
     private final BoardCommentRepository commentRepo;
+    private final UsersRepository usersRepo;
     private final SecurityUserResolver userResolver;
 
     // [기능 요약] 게시글 생성
     @Transactional
     public PostResp create(PostCreateReq req) {
         String email = userResolver.currentUserEmail();
+        Users author = usersRepo.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
@@ -34,7 +35,7 @@ public class BoardService {
                 .content(req.content)
                 .isPinned(req.pinned)
                 .department(req.department)
-                .authorEmail(email)
+                .author(author) // Users 매핑
                 .build();
 
         if (req.attachments != null) {
@@ -68,9 +69,7 @@ public class BoardService {
         Page<BoardPost> posts;
 
         if (q == null || q.isBlank()) {
-            // 검색어 없을 때
             if (type == null) {
-                // 🔹 type이 없으면 전체 조회
                 posts = postRepo.findByDeletedAtIsNull(pageable);
             } else {
                 posts = postRepo.findByDeletedAtIsNullAndType(type, pageable);
@@ -97,7 +96,7 @@ public class BoardService {
         BoardPost post = postRepo.findActiveById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        userResolver.ensureOwnerOrAdmin(post.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
 
         if (req.title != null) post.setTitle(req.title);
         if (req.content != null) post.setContent(req.content);
@@ -124,7 +123,7 @@ public class BoardService {
     public void delete(Long id) {
         BoardPost post = postRepo.findActiveById(id)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(post.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
         post.softDelete();
     }
 
@@ -139,12 +138,15 @@ public class BoardService {
     @Transactional
     public CommentResp addComment(Long postId, CommentCreateReq req) {
         String email = userResolver.currentUserEmail();
+        Users author = usersRepo.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         BoardPost post = postRepo.findActiveById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         BoardComment c = commentRepo.save(BoardComment.builder()
                 .post(post)
-                .authorEmail(email)
+                .author(author) // Users 매핑
                 .content(req.getContent())
                 .edited(false)
                 .build());
@@ -156,7 +158,7 @@ public class BoardService {
     public CommentResp updateComment(Long commentId, String newContent) {
         BoardComment c = commentRepo.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(c.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(c.getAuthor().getEmail());
         c.setContent(newContent);
         c.setEdited(true);
         return toCommentResp(c);
@@ -167,7 +169,7 @@ public class BoardService {
     public void deleteComment(Long commentId) {
         BoardComment c = commentRepo.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
-        userResolver.ensureOwnerOrAdmin(c.getAuthorEmail());
+        userResolver.ensureOwnerOrAdmin(c.getAuthor().getEmail());
         c.softDelete();
     }
 
@@ -180,7 +182,8 @@ public class BoardService {
                 .content(p.getContent())
                 .pinned(p.isPinned())
                 .viewCount(p.getViewCount())
-                .authorEmail(p.getAuthorEmail())
+                .authorEmail(p.getAuthor().getEmail())   // Users.email
+                .authorName(p.getAuthor().getUsername()) // Users.username
                 .department(p.getDepartment())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
@@ -202,7 +205,8 @@ public class BoardService {
         return CommentResp.builder()
                 .id(c.getId())
                 .content(c.getContent())
-                .authorEmail(c.getAuthorEmail())
+                .authorEmail(c.getAuthor().getEmail())   // Users.email
+                .authorName(c.getAuthor().getUsername()) // Users.username
                 .edited(c.isEdited())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())

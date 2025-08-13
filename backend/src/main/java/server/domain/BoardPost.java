@@ -33,9 +33,13 @@ public class BoardPost extends BaseTimeEntity {
     @Column(nullable = false)
     private String content;
 
-    // 정책: 로그인 식별자는 email 통일
-    @Column(nullable = false, length = 120)
-    private String authorEmail;
+    /**
+     * 작성자(User) 매핑
+     * Users의 PK(email)과 FK(user_email)로 연결
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
+    private Users author;
 
     @Column(length = 100)
     private String department;
