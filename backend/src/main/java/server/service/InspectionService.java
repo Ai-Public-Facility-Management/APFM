@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.*;
 import server.dto.*;
+import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
@@ -26,6 +27,7 @@ public class InspectionService {
     private final InspectionSettingRepository settingRepository;
     private final IssueService issueService;
     private final PublicFaService publicFaService;
+    private final CameraRepository cameraRepository;
 
     private static final SimpleDateFormat DETAIL_FMT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
@@ -106,31 +108,25 @@ public class InspectionService {
     // ✅ FastAPI 응답 결과를 저장하는 메서드
     @Transactional
     public void saveInspectionResult(List<InspectionResultDTO> results) {
-
-        // // 1️⃣ 사용자 조회
-        // Users user = usersRepository.findByEmail(result.getEmail())
-        // .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " +
-        // result.getEmail()));
-
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
         inspectionRepository.save(inspection);
-
         // 리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            if (dto.getDetections().getStatus().equals("NOMAL")) {
-                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(),
-                        dto.getDetections().getBox(), "NORMAL");
-            } else {
-                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(),
-                        dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
-                Issue issue = issueService.addIssue(dto.getDetections().getStatus(), 1L,
-                        dto.getDetections().getCost_estimate(), dto.getOriginal_image(), publicFa, inspection);
-                publicFa.setIssue(issue);
-                inspection.getIssues().add(issue);
+            Camera camera = cameraRepository.findById(dto.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+            camera.setImage(dto.getOriginal_image(),"image");
+            camera = cameraRepository.save(camera);
+            for(InspectionResultDTO.Detection detection : dto.getDetections()){
+                if(detection.getIssueType().equals("NONE")) {
+                    publicFaService.addPublicFa(camera,detection,"NORMAL");
+                }else{
+                    PublicFa publicFa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
+                    Issue issue = issueService.addIssue(publicFa,detection);
+                    publicFa.setIssue(issue);
+                    inspection.getIssues().add(issue);
+                }
             }
-
         }
     }
 
@@ -145,54 +141,24 @@ public class InspectionService {
         InspectionDetailDTO dto = new InspectionDetailDTO();
         dto.setId(inspection.getId());
         dto.setCreateDate(inspection.getCreateDate() != null ? DETAIL_FMT.format(inspection.getCreateDate()) : null);
+        List<Issue> issues = inspection.getIssues();
         dto.setStatus(status);
-
-        // (옵션) 상단 요약 필드 - 현재 도메인에 따라 값이 없을 수 있음 → 일단 null
-        dto.setFacilityName(null);
-        dto.setLocation(null);
-
-        // (옵션) 본문/요약 - 도메인에 있다면 매핑하세요. 없으면 null 유지
-        dto.setDescription(null);
-        dto.setContent(null);
-
-        // (옵션) 상단 이미지 목록 - 도메인에 저장된 리스트가 있으면 매핑. 지금은 빈 리스트
-        dto.setImageUrlList(List.of());
-
-        // 이슈 매핑
-        List<InspectionDetailDTO.IssueItem> items = new ArrayList<>();
-        if (inspection.getIssues() != null) {
-            for (Issue issue : inspection.getIssues()) {
-                InspectionDetailDTO.IssueItem it = new InspectionDetailDTO.IssueItem();
-                it.setId(issue.getId());
-                it.setFacilityCategory(issue.getPublicFa() != null ? issue.getPublicFa().getType().name() : null);
-                it.setType(issue.getType() != null ? issue.getType().name() : null);
-                it.setStatus(issue.getStatus() != null ? issue.getStatus().name() : null);
-
-                // 발생도/레벨/카운트 값이 도메인에 없다면 일단 null로 둠
-                it.setSeverity(null);
-                it.setLevel(null);
-                it.setCount(null);
-
-                it.setEstimate(issue.getEstimate());
-                it.setEstimateBasis(issue.getEstimateBasis());
-                it.setDescription(issue.getDescription());
-                it.setContent(issue.getContent());
-
-                // 임베디드 Photo가 있다면 URL 매핑
-                if (issue.getImage() != null) {
-                    it.setImageUrl(issue.getImage().getUrl());
-                } else {
-                    it.setImageUrl(null);
-                }
-
-                // FastAPI로부터 받은 상대 경로가 따로 있다면 여기에 매핑
-                it.setAiImagePath(null);
-
-                items.add(it);
-            }
+        if(issues.isEmpty()){
+            dto.setIssues(null);
+            return dto;
         }
-        dto.setIssues(items);
-
+        List<InspectionDetailDTO.IssueItem> issueItems = new ArrayList<>();
+        issues.forEach(issue -> {
+            InspectionDetailDTO.IssueItem issueItem = new InspectionDetailDTO.IssueItem();
+            issueItem.setId(issue.getId());
+            issueItem.setPublicFaType(issue.getPublicFa().getType().toString());
+            issueItem.setType(issue.getType().toString());
+            issueItem.setEstimate(issue.getEstimate());
+            issueItem.setEstimateBasis(issue.getEstimateBasis());
+            issueItem.setObstruction(issue.getObstruction());
+            issueItems.add(issueItem);
+        });
+        dto.setIssues(issueItems);
         return dto;
     }
 
