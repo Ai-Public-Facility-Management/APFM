@@ -13,6 +13,8 @@ import DetailPublicFa from "../features/PublicFa/DetailPublicFa";
 import FacilityList from "../features/Facility/FacilityList";
 import {getRoleFromToken, getToken} from "../api/login";
 
+import BoardList from "../features/Board/BoardList";
+
 // 토큰이 있어야 접근 가능
 const requireAuth = () => {
   const token = getToken?.() ?? null;
@@ -88,6 +90,11 @@ export const router = createBrowserRouter([
   {
     path: "/facility-list",
     element: <FacilityList />,
+    loader: requireAuth,
+  },
+  {
+    path: "/board",
+    element: <BoardList />,
     loader: requireAuth,
   },
   // 그 외 -> 메인으로
