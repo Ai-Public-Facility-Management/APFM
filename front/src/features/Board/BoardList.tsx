@@ -17,7 +17,6 @@ const BoardList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [totalPages, setTotalPages] = useState(1);
 
-  // 임시 데이터 로딩
   useEffect(() => {
     const load = async () => {
       try {
@@ -57,9 +56,9 @@ const BoardList = () => {
         <table className="board-table">
           <thead>
             <tr>
-              <th style={{ width: "80px" }}>번호</th>
               <th>제목</th>
-              <th style={{ width: "150px" }}>작성자</th>
+              <th style={{ width: "100px" }}>작성자</th>
+              <th style={{ width: "130px" }}>작성 부서</th>
               <th style={{ width: "150px" }}>작성일</th>
             </tr>
           </thead>
@@ -67,10 +66,10 @@ const BoardList = () => {
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
                 <tr key={post.id}>
-                  <td>{post.id}</td>
                   <td className="title-cell">{post.title}</td>
                   <td>{maskName(post.writerName)}</td>
-                  <td>{post.createdAt}</td>
+                  <td>{post.department}</td>
+                  <td>{post.createdAt.slice(0,10)}</td>
                 </tr>
               ))
             ) : (

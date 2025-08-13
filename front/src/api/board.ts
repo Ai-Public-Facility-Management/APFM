@@ -4,6 +4,7 @@ export interface BoardItem {
   id: number;
   title: string;
   writerName: string;
+  department: string;
   createdAt: string;
 }
 
