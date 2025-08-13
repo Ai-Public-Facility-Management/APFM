@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.*;
 import server.dto.*;
+import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
@@ -26,6 +27,7 @@ public class InspectionService {
     private final InspectionSettingRepository settingRepository;
     private final IssueService issueService;
     private final PublicFaService publicFaService;
+    private final CameraRepository cameraRepository;
 
     private static final SimpleDateFormat DETAIL_FMT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
@@ -106,31 +108,25 @@ public class InspectionService {
     // ✅ FastAPI 응답 결과를 저장하는 메서드
     @Transactional
     public void saveInspectionResult(List<InspectionResultDTO> results) {
-
-        // // 1️⃣ 사용자 조회
-        // Users user = usersRepository.findByEmail(result.getEmail())
-        // .orElseThrow(() -> new IllegalArgumentException("사용자 이메일이 존재하지 않습니다: " +
-        // result.getEmail()));
-
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
         inspectionRepository.save(inspection);
-
         // 리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            if (dto.getDetections().getStatus().equals("NOMAL")) {
-                publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(),
-                        dto.getDetections().getBox(), "NORMAL");
-            } else {
-                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(),
-                        dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL");
-                Issue issue = issueService.addIssue(dto.getDetections().getStatus(), 1L,
-                        dto.getDetections().getCost_estimate(), dto.getOriginal_image(), publicFa, inspection);
-                publicFa.setIssue(issue);
-                inspection.getIssues().add(issue);
+            Camera camera = cameraRepository.findById(dto.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+            camera.setImage(dto.getOriginal_image(),"image");
+            camera = cameraRepository.save(camera);
+            for(InspectionResultDTO.Detection detection : dto.getDetections()){
+                if(detection.getIssueType().equals("NONE")) {
+                    publicFaService.addPublicFa(camera,detection,"NORMAL");
+                }else{
+                    PublicFa publicFa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
+                    Issue issue = issueService.addIssue(publicFa,detection);
+                    publicFa.setIssue(issue);
+                    inspection.getIssues().add(issue);
+                }
             }
-
         }
     }
 

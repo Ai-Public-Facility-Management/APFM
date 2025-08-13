@@ -23,11 +23,7 @@ public class IssueController {
     @Autowired
     IssueService issueService;
 
-    @PostMapping
-    @ResponseBody
-    public Issue createIssue(@RequestBody IssueDTO issueDTO) {
-        return issueService.createIssue(issueDTO);
-    }
+
 
     @PutMapping
     @ResponseBody

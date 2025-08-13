@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import server.domain.Issue;
 import server.domain.Proposal;
 import server.domain.PublicFa;
+import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 import server.dto.IssueDetail;
 import server.repository.InspectionRepository;
@@ -64,17 +65,9 @@ public class IssueService {
         return issueRepository.findByInspection_Id(inspectionId);
     }
 
-    public Issue createIssue(IssueDTO issueDTO) {
-        Issue issue = new Issue(issueDTO);
-        issue.setPublicFa(publicFaRepository.findById(issueDTO.getPublicFaId()).orElse(new PublicFa()));
 
-        return issueRepository.save(issue);
-    }
-
-    public Issue addIssue(String status,Long estimate,String estimateBasis,String image,PublicFa publicFa,Inspection inspection) {
-        Issue issue = new Issue(IssueType.valueOf(status),estimate,estimateBasis,image);
-        issue.setPublicFa(publicFa);
-        issue.setInspection(inspection);
+    public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
+        Issue issue = new Issue(publicFa,detection);
         return issueRepository.save(issue);
     }
 
@@ -106,7 +99,7 @@ public class IssueService {
             detail.setCameraName(publicFa.getCamera().getLocation());
             detail.setCondition(issue.getType());
             detail.setObstruction(publicFa.getObstruction());
-            detail.setImage(issue.getImage());
+            detail.setImage(issue.getPublicFa().getImage());
             detail.setEstimate(issue.getEstimate());
             detail.setEstimateBasis(issue.getEstimateBasis());
 
