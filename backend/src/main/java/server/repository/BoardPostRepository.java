@@ -11,15 +11,18 @@ import java.util.Optional;
 
 public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
 
-    @Query("""
-           select p from BoardPost p
-           where p.deletedAt is null
-             and (:type is null or p.type = :type)
-             and (:q is null or (lower(p.title) like lower(concat('%', :q, '%'))
-                              or  lower(p.content) like lower(concat('%', :q, '%'))))
-           order by p.isPinned desc, p.id desc
-           """)
-    Page<BoardPost> search(BoardPost.PostType type, String q, Pageable pageable);
+    // [변경됨] JPQL 대신 Spring Data JPA 메서드 쿼리 사용
+    Page<BoardPost> findByDeletedAtIsNullAndType(BoardPost.PostType type, Pageable pageable);
+
+    Page<BoardPost> findByDeletedAtIsNullAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndContentContainingIgnoreCase(
+            String titleKeyword, String contentKeyword, Pageable pageable
+    );
+
+    Page<BoardPost> findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndTypeAndContentContainingIgnoreCase(
+            BoardPost.PostType type, String titleKeyword,
+            BoardPost.PostType type2, String contentKeyword,
+            Pageable pageable
+    );
 
     @Query("select p from BoardPost p where p.id = :id and p.deletedAt is null")
     Optional<BoardPost> findActiveById(Long id);
