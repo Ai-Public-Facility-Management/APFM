@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import server.domain.Issue;
 import server.domain.Proposal;
 import server.domain.PublicFa;
+import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 import server.dto.IssueDetail;
 import server.repository.InspectionRepository;
@@ -65,10 +66,8 @@ public class IssueService {
     }
 
 
-    public Issue addIssue(String status,Long estimate,String estimateBasis,PublicFa publicFa,Inspection inspection) {
-        Issue issue = new Issue(IssueType.valueOf(status),estimate,estimateBasis);
-        issue.setPublicFa(publicFa);
-        issue.setInspection(inspection);
+    public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
+        Issue issue = new Issue(publicFa,detection);
         return issueRepository.save(issue);
     }
 

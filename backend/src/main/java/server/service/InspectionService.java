@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.*;
 import server.dto.*;
+import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
@@ -26,6 +27,7 @@ public class InspectionService {
     private final InspectionSettingRepository settingRepository;
     private final IssueService issueService;
     private final PublicFaService publicFaService;
+    private final CameraRepository cameraRepository;
 
     // ✅ 정기점검 리스트 조회 (페이징 포함)
     public Page<InspectionSummary> getInspectionSummary(Pageable pageable) {
@@ -113,14 +115,20 @@ public class InspectionService {
 
         //리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            if(dto.getDetections().getStatus().equals("NOMAL")) {
-                publicFaService.addPublicFa(dto);
-            }else{
-                PublicFa publicFa = publicFaService.addPublicFa(dto.getDetections().getCameraId(), dto.getDetections().getPublicFaType(), dto.getDetections().getBox(), "ABNORMAL",dto.getOriginal_image());
-                Issue issue = issueService.addIssue(dto.getDetections().getStatus(),1L,dto.getDetections().getCost_estimate(),publicFa,inspection);
-                publicFa.setIssue(issue);
-                inspection.getIssues().add(issue);
+            Camera camera = cameraRepository.findById(dto.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+            camera.setImage(dto.getOriginal_image(),"image");
+            camera = cameraRepository.save(camera);
+            for(InspectionResultDTO.Detection detection : dto.getDetections()){
+                if(detection.getIssueType().equals("NONE")) {
+                    publicFaService.addPublicFa(camera,detection,"NORMAL");
+                }else{
+                    PublicFa publicFa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
+                    Issue issue = issueService.addIssue(publicFa,detection);
+                    publicFa.setIssue(issue);
+                    inspection.getIssues().add(issue);
+                }
             }
+
 
         }
     }

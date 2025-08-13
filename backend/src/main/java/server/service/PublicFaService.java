@@ -29,13 +29,12 @@ public class PublicFaService {
 
     // 수정 필요
     @Transactional
-    public PublicFa addPublicFa(InspectionResultDTO dto) {
+    public PublicFa addPublicFa(Camera camera,InspectionResultDTO.Detection detection,String publicFaStatus) {
         // 저장된 상태인 객체들만 조회
-        List<PublicFa> savedFas = publicFaRepository.findByCameraId(dto.getCameraId());
-        Camera camera = cameraRepository.findById(cameraId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        PublicFaType type = PublicFaType.valueOf(publicFaType);
-        Section section = new Section(box);
-        PublicFaDTO dto = new PublicFaDTO(type,section,FacilityStatus.valueOf(publicFaStatus));
+        List<PublicFa> savedFas = publicFaRepository.findByCameraId(camera.getId());
+        PublicFaType type = PublicFaType.valueOf(detection.getPublicFaType());
+        Section section = new Section(detection.getBox());
+        File image = new File(detection.getCrop_image(),"image");
         for (PublicFa savedFa : savedFas) {
             double iou = calculateIoU(section, savedFa.getSection());
             double IOU_THRESHOLD = 0.5;
@@ -43,11 +42,11 @@ public class PublicFaService {
                 if (savedFa.getType() == type)
                     return savedFa;
                 else
-                    return publicFaRepository.save(new PublicFa(dto,camera));
+                    return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,image));
             }
         }
         // 중복 아닌 경우 저장
-        return publicFaRepository.save(new PublicFa(dto,camera));
+        return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,image));
     }
 
 //    @Transactional

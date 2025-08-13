@@ -30,7 +30,6 @@ public class PublicFa {
     @Embedded
     private Section section;
 
-
     private Date installDate;
 
     private Date lastRepair;
@@ -48,9 +47,6 @@ public class PublicFa {
     @OneToOne(mappedBy = "publicFa",cascade = CascadeType.ALL)
     private Issue issue;
 
-    //    @ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)
-//    @JoinColumn(name = "inspection_id")
-//    private Inspection inspection;
 
     public PublicFa updateFa(PublicFaDTO publicFaDTO) {
         this.setStatus(publicFaDTO.getStatus());
@@ -77,6 +73,14 @@ public class PublicFa {
         this.setInstallDate(publicFaDTO.getInstallDate());
         this.setLastRepair(publicFaDTO.getLastRepair());
         this.setObstruction(publicFaDTO.getObstruction());
+    }
+
+    public PublicFa(PublicFaType type,Section section,FacilityStatus publicFaStatus,Camera camera,File image) {
+        this.type = type;
+        this.section = section;
+        this.camera = camera;
+        this.status = publicFaStatus;
+        this.image = image;
     }
 }
 

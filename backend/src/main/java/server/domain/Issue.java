@@ -3,6 +3,7 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 
 import java.util.Date;
@@ -31,19 +32,21 @@ public class Issue {
     @Enumerated(EnumType.STRING)
     private IssueStatus status;
 
-
     private Long estimate;
 
     @Column(length = 500)
     private String estimateBasis;
 
-    private int obstructionLevel;
+    @Column(length = 500)
+    private String estimateReferences;
 
-    private String description;
+    private Long obstruction;
 
-    private String location;
+    @Column(length = 500)
+    private String obstructionBasis;
 
-    private String content;
+    @Column(length = 500)
+    private String visionAnalysis;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publicFa_id", unique = true)
@@ -61,11 +64,15 @@ public class Issue {
 //        this.estimate = issueDTO.getEstimate();
 //    }
 
-    public Issue(IssueType type,Long estimate,String estimateBasis) {
+    public Issue(PublicFa publicFa, InspectionResultDTO.Detection detection) {
+        this.publicFa = publicFa;
+        this.type = IssueType.valueOf(detection.getIssueType());
+        this.estimate = detection.getEstimate();
+        this.estimateBasis = detection.getEstimateBasis();
+        this.obstruction = detection.getObstruction();
+        this.obstructionBasis = detection.getObstructionBasis();
+        this.visionAnalysis = detection.getVisionAnalysis();
         this.creationDate = new Date();
-        this.type = type;
-        this.estimateBasis = estimateBasis;
-        this.estimate = estimate;
     }
 
 }
