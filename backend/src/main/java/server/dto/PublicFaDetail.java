@@ -11,7 +11,7 @@ public class PublicFaDetail {
     private Long id;
     private String cameraName;
     private PublicFaType type;
-    private File image;
+    private String image;
     private Section section;
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date installDate;
@@ -27,7 +27,7 @@ public class PublicFaDetail {
         this.cameraName = publicFa.getCamera().getLocation();
         this.type = publicFa.getType();
         if (publicFa.getIssue() != null) {
-            this.image = publicFa.getIssue().getImage();
+            this.image = publicFa.getImage().getUrl();
             this.estimate = publicFa.getIssue().getEstimate();
             this.estimateBasis = publicFa.getIssue().getEstimateBasis();
         }
