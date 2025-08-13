@@ -1,54 +1,59 @@
+// src/features/schedule/IntervalModal.tsx
 import { useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 
-import { saveInspectionSetting, type Frequency } from "../../api/inspection";
+import { saveInspectionSetting } from "../../api/inspection";
 import { useScheduleModal } from "./ScheduleModalProvider";
 import "./IntervalModal.css";
 
+// UI용 주기 타입(백엔드엔 inspectionCycle 숫자로 보냄)
+type Frequency = "DAILY" | "WEEKLY" | "MONTHLY";
+
 export default function IntervalModal() {
-  // Provider에서 닫기 함수 사용 (라우터 X)
   const { close } = useScheduleModal();
 
-  // 폼 상태
-  const [facilityId, setFacilityId] = useState<number | "">("");
-  // 달력(Date) + 서버로 보낼 문자열(YYYY-MM-DD) 동기화
+  // 날짜/시간/주소/주기
   const [startObj, setStartObj] = useState<Date>(new Date());
   const [startDate, setStartDate] = useState<string>(() =>
     new Date().toISOString().slice(0, 10)
   );
-
-  const [freq, setFreq] = useState<Frequency>("DAILY");
   const [hour, setHour] = useState(9);
   const [minute, setMinute] = useState(0);
-  const [dow, setDow] = useState(1);   // WEEKLY: 월=1..일=7
-  const [dom, setDom] = useState(1);   // MONTHLY: 1..28
+  //const [address, setAddress] = useState("");
+  const [freq, setFreq] = useState<Frequency>("DAILY");
   const [loading, setLoading] = useState(false);
 
-  // 달력에서 날짜 선택
+  // 드롭다운 옵션
+  const hours = Array.from({ length: 24 }, (_, i) => i);      // 0..23
+  const minutesArr = Array.from({ length: 60 }, (_, i) => i); // 0..59
+
+  // 달력 선택
   const onPick = (d?: Date) => {
     if (!d) return;
     setStartObj(d);
     setStartDate(d.toISOString().slice(0, 10));
   };
 
+  const pad = (n: number) => String(n).padStart(2, "0");
+  // NOTE: 팀 규칙에 맞게 필요하면 조정 (예: MONTHLY=30일 가정)
+  const freqToCycle = (f: Frequency) => (f === "DAILY" ? 1 : f === "WEEKLY" ? 7 : 30);
+
   const onSave = async () => {
-    if (facilityId === "") return alert("시설 ID를 입력하세요.");
+    if (!startDate) return alert("시작 날짜를 선택하세요.");
+    //if (!address.trim()) return alert("주소를 입력하세요.");
+
     setLoading(true);
     try {
-      const payload: any = {
-        facilityId: Number(facilityId),
-        frequency: freq,
-        hour,
-        minute,
-        startAt: new Date(`${startDate}T00:00:00`).toISOString(),
-        enabled: true,
-        ...(freq === "WEEKLY" ? { dayOfWeek: dow } : {}),
-        ...(freq === "MONTHLY" ? { dayOfMonth: dom } : {}),
+      const payload = {
+        startDate,                                 // "YYYY-MM-DD"
+        startTime: `${pad(hour)}:${pad(minute)}`,  // "HH:mm"
+        inspectionCycle: freqToCycle(freq),      // 정수(일 단위)
+        
       };
       await saveInspectionSetting(payload);
       alert("저장되었습니다.");
-      close(); // 모달 닫기
+      close();
     } catch (e) {
       console.error(e);
       alert("저장 실패: 서버 응답을 확인해주세요.");
@@ -57,7 +62,6 @@ export default function IntervalModal() {
     }
   };
 
-  // 배경 클릭 시 닫힘 방지
   const stop = (e: React.MouseEvent) => e.stopPropagation();
 
   return (
@@ -67,15 +71,15 @@ export default function IntervalModal() {
         <h2 className="modal-title">점검 주기 설정</h2>
 
         <div className="modal-grid">
-          {/* 왼쪽: 큰 달력 */}
+          {/* 왼쪽: 달력 */}
           <div>
             <div className="calendar-card">
               <DayPicker
                 mode="single"
                 selected={startObj}
                 onSelect={onPick}
-                weekStartsOn={1}          // 월요일 시작
-                captionLayout="dropdown"  // 년/월 드롭다운
+                weekStartsOn={1}
+                captionLayout="dropdown"
               />
               <div className="cal-actions">
                 <button
@@ -88,39 +92,17 @@ export default function IntervalModal() {
                 >
                   오늘
                 </button>
-                <div className="spacer" />
-                <button className="btn" onClick={close}>취소</button>
-                <button className="btn btn-primary" onClick={onSave} disabled={loading}>
-                  {loading ? "저장 중…" : "선택"}
-                </button>
               </div>
             </div>
           </div>
 
-          {/* 오른쪽: 드롭다운/인풋 */}
+          {/* 오른쪽: 폼 */}
           <div>
             <div className="form-group">
               <span className="label">시작 날짜</span>
-              <input
-                type="text"
-                className="input"
-                value={startDate}
-                readOnly
-              />
+              <input type="text" className="input" value={startDate} readOnly />
             </div>
 
-            <div className="form-group">
-              <span className="label">시설 ID</span>
-              <input
-                type="number"
-                className="input"
-                value={facilityId}
-                onChange={(e) =>
-                  setFacilityId(e.target.value === "" ? "" : Number(e.target.value))
-                }
-                placeholder="예: 42"
-              />
-            </div>
 
             <div className="form-group">
               <span className="label">주기</span>
@@ -135,66 +117,38 @@ export default function IntervalModal() {
               </select>
             </div>
 
-            {freq === "WEEKLY" && (
-              <div className="form-group">
-                <span className="label">요일</span>
-                <select
-                  className="select"
-                  value={dow}
-                  onChange={(e) => setDow(Number(e.target.value))}
-                >
-                  <option value={1}>월</option>
-                  <option value={2}>화</option>
-                  <option value={3}>수</option>
-                  <option value={4}>목</option>
-                  <option value={5}>금</option>
-                  <option value={6}>토</option>
-                  <option value={7}>일</option>
-                </select>
-              </div>
-            )}
-
-            {freq === "MONTHLY" && (
-              <div className="form-group">
-                <span className="label">일(1~28)</span>
-                <input
-                  className="input"
-                  type="number"
-                  min={1}
-                  max={28}
-                  value={dom}
-                  onChange={(e) => setDom(Number(e.target.value))}
-                />
-              </div>
-            )}
-
             <div className="form-group">
               <span className="label">시</span>
-              <input
-                className="input"
-                type="number"
-                min={0}
-                max={23}
+              <select
+                className="select"
                 value={hour}
                 onChange={(e) => setHour(Number(e.target.value))}
-              />
+              >
+                {hours.map((h) => (
+                  <option key={h} value={h}>
+                    {String(h).padStart(2, "0")}시
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="form-group">
               <span className="label">분</span>
-              <input
-                className="input"
-                type="number"
-                min={0}
-                max={59}
+              <select
+                className="select"
                 value={minute}
                 onChange={(e) => setMinute(Number(e.target.value))}
-              />
+              >
+                {minutesArr.map((m) => (
+                  <option key={m} value={m}>
+                    {String(m).padStart(2, "0")}분
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
-        {/* 하단 버튼 (추가로 원하면 유지) */}
         <div className="actions">
           <button className="btn" onClick={close}>취소</button>
           <button className="btn btn-primary" onClick={onSave} disabled={loading}>

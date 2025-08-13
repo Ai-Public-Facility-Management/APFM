@@ -30,7 +30,7 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping(value = "/detail")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> viewPublicFaById(@RequestParam long id) {
         Map<String, Object> response = new HashMap<>();

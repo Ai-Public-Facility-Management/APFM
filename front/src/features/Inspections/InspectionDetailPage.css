@@ -1,0 +1,153 @@
+/* [기능 요약] '점검 보고' 상세 페이지 스타일 (정부 포털 톤) */
+
+.inspDetail-wrap {
+  max-width: 980px;
+  margin: 40px auto 80px;
+  padding: 0 16px;
+}
+
+.inspDetail-breadcrumb {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.inspDetail-pageTitle {
+  font-size: 28px;
+  font-weight: 800;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+}
+
+.inspDetail-banner {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #374151;
+  margin-bottom: 20px;
+}
+
+.inspDetail-error {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.inspDetail-section {
+  margin-top: 28px;
+}
+
+.inspDetail-sectionTitle {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+
+.inspDetail-article {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+
+.inspDetail-article + .inspDetail-article {
+  margin-top: 24px;
+}
+
+/* 큰 이미지 */
+.inspDetail-mainImage {
+  width: 100%;
+  max-height: 520px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+}
+
+.inspDetail-imagePlaceholder {
+  width: 100%;
+  height: 360px;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+  color: #6b7280;
+  display: grid;
+  place-items: center;
+  background: #fafafa;
+}
+
+/* 항목 리스트 (좌/우 2열) */
+.inspDetail-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-top: 14px;
+}
+
+.inspDetail-fieldsCol {
+  display: grid;
+  gap: 6px;
+}
+
+.inspDetail-line {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.inspDetail-lineLabel {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.inspDetail-lineValue {
+  color: #111827;
+  font-size: 14px;
+}
+
+.inspDetail-prewrap {
+  white-space: pre-wrap;
+}
+
+/* 버튼 영역 */
+.inspDetail-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.inspDetail-primaryBtn {
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inspDetail-backRow {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.inspDetail-backLink {
+  color: #374151;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.inspDetail-backLink:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 820px) {
+  .inspDetail-fields {
+    grid-template-columns: 1fr;
+  }
+}

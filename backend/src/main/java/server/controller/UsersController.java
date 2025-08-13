@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @Transactional
 public class UsersController {
 
@@ -48,18 +48,30 @@ public class UsersController {
         return ResponseEntity.ok(isDuplicated);
     } //email 중복 확인 api
 
-    //비밀번호 초기화 요청
-    @GetMapping("/reset")
-    public ResponseEntity<Boolean> reqestReset(@RequestParam String email) {
+    /* ===== 비밀번호 재설정(코드) ===== */
 
-        usersService.resetEmail(email);
-        return ResponseEntity.ok(true);
+    // (1) 코드 요청
+    @PostMapping("/reset-code")
+    public ResponseEntity<Void> requestResetCode(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        usersService.sendResetCodeToMember(email);
+        return ResponseEntity.noContent().build();
     }
 
-    //비밀번호 초기화
-    @PostMapping("/reset-confime")
+    // (2) (선택) 코드 검증만
+    @PostMapping("/reset-code/verify")
+    public ResponseEntity<Boolean> verifyResetCode(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        String code  = payload.get("code");
+        return ResponseEntity.ok(usersService.verifyResetCode(email, code));
+    }
+
+    // (3) 최종 비밀번호 변경
+    @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> payload) {
-        return ResponseEntity.ok(usersService.resetPassword(payload));
+        String email = payload.get("email");
+        String code = payload.get("code");
+        String newPassword = payload.get("password");
+        return ResponseEntity.ok(usersService.resetPasswordWithCode(email, code, newPassword));
     }
-
 }

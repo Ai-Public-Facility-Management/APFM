@@ -176,7 +176,7 @@ export default function SignUpPage() {
                 <option value="DEVELOPMENT">개발부서</option>
                 <option value="DESIGN">디자인부서</option>
                 <option value="MARKETING">마케팅부서</option>
-                <option value="SALES">영업부서</option>
+                <option value="SALES">총무과</option>
                 <option value="HR">인사과</option>
                 <option value="FINANCE">재무과</option>
               </select>

@@ -91,10 +91,10 @@ const Header: React.FC = () => {
         ) : (
           <div className="headerIcons">
             {/* 통합검색 유지 */}
-            <Link to="/search">
+            <Link to="/board">
               {/* 새 아이콘도 기존 크기 규칙을 재사용하려면 className을 search-image로 통일해도 됩니다 */}
               <img src={search} alt="검색" className="search-image" />
-              <span>통합검색</span>
+              <span>게시판</span>
             </Link>
           {/* 페이지 띄어서 하는 점검 주기 나중에 모달 신경 안쓰면 지워도됨
             
