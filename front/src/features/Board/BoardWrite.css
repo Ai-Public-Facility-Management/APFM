@@ -1,0 +1,91 @@
+.pw-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.pw-card {
+  width: 100%;
+  max-width: 600px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pw-heading {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.pw-form-group {
+  margin-bottom: 15px;
+}
+
+.pw-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.pw-input,
+.pw-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.pw-textarea {
+  min-height: 120px;
+}
+
+.pw-file-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pw-file-label {
+  padding: 6px 12px;
+  background-color: #0056b3;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pw-file-label:hover {
+  background-color: #004494;
+}
+
+.pw-file-name {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.pw-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.pw-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pw-btn-cancel {
+  background-color: #ccc;
+}
+
+.pw-btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.pw-btn-primary:hover {
+  background-color: #0069d9;
+}
