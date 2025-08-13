@@ -7,29 +7,20 @@ import java.util.List;
 @Data
 public class InspectionDetailDTO {
     private Long id;
-    private String createDate;
-    private String status;
-    private String facilityName;
-    private String location;
-    private String description;
-    private String content;
-    private List<String> imageUrlList;
-    private List<IssueItem> issues;
+    private String createDate;              //정기점검 날짜
+    private String cameraName;              //카메라 이름(위치)
+    private String imageUrl;                //카메라 캡처 이미지
+    private List<IssueItem> issues;         //이슈사항
+    private String status;                  //보고서 작성 여부
 
     @Data
     public static class IssueItem {
-        private Long id;
-        private String facilityCategory;
-        private String type;
-        private String status;
-        private Integer severity;
-        private Integer level;
-        private Integer count;
-        private Long estimate;
-        private String estimateBasis;
-        private String description;
-        private String content;
-        private String imageUrl;
-        private String aiImagePath;
+        private Long id;                    //이슈사항 Id
+        private String publicFaType;        //시설물 종류
+        private String type;                //이슈사항 타입
+        private Long estimate;              //견적
+        private String estimateBasis;       //견적 근거
+        private Long obstruction;         //방해도
+
     }
 }

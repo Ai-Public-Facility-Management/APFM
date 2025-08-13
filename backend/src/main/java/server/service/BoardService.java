@@ -12,6 +12,7 @@ import server.domain.BoardPost;
 import server.dto.BoardDTO.*;
 import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -61,11 +62,32 @@ public class BoardService {
         return toPostResp(post, commentCount);
     }
 
-    // [기능 요약] 게시글 검색/목록
+    // [변경됨] 게시글 검색/목록
     @Transactional(readOnly = true)
     public Page<PostResp> search(BoardPost.PostType type, String q, Pageable pageable) {
-        return postRepo.search(type, q, pageable)
-                .map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId())));
+        Page<BoardPost> posts;
+
+        if (q == null || q.isBlank()) {
+            // 검색어 없을 때
+            if (type == null) {
+                posts = postRepo.findByDeletedAtIsNullAndType(null, pageable);
+            } else {
+                posts = postRepo.findByDeletedAtIsNullAndType(type, pageable);
+            }
+        } else {
+            String keyword = q.trim();
+            if (type == null) {
+                posts = postRepo.findByDeletedAtIsNullAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndContentContainingIgnoreCase(
+                        keyword, keyword, pageable
+                );
+            } else {
+                posts = postRepo.findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndTypeAndContentContainingIgnoreCase(
+                        type, keyword, type, keyword, pageable
+                );
+            }
+        }
+
+        return posts.map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId())));
     }
 
     // [기능 요약] 게시글 수정(작성자/관리자)
@@ -170,7 +192,7 @@ public class BoardService {
                                         .storedUrl(a.getStoredUrl())
                                         .build()
                                 )
-                                .collect(Collectors.toList())   // ← 자바 8/11
+                                .collect(Collectors.toList())
                 )
                 .build();
     }
