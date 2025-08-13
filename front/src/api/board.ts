@@ -1,87 +1,51 @@
-// src/api/board.ts
 import { api } from "./http";
 
-// ===== 인터페이스 =====
-export interface Attachment {
-  id: number;
-  originalName: string;
-  storedUrl: string;
-}
-
-export interface PostListItem {
+export interface BoardItem {
   id: number;
   title: string;
-  authorEmail: string;
-  department: string;
-  createdAt: string;
-  viewCount: number;
-}
-
-export interface PostDetail {
-  id: number;
   type: string;
-  title: string;
-  content: string;
-  pinned: boolean;
-  viewCount: number;
-  authorEmail: string;
   authorName: string;
   department: string;
-  commentCount: number;
   createdAt: string;
-  updatedAt: string;
-  attachments: Attachment[];
 }
 
-export interface Comment {
-  id: number;
-  content: string;
-  authorEmail: string;
-  authorName: string;
-  edited: boolean;
-  createdAt: string;
-  updatedAt: string;
+export interface BoardPage {
+  content: BoardItem[];
+  totalElements: number;
+  totalPages: number;
+  // 필요에 따라 pageable 등 추가 가능
 }
 
-// ===== API 함수 =====
+/**
+ * 게시글 목록 조회 (페이징, 검색)
+ * @param page 0부터 시작하는 페이지 번호
+ * @param size 페이지 크기
+ * @param q 검색어 (옵션)
+ * @returns 페이징된 게시글 데이터
+ */
+export async function fetchBoards(
+  page: number,
+  size: number,
+  q?: string
+): Promise<BoardPage> {
+  const params: Record<string, any> = { page, size };
+  if (q) params.q = q;
 
-// 📌 게시글 목록 조회 (검색 + 페이지네이션)
-export const getPosts = (
-  page = 0,
-  size = 10,
-  keyword = "",
-  sort = "createdAt,desc"
-) =>
-  api.get<{ content: PostListItem[]; totalPages: number; totalElements: number }>(
-    "/boards",
-    {
-      params: { page, size, keyword, sort },
-    }
-  );
+  const response = await api.get("/api/boards", { params });
+  // 백엔드 API 응답 구조에 맞게 조정 필요
+  return {
+    content: response.data.content,
+    totalElements: response.data.totalElements,
+    totalPages: response.data.totalPages,
+  };
+}
 
-// 📌 게시글 상세 조회
-export const getPostDetail = (postId: string) =>
-  api.get<PostDetail>(`/api/boards/${postId}`);
-
-// 📌 댓글 목록 조회
-export const getComments = (
-  postId: string,
-  page = 0,
-  size = 10,
-  sort = "latest"
-) =>
-  api.get<{ content: Comment[] }>(`/api/boards/${postId}/comments`, {
-    params: { page, size, sort },
-  });
-
-// 📌 댓글 작성
-export const addComment = (postId: string, content: string) =>
-  api.post(`/api/boards/${postId}/comments`, { content });
-
-// 📌 댓글 수정
-export const updateComment = (commentId: number, content: string) =>
-  api.put(`/api/boards/comments/${commentId}`, { content });
-
-// 📌 댓글 삭제
-export const deleteComment = (commentId: number) =>
-  api.delete(`/api/boards/comments/${commentId}`);
+/**
+ * 특정 게시글 상세 조회
+ * @param id 게시글 ID
+ * @returns 게시글 상세 데이터 (필요하면 타입 정의 후 추가)
+ */
+// export async function fetchBoardDetail(id: number) {
+//   const response = await api.get("/api/boards/" + id);
+//   return response.data;
+// }

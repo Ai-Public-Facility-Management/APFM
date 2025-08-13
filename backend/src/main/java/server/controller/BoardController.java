@@ -27,16 +27,14 @@ public class BoardController {
     public ResponseEntity<PageResp<PostResp>> list(
             @RequestParam(required = false) BoardPost.PostType type,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String department,
-            @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        // MVP: pinned desc, id desc 기준. 필요하면 sort 파라미터에 따라 동적 Sort 구성.
         Pageable pageable = PageRequest.of(page, size);
         var p = boardService.search(type, q, pageable);
         return ResponseEntity.ok(PageResp.of(p));
     }
+
 
     // [기능 요약] 게시글 상세(+조회수 증가)
     @GetMapping("/{postId}")
