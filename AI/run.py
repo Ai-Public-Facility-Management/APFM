@@ -17,6 +17,8 @@ from pydantic import BaseModel
 from typing import List
 import logging
 from priority_graph import run_priority_graph
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
 
 from model_config import (
     yolo_model, class_names, clip_device, clip_model,
@@ -36,6 +38,15 @@ app.add_middleware(
 )
 
 logger = logging.getLogger("uvicorn.error")
+
+# 📌 CORS 설정 추가
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React 개발 서버 주소
+    allow_credentials=True,
+    allow_methods=["*"],  # OPTIONS 포함 모든 HTTP 메서드 허용
+    allow_headers=["*"],  # Authorization 등 모든 헤더 허용
+)
 
 def expand_box(x1, y1, x2, y2, img_w, img_h, pad_px=20):
     return (
@@ -283,11 +294,43 @@ async def batch_predict(req: FolderPathRequest):
     return result_dict
 
 # 기존 엔드포인트 유지
-@app.post("/generate-proposal")
-async def generate_proposal_api(request: dict):
-    estimations = request.get("estimations", [])
-    proposal = generate_proposal(estimations)
+class BackendEstimation(BaseModel):
+    vision_analysis: str
+    estimate: int
+    estimateBasis: str
+
+class FromSpringRequest(BaseModel):
+    estimations: List[BackendEstimation]
+
+def build_output_text(e: BackendEstimation) -> str:
+    return f"예상 견적 (원): {e.estimate:,}원\n\n📌 계산 근거 요약:\n{(e.estimateBasis or '').strip()}"
+
+latest_proposal: dict = {}
+
+@app.post("/proposal/generate-from-spring")
+def generate_from_spring(req: FromSpringRequest):
+    global latest_proposal
+    items = [
+        {
+            "vision_analysis": e.vision_analysis,
+            "estimate": e.estimate,
+            "estimate_basis": e.estimateBasis
+        }
+        for e in req.estimations
+    ]
+    proposal = generate_proposal(items)
+    latest_proposal = proposal
     return {"proposal": proposal}
+
+
+
+
+@app.get("/proposal/latest")
+def get_latest_proposal():
+    if not latest_proposal:
+        raise HTTPException(status_code=404, detail="아직 생성된 제안서가 없습니다.")
+    return {"proposal": latest_proposal}
+
 
 @app.post("/proposal-to-docx")
 async def proposal_to_docx_api(request: dict):

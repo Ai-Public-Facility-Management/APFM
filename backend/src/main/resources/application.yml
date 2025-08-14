@@ -119,6 +119,10 @@ jwt:
   secret: ${SECRET_KEY}
   expiration: 3600000
 
+app:
+  fastapi:
+    base-url: http://localhost:8080  # FastAPI 서버 주소
+
 server:
   port: 8082
 

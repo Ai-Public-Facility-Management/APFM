@@ -15,16 +15,15 @@ public class PublicFaSummary {
     private IssueType condition;
     private FacilityStatus status;
 
-    public PublicFaSummary(PublicFa fa){
+    public PublicFaSummary(PublicFa fa) {
         this.publicFaId = fa.getId();
         this.cameraName = fa.getCamera().getLocation();
         this.publicFaType = fa.getType();
-        if(fa.getIssue() != null){
+        if (fa.getIssue() != null) {
             this.issueId = fa.getIssue().getId();
             this.condition = fa.getIssue().getType();
+
         }
-        this.status = fa.getStatus();
     }
+
 }
-
-

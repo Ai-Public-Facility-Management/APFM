@@ -56,7 +56,8 @@ public class SecurityConfig {
                         .requestMatchers(
 
                                  "/api/auth/**","/api/publicfa/**","/api/issue/**","/api/users/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**", "/api/boards/**"
+                                "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**",
+                                "/api/proposal/**", "/api/boards/**"
 
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

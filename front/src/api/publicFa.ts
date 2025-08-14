@@ -58,3 +58,62 @@ export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {
   const response = await api.get("/api/publicfa/detail", { params: { id } });
   return response.data.publicFa;
 }
+
+
+/**
+ * 제안 요청서 생성 API
+ * @param ids 선택된 시설물 ID 배열
+ */
+export const createProposal = async (ids: number[]) => {
+  try {
+    const response = await api.post("/api/proposal/generate", ids, {
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    console.error("제안 요청서 전송 실패:", error);
+    throw error;
+  }
+};
+
+export interface ProposalData {
+  project_name: string;
+  project_overview: string;
+  construction_period: string;
+  site_analysis_summary: string[];
+  estimation_details_with_basis: string[];
+  total_cost: string;
+  manpower_plan: string;
+  equipment_plan: string;
+  safety_quality_plan: string;
+  conclusion_expected_effect: string;
+}
+
+export const fetchProposal = async (): Promise<ProposalData> => {
+  const res = await api.get<{ proposal: ProposalData }>("http://localhost:8080/proposal/latest");
+  return res.data.proposal;
+};
+
+export const saveProposal = async (proposal: ProposalData) => {
+  try {
+    const res = await api.post(
+        "http://localhost:8080/proposal-to-docx",
+        { proposal },
+        {
+          responseType: "blob", // DOCX는 바이너리 파일
+        }
+    );
+
+    // 다운로드 처리
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "proposal.docx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("DOCX 다운로드 실패:", error);
+    throw error;
+  }
+};
