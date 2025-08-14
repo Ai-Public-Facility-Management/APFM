@@ -11,7 +11,7 @@ from estimate_util import run_estimate
 from proposal.generate import generate_proposal
 from proposal.word import convert_to_word
 from fastapi.responses import StreamingResponse
-from routes import predict_high  
+from routes import (predict_high, predict_board)  
 from pydantic import BaseModel
 from typing import List
 import logging
@@ -46,6 +46,8 @@ app.include_router(
     prefix="",
     tags=["predict_high"]
 )
+
+app.include_router(predict_board.router)
 
 class ImagePathRequest(BaseModel):
     image_path: str
@@ -315,3 +317,4 @@ async def priority_run_api(state: InspectionState):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"그래프 실행 실패: {str(e)}")
+#uvicorn run:app --host 0.0.0.0 --port 8080 --reload
