@@ -117,6 +117,7 @@ export default function BoardDetail() {
     if (!post) return;
     navigate("/board/write", {
         state: {
+          id: post.id,
           title: post.title,
           content: post.content,
           imageUrl: post.imageUrl
