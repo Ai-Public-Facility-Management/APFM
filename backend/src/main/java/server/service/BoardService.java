@@ -29,7 +29,10 @@ public class BoardService {
         String email = userResolver.currentUserEmail();
         Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        String url = azureService.azureBlobUpload(file,".png");
+        String url = null;
+        if(file != null){
+            url = azureService.azureBlobUpload(file,".png");
+        }
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
@@ -163,7 +166,11 @@ public class BoardService {
 
     // ===== mapper =====
     private PostResp toPostResp(BoardPost p, long commentCount, boolean isAuthor) {
-        String sasUrl = azureService.azureBlobSas(p.getImageUrl());
+        String sasUrl = null;
+        if(p.getImageUrl() != null){
+            sasUrl = azureService.azureBlobSas(p.getImageUrl());
+        }
+
         return PostResp.builder()
                 .id(p.getId())
                 .type(p.getType().name())

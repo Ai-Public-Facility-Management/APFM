@@ -46,7 +46,9 @@ public class BoardController {
 
     // [기능 요약] 게시글 작성
     @PostMapping
-    public ResponseEntity<PostResp> create(@RequestPart MultipartFile file, @RequestPart PostCreateReq req) throws IOException {
+    public ResponseEntity<PostResp> create(
+            @RequestPart(required = false) MultipartFile file,
+            @RequestPart PostCreateReq req) throws IOException {
         return ResponseEntity.ok(boardService.create(file,req));
     }
 
