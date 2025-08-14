@@ -5,6 +5,16 @@ import Layout from "../../components/Layout";
 import "./BoardList.css";
 import { fetchBoards, BoardItem } from "../../api/board";
 
+// 부서 코드 → 한글 매핑
+const departmentLabels: Record<string, string> = {
+  DEVELOPMENT: "개발부서",
+  DESIGN: "디자인부서",
+  MARKETING: "마케팅부서",
+  SALES: "총무과",
+  HR: "인사과",
+  FINANCE: "재무과",
+};
+
 // 이름 마스킹 함수
 const maskName = (name: string) => {
   if (!name) return "";
@@ -100,7 +110,7 @@ const BoardList = () => {
                     onClick={() => navigate(`/board/${post.id}`)}>
                   <td className="title-cell">{post.title}</td>
                   <td>{maskName(post.authorName)}</td>
-                  <td>{post.authorDepartment}</td>
+                  <td>{departmentLabels[post.authorDepartment] || post.authorDepartment}</td>
                   <td>{post.createdAt ? post.createdAt.slice(0, 10) : ""}</td>
                 </tr>
               ))
