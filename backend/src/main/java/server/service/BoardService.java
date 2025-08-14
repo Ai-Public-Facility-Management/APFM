@@ -92,19 +92,25 @@ public class BoardService {
 
     // [기능 요약] 게시글 수정(작성자/관리자)
     @Transactional
-    public PostResp update(Long postId, PostUpdateReq req) {
+    public PostResp update(Long postId, MultipartFile file, PostUpdateReq req) throws IOException {
         BoardPost post = postRepo.findByIdAndDeletedAtIsNull(postId)
-            .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
 
         if (req.title != null) post.setTitle(req.title);
         if (req.content != null) post.setContent(req.content);
-        if (req.imageUrl != null) post.setImageUrl(req.imageUrl);
+
+        // 파일이 있으면 Azure에 업로드 후 이미지 URL 교체
+        if (file != null && !file.isEmpty()) {
+            String url = azureService.azureBlobUpload(file, ".png");
+            post.setImageUrl(url);
+        }
 
         String currentUserEmail = userResolver.currentUserEmail();
         boolean isAuthor = currentUserEmail.equals(post.getAuthor().getEmail());
         long commentCount = commentRepo.countActiveByPostId(postId);
+
         return toPostResp(post, commentCount, isAuthor);
     }
 
