@@ -8,11 +8,15 @@ import java.util.List;
 public class InspectionDetailDTO {
     private Long id;
     private String createDate;              //정기점검 날짜
-    private String cameraName;              //카메라 이름(위치)
-    private String imageUrl;                //카메라 캡처 이미지
-    private List<IssueItem> issues;         //이슈사항
+    private List<Camera> cameras;         //이슈사항
     private String status;                  //보고서 작성 여부
 
+    @Data
+    public static class Camera{
+        private String cameraName;              //카메라 이름(위치)
+        private String imageUrl;                //카메라 캡처 이미지
+        private List<IssueItem> issues;
+    }
     @Data
     public static class IssueItem {
         private Long id;                    //이슈사항 Id

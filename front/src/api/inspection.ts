@@ -14,30 +14,27 @@ export type InspectionSummary = {
   hasReport: boolean;
 };
 
-export type InspectionDetail = {
+// [기능 요약] 백엔드 InspectionDetailDTO와 1:1 매핑
+export type IssueItem = {
   id: number;
-  createDate?: string;
-  status?: string;
-  facilityName?: string;
-  location?: string;
-  description?: string;
-  content?: string;
-  imageUrlList?: string[];
-  issues?: Array<{
-    id: number;
-    facilityCategory?: string;
-    type?: string;
-    status?: string;
-    severity?: number;
-    level?: number;
-    count?: number;
-    estimate?: number;
-    estimateBasis?: string;
-    description?: string;
-    content?: string;
-    imageUrl?: string;
-    aiImagePath?: string;
-  }>;
+  publicFaType?: string;
+  type?: string;
+  estimate?: number;
+  estimateBasis?: string;
+  obstruction?: string;
+};
+
+export type Camera = {
+  cameraName: string;       // 카메라 이름(위치)
+  imageUrl: string;         // 카메라 캡처 이미지
+  issues: IssueItem[];      // 카메라별 이슈 목록
+};
+
+export type InspectionDetail = {
+  id: number;               // 점검 ID
+  createDate: string;       // 점검 날짜
+  cameras: Camera[];        // 점검에 포함된 카메라 목록
+  status: string;           // 보고서 작성 여부
 };
 
 export interface InspectionSettingDTO {
@@ -57,7 +54,9 @@ export const fetchInspectionList = async (
 };
 
 // [기능 요약] 점검 상세 조회 (백엔드에 신규 추가 예정)
-export const fetchInspectionDetail = async (inspectionId: number) => {
+export const fetchInspectionDetail = async (
+  inspectionId: number
+): Promise<InspectionDetail> => {
   const { data } = await api.get(`/api/inspection/${inspectionId}`);
   return data.data as InspectionDetail;
 };
