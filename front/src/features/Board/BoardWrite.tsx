@@ -82,8 +82,8 @@ export default function BoardWrite() {
       if (decoded.role === "ADMIN") postType = "NOTICE";
     }
 
+    const dto = { type: postType, title, content };
 
-    const dto = { type: "FREE", title, content };
     const formData = new FormData();
     formData.append("req", new Blob([JSON.stringify(dto)], { type: "application/json" }));
     if (file) formData.append("file", file);
