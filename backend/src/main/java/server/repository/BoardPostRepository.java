@@ -11,13 +11,18 @@ import java.util.Optional;
 
 public interface BoardPostRepository extends JpaRepository<BoardPost, Long> {
 
-    // [변경됨] JPQL 대신 Spring Data JPA 메서드 쿼리 사용
+    // 🔹 전체 목록 (type 조건 없이)
+    Page<BoardPost> findByDeletedAtIsNull(Pageable pageable);
+
+    // 🔹 type만 필터
     Page<BoardPost> findByDeletedAtIsNullAndType(BoardPost.PostType type, Pageable pageable);
 
+    // 🔹 type 없이 제목·내용 검색
     Page<BoardPost> findByDeletedAtIsNullAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndContentContainingIgnoreCase(
             String titleKeyword, String contentKeyword, Pageable pageable
     );
 
+    // 🔹 type 포함 제목·내용 검색
     Page<BoardPost> findByDeletedAtIsNullAndTypeAndTitleContainingIgnoreCaseOrDeletedAtIsNullAndTypeAndContentContainingIgnoreCase(
             BoardPost.PostType type, String titleKeyword,
             BoardPost.PostType type2, String contentKeyword,

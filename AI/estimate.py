@@ -55,7 +55,6 @@ def run_hybrid_rag_query(vectordb, query):
         "question": query
     })
 
-    # LLM 응답 문자열 처리
     if isinstance(raw_answer, dict) and "output_text" in raw_answer:
         output_text = raw_answer["output_text"]
     elif isinstance(raw_answer, str):
@@ -63,7 +62,7 @@ def run_hybrid_rag_query(vectordb, query):
     else:
         output_text = str(raw_answer)
 
-    # 견적 정수 추출
+    # 견적 추출
     estimate_match = re.search(r"예상\s*견적\s*\(원\)\s*[:：]\s*([\d,]+)", output_text)
     try:
         estimate_val = int(estimate_match.group(1).replace(",", "")) if estimate_match else None
@@ -78,12 +77,18 @@ def run_hybrid_rag_query(vectordb, query):
     ref_match = re.search(r"📚\s*참고\s*문서\s*내용\s*요약\s*[:：]\s*(.+)", output_text, re.S)
     ref_text = ref_match.group(1).strip() if ref_match else ""
 
-    # estimate_basis = 계산 근거 + 참고 문서 내용
-    estimate_basis = basis_text
-    if ref_text:
-        estimate_basis += "\n\n" + ref_text
+    # 📌 라벨 포함해서 합치기
+    if basis_text or ref_text:
+        estimate_basis = ""
+        if basis_text:
+            estimate_basis += "📌 계산 근거 요약:\n" + basis_text
+        if ref_text:
+            if estimate_basis:
+                estimate_basis += "\n\n"
+            estimate_basis += "📚 참고 문서 내용 요약:\n" + ref_text
+    else:
+        estimate_basis = ""
 
-    # 메타 문서
     meta_docs = [
         {
             "id": getattr(doc, "id", None),

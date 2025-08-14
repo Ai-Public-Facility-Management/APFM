@@ -70,7 +70,8 @@ public class BoardService {
         if (q == null || q.isBlank()) {
             // 검색어 없을 때
             if (type == null) {
-                posts = postRepo.findByDeletedAtIsNullAndType(null, pageable);
+                // 🔹 type이 없으면 전체 조회
+                posts = postRepo.findByDeletedAtIsNull(pageable);
             } else {
                 posts = postRepo.findByDeletedAtIsNullAndType(type, pageable);
             }

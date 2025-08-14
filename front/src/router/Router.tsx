@@ -12,7 +12,7 @@ import InspectionDetailPage from "../features/Inspections/InspectionDetailPage";
 import DetailPublicFa from "../features/PublicFa/DetailPublicFa";
 import FacilityList from "../features/Facility/FacilityList";
 import {getRoleFromToken, getToken} from "../api/login";
-
+import BoardWrite from "../features/Board/BoardWrite";
 import BoardList from "../features/Board/BoardList";
 
 // 토큰이 있어야 접근 가능
@@ -97,6 +97,14 @@ export const router = createBrowserRouter([
     element: <BoardList />,
     loader: requireAuth,
   },
+
+  {
+    path: "/board/write", // ✨ 작성 페이지 라우트
+    element: <BoardWrite />,
+    loader: requireAuth,
+  },
+  
+  
   // 그 외 -> 메인으로
   {
     path: "*",
