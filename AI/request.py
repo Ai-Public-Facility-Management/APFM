@@ -3,7 +3,7 @@ import json
 import os
 
 # 서버 주소 (FastAPI 서버가 실행 중이어야 함)
-API_URL = "http://localhost:8080/predict"
+API_URL = "http://localhost:8080/predict-high"
 
 # 테스트할 이미지 폴더 경로 (실제 경로로 변경하세요)
 image_folder_path = "testimg"  # 예: "D:/cctv_images"
