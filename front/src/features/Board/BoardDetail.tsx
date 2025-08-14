@@ -13,6 +13,16 @@ import {
 } from "../../api/board";
 import "./BoardDetail.css";
 
+// 부서 코드 → 한글 매핑
+const departmentLabels: Record<string, string> = {
+  DEVELOPMENT: "개발부서",
+  DESIGN: "디자인부서",
+  MARKETING: "마케팅부서",
+  SALES: "총무과",
+  HR: "인사과",
+  FINANCE: "재무과",
+};
+
 const maskAuthor = (value: string) => {
   if (!value) return "";
   if (value.includes("@")) {
@@ -136,11 +146,20 @@ export default function BoardDetail() {
         <h2 className="title">{post.title}</h2>
         <div className="meta">
           <span>작성자: {maskAuthor(post.authorName || post.authorEmail)}</span>
-          <span>부서: {post.authorDepartment}</span>
+          <span>부서: {departmentLabels[post.authorDepartment] || post.authorDepartment}</span>
           <span>작성일: {new Date(post.createdAt).toLocaleString()}</span>
           <span>조회수: {post.viewCount}</span>
         </div>
         <hr className="section-divider" />
+        {post.imageUrl && (
+          <div className="post-image">
+            <img
+              src={post.imageUrl}
+              alt="게시글 첨부 이미지"
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          </div>
+        )}
 
         <div className="post-content">{post.content}</div>
 
