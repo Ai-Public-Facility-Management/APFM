@@ -54,8 +54,12 @@ public class BoardController {
 
     // [기능 요약] 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResp> update(@PathVariable Long postId, @RequestBody PostUpdateReq req) {
-        return ResponseEntity.ok(boardService.update(postId, req));
+    public ResponseEntity<PostResp> update(
+            @PathVariable Long postId,
+            @RequestPart(required = false) MultipartFile file, // 새로 첨부된 파일
+            @RequestPart PostUpdateReq req                     // JSON 본문
+    ) throws IOException {
+        return ResponseEntity.ok(boardService.update(postId, file, req));
     }
 
     // [기능 요약] 게시글 삭제(소프트)
