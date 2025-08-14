@@ -34,7 +34,7 @@ public class Users {
         this.email = email;
         this.password = paasword;
         this.username = "Admin";
-        this.department = null;
+        this.department = Department.DEVELOPMENT;
         this.approvalStatus = ApprovalStatus.APPROVED;
         this.type = UserType.ADMIN;
         this.level = 0L;
