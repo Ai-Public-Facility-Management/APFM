@@ -24,27 +24,12 @@ public class IssueService {
     private IssueRepository issueRepository;
 
 
-    public int countRepairIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
-    }
-
-    public int countRemovalIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
-    } // 점검별 remove 이슈
-
-    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
-        return issueRepository.findByInspection_Id(inspectionId);
-    }
-
-
     public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
         Issue issue = new Issue(publicFa,detection);
         return issueRepository.save(issue);
     }
 
-    public void deleteIssue(IssueDTO issueDTO) {
-        issueRepository.deleteById(issueDTO.getId());
-    }
+    public void deleteIssue(IssueDTO issueDTO) {issueRepository.deleteById(issueDTO.getId());}
 
     public List<Issue> getAllIssue(){
         return issueRepository.findAll();
@@ -71,8 +56,15 @@ public class IssueService {
         return details;
     }
 
-    public Issue updateIssue(IssueDTO issueDTO) {
-        return issueRepository.findById(issueDTO.getId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public String setProcessing(List<Long> ids) {
+        List<Issue> issues =  issueRepository.findAllById(ids);
+        if(!issues.isEmpty()){
+            issues.forEach(issue -> {
+                issue.setProcessing(true);
+            });
+        }else
+            return "fail";
+        return "done";
     }
 
 }

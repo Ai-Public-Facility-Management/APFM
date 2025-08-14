@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 import server.domain.*;
 import server.dto.*;
 import server.service.IssueService;
@@ -24,13 +25,6 @@ public class IssueController {
     IssueService issueService;
 
 
-
-    @PutMapping
-    @ResponseBody
-    public Issue updateIssue(@RequestBody IssueDTO issueDTO) {
-        return issueService.updateIssue(issueDTO);
-    }
-
     @DeleteMapping
     @ResponseBody
     public void deleteIssue(@RequestBody IssueDTO issueDTO) {
@@ -49,6 +43,11 @@ public class IssueController {
         Map<String, Object> response = new HashMap<>();
         response.put("issues", issueService.getIssues(id));
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/setProcessing")
+    public ResponseEntity<String> setProcessing(@RequestBody List<Long> ids) {
+        return ResponseEntity.ok(issueService.setProcessing(ids));
     }
 
 }

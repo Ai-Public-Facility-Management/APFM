@@ -4,11 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import server.dto.InspectionResultDTO;
-import server.dto.IssueDTO;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Entity
@@ -48,6 +45,8 @@ public class Issue {
     @Column(length = 500)
     private String visionAnalysis;
 
+    private boolean isProcessing;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publicFa_id", unique = true)
     private PublicFa publicFa;
@@ -73,6 +72,7 @@ public class Issue {
         this.obstructionBasis = detection.getObstructionBasis();
         this.visionAnalysis = detection.getVisionAnalysis();
         this.creationDate = new Date();
+        this.isProcessing = false;
     }
 
 }
