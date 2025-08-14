@@ -7,10 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import server.domain.BoardPost;
 import server.dto.BoardDTO.*;
 import server.service.BoardService;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -27,16 +29,14 @@ public class BoardController {
     public ResponseEntity<PageResp<PostResp>> list(
             @RequestParam(required = false) BoardPost.PostType type,
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) String department,
-            @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        // MVP: pinned desc, id desc 기준. 필요하면 sort 파라미터에 따라 동적 Sort 구성.
         Pageable pageable = PageRequest.of(page, size);
         var p = boardService.search(type, q, pageable);
         return ResponseEntity.ok(PageResp.of(p));
     }
+
 
     // [기능 요약] 게시글 상세(+조회수 증가)
     @GetMapping("/{postId}")
@@ -46,14 +46,20 @@ public class BoardController {
 
     // [기능 요약] 게시글 작성
     @PostMapping
-    public ResponseEntity<PostResp> create(@RequestBody PostCreateReq req) {
-        return ResponseEntity.ok(boardService.create(req));
+    public ResponseEntity<PostResp> create(
+            @RequestPart(required = false) MultipartFile file,
+            @RequestPart PostCreateReq req) throws IOException {
+        return ResponseEntity.ok(boardService.create(file,req));
     }
 
     // [기능 요약] 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResp> update(@PathVariable Long postId, @RequestBody PostUpdateReq req) {
-        return ResponseEntity.ok(boardService.update(postId, req));
+    public ResponseEntity<PostResp> update(
+            @PathVariable Long postId,
+            @RequestPart(required = false) MultipartFile file, // 새로 첨부된 파일
+            @RequestPart PostUpdateReq req                     // JSON 본문
+    ) throws IOException {
+        return ResponseEntity.ok(boardService.update(postId, file, req));
     }
 
     // [기능 요약] 게시글 삭제(소프트)

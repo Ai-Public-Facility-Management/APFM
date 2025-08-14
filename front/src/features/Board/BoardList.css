@@ -24,6 +24,7 @@
   border-radius: 8px;
 }
 
+.write-btn,
 .search-btn {
   padding: 0 16px;
   border: none;
@@ -58,6 +59,20 @@
 .title-cell {
   cursor: pointer;
   color: #003b7a;
+}
+.notice-row {
+  background-color: #fff9e6; /* 연한 노란색 배경 */
+  font-weight: bold;
+}
+
+.notice-badge {
+  display: inline-block;
+  background-color: #ff9800;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
 }
 
 .no-data {

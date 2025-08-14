@@ -11,6 +11,7 @@ import InspectionListPage from "../features/Inspections/InspectionListPage";
 import InspectionDetailPage from "../features/Inspections/InspectionDetailPage";
 import DetailPublicFa from "../features/PublicFa/DetailPublicFa";
 import FacilityList from "../features/Facility/FacilityList";
+import BoardDetail from "../features/Board/BoardDetail";
 import {getRoleFromToken, getToken} from "../api/login";
 import BoardWrite from "../features/Board/BoardWrite";
 import BoardList from "../features/Board/BoardList";
@@ -98,17 +99,24 @@ export const router = createBrowserRouter([
     element: <BoardList />,
     loader: requireAuth,
   },
+  {
+      path: "/board/:postId",  // ✅ 상세 페이지 추가
+      element: <BoardDetail />,
+      loader: requireAuth,
+  },
 
   {
     path: "/board/write", // ✨ 작성 페이지 라우트
     element: <BoardWrite />,
     loader: requireAuth,
   },
+
   {
     path: "/proposal",
     element: <ProposalPage/>,
     loader: requireAuth
   },
+
 
   // 그 외 -> 메인으로
   {

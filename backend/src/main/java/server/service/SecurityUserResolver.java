@@ -4,9 +4,17 @@ package server.service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import server.domain.Users;
+import server.repository.UsersRepository;
 
 @Component
 public class SecurityUserResolver {
+    private final UsersRepository usersRepository;
+
+    // 생성자 주입 (Spring이 자동으로 UsersRepository를 넣어줌)
+    public SecurityUserResolver(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
+    }
 
     public String currentUserEmail() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -20,5 +28,11 @@ public class SecurityUserResolver {
         boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) return;
         if (!auth.getName().equals(ownerEmail)) throw new SecurityException("권한이 없습니다.");
+    }
+
+    public Users currentUser() {
+        String email = currentUserEmail();
+        return usersRepository.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 }

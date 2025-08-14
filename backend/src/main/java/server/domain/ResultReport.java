@@ -2,9 +2,7 @@ package server.domain;
 
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -13,10 +11,15 @@ import lombok.Data;
 public class ResultReport {
 
     @Id
-    private Integer proposalId;
+    private Long id;
 
-    private Integer amount;
+    @Embedded
+    private File file;
 
     private Date creationDate;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issue_id", unique = true)
+    private Issue issue;
 
 }

@@ -1,91 +1,106 @@
 .pw-container {
-  display: flex;
-  justify-content: center;
-  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  box-sizing: border-box;
 }
 
 .pw-card {
   width: 100%;
-  max-width: 600px;
-  background: white;
-  padding: 20px;
+  background: #fff;
+  padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: none; /* 카드 그림자 제거, 테마에 맞게 */
 }
 
 .pw-heading {
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: left;
+  color: #003b7a;
 }
 
 .pw-form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .pw-label {
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: 600;
+  margin-bottom: 8px;
   display: block;
 }
 
 .pw-input,
 .pw-textarea {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0 12px;
+  height: 44px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
 }
 
 .pw-textarea {
-  min-height: 120px;
+  min-height: 200px; /* 글쓰기 편하게 */
+  padding-top: 8px;
 }
 
 .pw-file-upload {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .pw-file-label {
-  padding: 6px 12px;
-  background-color: #0056b3;
-  color: white;
-  border-radius: 4px;
+  padding: 0 16px;
+  height: 44px;
+  background-color: #003b7a;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pw-file-label:hover {
-  background-color: #004494;
+  background-color: #002a5a;
 }
 
 .pw-file-name {
-  font-size: 0.9rem;
+  font-size: 14px;
   color: #555;
 }
 
 .pw-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .pw-btn {
-  padding: 8px 16px;
+  min-width: 100px;
+  height: 44px;
+  border-radius: 8px;
   border: none;
-  border-radius: 4px;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .pw-btn-cancel {
   background-color: #ccc;
+  color: #333;
 }
 
 .pw-btn-primary {
-  background-color: #007bff;
-  color: white;
+  background-color: #003b7a;
+  color: #fff;
 }
 
 .pw-btn-primary:hover {
-  background-color: #0069d9;
+  background-color: #002a5a;
 }

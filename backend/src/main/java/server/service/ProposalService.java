@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class ProposalService {
 
     private final IssueRepository issueRepository;
+
     private final WebClient.Builder webClientBuilder;
 
     @Value("${app.fastapi.base-url}")
@@ -33,6 +34,7 @@ public class ProposalService {
     public Mono<String> generateProposalForIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return Mono.just("");
+
         }
 
         // 1. DB 조회

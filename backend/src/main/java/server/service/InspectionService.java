@@ -14,6 +14,7 @@ import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
+import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -93,6 +94,7 @@ public class InspectionService {
         return dashboardInspections;
     }
 
+    //점검 주기 설정 저장
     @Transactional
     public InspectionSettingDTO setInspectionSetting(InspectionSettingDTO dto) {
         InspectionSetting setting = settingRepository.findById(1L)
@@ -130,7 +132,7 @@ public class InspectionService {
         }
     }
 
-    // 점검 상세 추가
+    // ✅ 점검 상세 조회 (카메라별 이슈 포함)
     @Transactional(readOnly = true)
     public InspectionDetailDTO getInspectionDetail(Long id) {
         Inspection inspection = inspectionRepository.findWithIssuesById(id)
@@ -140,25 +142,41 @@ public class InspectionService {
 
         InspectionDetailDTO dto = new InspectionDetailDTO();
         dto.setId(inspection.getId());
-        dto.setCreateDate(inspection.getCreateDate() != null ? DETAIL_FMT.format(inspection.getCreateDate()) : null);
-        List<Issue> issues = inspection.getIssues();
+        dto.setCreateDate(inspection.getCreateDate() != null
+                ? DETAIL_FMT.format(inspection.getCreateDate())
+                : null);
         dto.setStatus(status);
-        if(issues.isEmpty()){
-            dto.setIssues(null);
-            return dto;
-        }
-        List<InspectionDetailDTO.IssueItem> issueItems = new ArrayList<>();
-        issues.forEach(issue -> {
-            InspectionDetailDTO.IssueItem issueItem = new InspectionDetailDTO.IssueItem();
-            issueItem.setId(issue.getId());
-            issueItem.setPublicFaType(issue.getPublicFa().getType().toString());
-            issueItem.setType(issue.getType().toString());
-            issueItem.setEstimate(issue.getEstimate());
-            issueItem.setEstimateBasis(issue.getEstimateBasis());
-            issueItem.setObstruction(issue.getObstruction());
-            issueItems.add(issueItem);
-        });
-        dto.setIssues(issueItems);
+
+        // 카메라별 그룹핑
+        List<InspectionDetailDTO.Camera> cameraList = inspection.getIssues().stream()
+                .collect(Collectors.groupingBy(issue -> issue.getPublicFa().getCamera()))
+                .entrySet().stream()
+                .map(entry -> {
+                    Camera camera = entry.getKey();
+                    List<Issue> cameraIssues = entry.getValue();
+
+                    InspectionDetailDTO.Camera camDto = new InspectionDetailDTO.Camera();
+                    camDto.setCameraName(camera.getLocation()); // 또는 camera.getName()
+                    camDto.setImageUrl(camera.getImage() != null ? camera.getImage().getUrl() : null); // 엔티티 필드명에 맞게 조정
+
+                    List<InspectionDetailDTO.IssueItem> issueItems = new ArrayList<>();
+                    for (Issue issue : cameraIssues) {
+                        InspectionDetailDTO.IssueItem issueItem = new InspectionDetailDTO.IssueItem();
+                        issueItem.setId(issue.getId());
+                        issueItem.setPublicFaType(issue.getPublicFa().getType().getDisplayName());
+                        issueItem.setType(issue.getType().toString());
+                        issueItem.setEstimate(issue.getEstimate());
+                        issueItem.setEstimateBasis(issue.getEstimateBasis());
+                        issueItem.setObstruction(issue.getObstruction());
+                        issueItems.add(issueItem);
+                    }
+
+                    camDto.setIssues(issueItems);
+                    return camDto;
+                })
+                .collect(Collectors.toList());
+
+        dto.setCameras(cameraList);
         return dto;
     }
 

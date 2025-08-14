@@ -14,7 +14,6 @@ public class PublicFaSummary {
     private PublicFaType publicFaType;
     private IssueType condition;
     private FacilityStatus status;
-    private Boolean isProcessing;
 
     public PublicFaSummary(PublicFa fa) {
         this.publicFaId = fa.getId();
@@ -24,7 +23,6 @@ public class PublicFaSummary {
             this.issueId = fa.getIssue().getId();
             this.condition = fa.getIssue().getType();
 
-            this.status = fa.getStatus();
         }
     }
 

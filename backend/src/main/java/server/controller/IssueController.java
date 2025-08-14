@@ -8,8 +8,16 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import server.domain.*;
 import server.dto.*;
+import org.springframework.web.multipart.MultipartFile;
+import server.domain.Issue;
+import server.domain.Proposal;
+import server.domain.ResultReport;
+import server.dto.IssueDTO;
+import server.repository.ResultReportRepository;
+import server.service.AzureService;
 import server.service.IssueService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +32,19 @@ public class IssueController {
     @Autowired
     IssueService issueService;
 
+//    @PutMapping
+//    @ResponseBody
+//    public Issue updateIssue(@RequestBody IssueDTO issueDTO) {
+//        return issueService.updateIssue(issueDTO);
+//    }
 
-    @DeleteMapping
-    @ResponseBody
-    public void deleteIssue(@RequestBody IssueDTO issueDTO) {
-        issueService.deleteIssue(issueDTO);
-    }
+//    @DeleteMapping
+//    @ResponseBody
+//    public void deleteIssue(@RequestBody IssueDTO issueDTO) {
+//        issueService.deleteIssue(issueDTO);
+//    }
+
+
 
     @GetMapping(value="/all")
     @ResponseBody
@@ -45,9 +60,14 @@ public class IssueController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/setProcessing")
-    public ResponseEntity<String> setProcessing(@RequestBody List<Long> ids) {
-        return ResponseEntity.ok(issueService.setProcessing(ids));
+
+    @PostMapping("/result")
+    @Transactional
+    public ResponseEntity<Map<String,String>> uploadReport(@RequestParam("file") MultipartFile file, @RequestParam Long publicFa_id) throws IOException {
+        Map<String, String> response = new HashMap<>();
+        response.put("path", issueService.uploadResult(file,publicFa_id));
+        return ResponseEntity.ok(response);
+
     }
 
 }
