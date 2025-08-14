@@ -4,7 +4,15 @@ import Layout from "../../components/Layout";
 import { useNavigate } from "react-router-dom";
 import "./BoardWrite.css";
 
+import { jwtDecode } from "jwt-decode";
+
+
 const API_BASE = "http://localhost:8082"; // API 서버 주소
+
+
+interface JwtPayload {
+  role: string;
+}
 
 export default function BoardWrite() {
   const [title, setTitle] = useState("");
@@ -45,8 +53,16 @@ export default function BoardWrite() {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    let postType = "FREE";
+    if (token) {
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.role === "ADMIN") postType = "NOTICE";
+    }
+
+
     const dto = {
-      type: "FREE",
+      type: postType,
       title,
       content
     };
