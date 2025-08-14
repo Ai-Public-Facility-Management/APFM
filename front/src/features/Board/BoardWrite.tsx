@@ -1,7 +1,7 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
 import Layout from "../../components/Layout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./BoardWrite.css";
 
 import { jwtDecode } from "jwt-decode";
@@ -15,13 +15,34 @@ interface JwtPayload {
 }
 
 export default function BoardWrite() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editPost = location.state; // BoardDetail에서 navigate로 넘긴 데이터
+  const isEditMode = !!editPost?.id;
+
+  const [title, setTitle] = useState(isEditMode ? editPost?.title || "" : "");
+  const [content, setContent] = useState(isEditMode ? editPost?.content || "" : "");
   const [pinned, setPinned] = useState(false);
   const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  const navigate = useNavigate();
+  // 글 작성/수정 데이터 저장 key
+  const draftKey = isEditMode ? `editPostDraft-${editPost.id}` : "newPostDraft";
+
+    // ✅ 진입 시 저장된 draft 불러오기 (있으면 덮어씀)
+    useEffect(() => {
+      const savedDraft = localStorage.getItem(draftKey);
+      if (savedDraft) {
+        const { title: savedTitle, content: savedContent } = JSON.parse(savedDraft);
+        setTitle(savedTitle || "");
+        setContent(savedContent || "");
+      }
+    }, [draftKey]);
+
+    // ✅ 입력값이 변경될 때마다 draft 저장
+    useEffect(() => {
+      localStorage.setItem(draftKey, JSON.stringify({ title, content }));
+    }, [title, content, draftKey]);
 
   const resetForm = () => {
     setTitle("");
@@ -29,6 +50,7 @@ export default function BoardWrite() {
     setPinned(false);
     setDepartment("");
     setFile(null);
+    localStorage.removeItem(draftKey); // 저장 후 draft 삭제
   };
 
   const handleFileChange = (selectedFile: File | null) => {
@@ -61,32 +83,36 @@ export default function BoardWrite() {
     }
 
 
-    const dto = {
-      type: postType,
-      title,
-      content
-    };
-
+    const dto = { type: "FREE", title, content };
     const formData = new FormData();
     formData.append("req", new Blob([JSON.stringify(dto)], { type: "application/json" }));
-    if (file) {
-      formData.append("file", file);
-    }
+    if (file) formData.append("file", file);
 
     try {
-      await axios.post(`${API_BASE}/api/boards`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
-
-      alert("글이 등록되었습니다.");
+      if (isEditMode) {
+        // 수정 모드
+        await axios.put(`${API_BASE}/api/boards/${editPost.id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        alert("글이 수정되었습니다.");
+      } else {
+        // 작성 모드
+        await axios.post(`${API_BASE}/api/boards`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        alert("글이 등록되었습니다.");
+      }
       resetForm();
       navigate("/board");
     } catch (err) {
-      console.error("등록 실패:", err);
-      alert("등록에 실패했습니다.");
+      console.error("저장 실패:", err);
+      alert("저장에 실패했습니다.");
     }
   };
 
@@ -95,7 +121,7 @@ export default function BoardWrite() {
     <Layout>
       <div className="pw-container">
         <div className="pw-card">
-          <h1 className="pw-heading">글 작성</h1>
+          <h1 className="pw-heading">{isEditMode ? "글 수정" : "글 작성"}</h1>
           <form className="pw-form" onSubmit={handleSubmit}>
             <div className="pw-form-group">
               <label className="pw-label">제목 *</label>
@@ -138,6 +164,20 @@ export default function BoardWrite() {
                   {file ? file.name : "선택된 파일 없음"}
                 </span>
               </div>
+              {/* 수정 모드일 때 기존 이미지 표시 */}
+              {isEditMode && editPost?.imageUrl && !file && (
+                <div style={{ marginTop: "8px" }}>
+                  <img
+                    src={editPost.imageUrl}
+                    alt="첨부 이미지"
+                    style={{
+                      maxWidth: "200px",
+                      height: "auto",
+                      border: "1px solid #ddd"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="pw-actions">
