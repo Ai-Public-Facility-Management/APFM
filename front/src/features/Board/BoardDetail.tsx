@@ -10,6 +10,7 @@ import {
   updateComment,
   BoardDetail as PostDetail,
   Comment,
+  deletePost,
 } from "../../api/board";
 import "./BoardDetail.css";
 
@@ -125,6 +126,19 @@ export default function BoardDetail() {
       });
   };
 
+  const handleDeletePost = async () => {
+      if (!post) return;
+      if (!window.confirm("정말 이 게시글을 삭제하시겠습니까?")) return;
+      try {
+        await deletePost(post.id);
+        alert("게시글이 삭제되었습니다.");
+        navigate("/board");
+      } catch (err) {
+        console.error("게시글 삭제 실패", err);
+        alert("삭제 중 오류가 발생했습니다.");
+      }
+    };
+
   if (loading) {
     return (
       <Layout>
@@ -168,7 +182,10 @@ export default function BoardDetail() {
 
         <div className="post-actions">
           {post.isAuthor && (
+            <>
             <button className="action-btn" onClick={handleEditPost}>수정</button>
+            <button className="action-btn delete-btn" onClick={handleDeletePost}>삭제</button>
+            </>
           )}
           <button className="action-btn" onClick={() => navigate("/board")}>뒤로가기</button>
         </div>

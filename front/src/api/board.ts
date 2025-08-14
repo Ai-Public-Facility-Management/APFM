@@ -111,3 +111,8 @@ export async function updateComment(commentId: number, content: string): Promise
 export async function deleteComment(commentId: number): Promise<void> {
   await api.delete(`/api/boards/comments/${commentId}`);
 }
+
+// 📌 게시글 삭제
+export async function deletePost(postId: number): Promise<void> {
+  await api.delete(`/api/boards/${postId}`);
+}
