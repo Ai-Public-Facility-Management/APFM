@@ -5,11 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import server.domain.*;
 import server.dto.BoardDTO.*;
 import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
 import server.repository.UsersRepository;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,19 +22,19 @@ public class BoardService {
     private final BoardCommentRepository commentRepo;
     private final UsersRepository usersRepo;
     private final SecurityUserResolver userResolver;
-
+    private final AzureService azureService;
     // [기능 요약] 게시글 생성
     @Transactional
-    public PostResp create(PostCreateReq req) {
+    public PostResp create(MultipartFile file,PostCreateReq req) throws IOException {
         String email = userResolver.currentUserEmail();
         Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
+        String url = azureService.azureBlobUpload(file,".png");
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
                 .content(req.content)
-                .imageUrl(req.imageUrl) // 이미지 주소 저장
+                .imageUrl(url) // 이미지 주소 저장
                 .author(author) // Users 매핑
                 .build();
 
@@ -160,12 +163,13 @@ public class BoardService {
 
     // ===== mapper =====
     private PostResp toPostResp(BoardPost p, long commentCount, boolean isAuthor) {
+        String sasUrl = azureService.azureBlobSas(p.getImageUrl());
         return PostResp.builder()
                 .id(p.getId())
                 .type(p.getType().name())
                 .title(p.getTitle())
                 .content(p.getContent())
-                .imageUrl(p.getImageUrl()) // 이미지 주소 내려줌
+                .imageUrl(sasUrl) // 이미지 주소 내려줌
                 .viewCount(p.getViewCount())
                 .authorEmail(p.getAuthor().getEmail())
                 .authorName(p.getAuthor().getUsername())

@@ -16,7 +16,6 @@ public class BoardDTO {
         public BoardPost.PostType type;
         public String title;
         public String content;
-        public String imageUrl; // 이미지 주소
     }
 
     @Getter @Setter
