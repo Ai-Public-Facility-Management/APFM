@@ -13,7 +13,7 @@ my:
 azure:
   account_key: ${ACCOUNT_KEY}
   account_name: ${ACCOUNT_NAME}
-  connection_string: ${CONNECTION_STRING}}
+  connection_string: ${CONNECTION_STRING}
   container_name: ${CONTAINER_NAME}
 spring:
   config:

@@ -7,10 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import server.domain.BoardPost;
 import server.dto.BoardDTO.*;
 import server.service.BoardService;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -44,8 +46,8 @@ public class BoardController {
 
     // [기능 요약] 게시글 작성
     @PostMapping
-    public ResponseEntity<PostResp> create(@RequestBody PostCreateReq req) {
-        return ResponseEntity.ok(boardService.create(req));
+    public ResponseEntity<PostResp> create(@RequestPart MultipartFile file, @RequestPart PostCreateReq req) throws IOException {
+        return ResponseEntity.ok(boardService.create(file,req));
     }
 
     // [기능 요약] 게시글 수정
