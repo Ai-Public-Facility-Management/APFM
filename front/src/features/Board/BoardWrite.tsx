@@ -1,19 +1,25 @@
 import React, { useState, FormEvent } from "react";
 import axios from "axios";
 import Layout from "../../components/Layout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./BoardWrite.css";
 
 const API_BASE = "http://localhost:8082"; // API 서버 주소
 
 export default function BoardWrite() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // location.state로 전달받은 값 (없으면 빈 값)
+  const editData = location.state || {};
+
+  const [title, setTitle] = useState(editData.title || "");
+  const [content, setContent] = useState(editData.content || "");
   const [pinned, setPinned] = useState(false);
   const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
-  const navigate = useNavigate();
+  const [existingImageUrl, setExistingImageUrl] = useState(editData.imageUrl || "");
 
   const resetForm = () => {
     setTitle("");
@@ -21,6 +27,7 @@ export default function BoardWrite() {
     setPinned(false);
     setDepartment("");
     setFile(null);
+    setExistingImageUrl("");
   };
 
   const handleFileChange = (selectedFile: File | null) => {
@@ -66,19 +73,31 @@ export default function BoardWrite() {
     };
 
     try {
-      await axios.post(`${API_BASE}/api/boards`, payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      if (editData.id) {
+        // 수정 API
+        await axios.put(`${API_BASE}/api/boards/${editData.id}`, payload, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        alert("글이 수정되었습니다.");
+      } else {
+        // 등록 API
+        await axios.post(`${API_BASE}/api/boards`, payload, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        alert("글이 등록되었습니다.");
+      }
 
-      alert("글이 등록되었습니다.");
       resetForm();
-      navigate("/board"); // ✅ 저장 후 자동 이동
+      navigate("/board");
     } catch (err) {
-      console.error("등록 실패:", err);
-      alert("등록에 실패했습니다.");
+      console.error("저장 실패:", err);
+      alert("저장에 실패했습니다.");
     }
   };
 
