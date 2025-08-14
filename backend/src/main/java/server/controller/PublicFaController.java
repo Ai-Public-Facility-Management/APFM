@@ -22,6 +22,7 @@ public class PublicFaController {
     @Autowired
     PublicFaService publicFaService;
 
+
     @GetMapping(value="/all")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> viewAllPublicFa(@PageableDefault(size = 15) Pageable pageable) {
@@ -47,11 +48,7 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-//    @PostMapping()
-//    @ResponseBody
-//    public ResponseFa createFa(@RequestBody PublicFaDTO publicFaDTO) {
-//        return publicFaService.addPublicFa(publicFaDTO);
-//    }
+
 
     @PostMapping("/approve")
     public PublicFa approveBox(@RequestParam Long id) {

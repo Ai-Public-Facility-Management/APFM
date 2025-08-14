@@ -19,10 +19,6 @@ public class Issue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Long resultId;
-
-    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL)
-    private Proposal proposal;
 
     private Date creationDate;
 
@@ -56,13 +52,8 @@ public class Issue {
     @JoinColumn(name="inspection_id")
     private Inspection inspection;
 
-//    public Issue(IssueDTO issueDTO) {
-//        this.creationDate = issueDTO.getCreationDate();
-//        this.type = issueDTO.getType();
-//        this.image = issueDTO.getImage();
-//        this.estimateBasis = issueDTO.getEstimateBasis();
-//        this.estimate = issueDTO.getEstimate();
-//    }
+    @OneToOne(mappedBy = "issue",cascade = CascadeType.ALL)
+    private ResultReport resultReport;
 
     public Issue(PublicFa publicFa, InspectionResultDTO.Detection detection) {
         this.publicFa = publicFa;
