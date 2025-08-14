@@ -163,7 +163,7 @@ public class InspectionService {
                     for (Issue issue : cameraIssues) {
                         InspectionDetailDTO.IssueItem issueItem = new InspectionDetailDTO.IssueItem();
                         issueItem.setId(issue.getId());
-                        issueItem.setPublicFaType(issue.getPublicFa().getType().toString());
+                        issueItem.setPublicFaType(issue.getPublicFa().getType().getDisplayName());
                         issueItem.setType(issue.getType().toString());
                         issueItem.setEstimate(issue.getEstimate());
                         issueItem.setEstimateBasis(issue.getEstimateBasis());
