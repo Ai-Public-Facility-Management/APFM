@@ -1,12 +1,13 @@
 package server.dto;
 
 import lombok.Data;
-import server.domain.IssueType;
 import server.domain.File;
+import server.domain.IssueType;
 
 import java.util.Date;
 
 @Data
+
 public class IssueDTO {
     private Long id;
 
