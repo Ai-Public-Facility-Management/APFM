@@ -1,19 +1,56 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
 import Layout from "../../components/Layout";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./BoardWrite.css";
 
-const API_BASE = "http://localhost:8082"; // 실제 API 서버 주소
+import { jwtDecode } from "jwt-decode";
+
+
+const API_BASE = "http://localhost:8082"; // API 서버 주소
+
+
+interface JwtPayload {
+  role: string;
+}
 
 export default function BoardWrite() {
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editPost = location.state; // BoardDetail에서 navigate로 넘긴 데이터
+  const isEditMode = !!editPost?.id;
+
+  const [title, setTitle] = useState(isEditMode ? editPost?.title || "" : "");
+  const [content, setContent] = useState(isEditMode ? editPost?.content || "" : "");
+  const [pinned, setPinned] = useState(false);
+  const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
+  // 글 작성/수정 데이터 저장 key
+  const draftKey = isEditMode ? `editPostDraft-${editPost.id}` : "newPostDraft";
+
+    // ✅ 진입 시 저장된 draft 불러오기 (있으면 덮어씀)
+    useEffect(() => {
+      const savedDraft = localStorage.getItem(draftKey);
+      if (savedDraft) {
+        const { title: savedTitle, content: savedContent } = JSON.parse(savedDraft);
+        setTitle(savedTitle || "");
+        setContent(savedContent || "");
+      }
+    }, [draftKey]);
+
+    // ✅ 입력값이 변경될 때마다 draft 저장
+    useEffect(() => {
+      localStorage.setItem(draftKey, JSON.stringify({ title, content }));
+    }, [title, content, draftKey]);
 
   const resetForm = () => {
     setTitle("");
-    setSummary("");
+    setContent("");
+    setPinned(false);
+    setDepartment("");
     setFile(null);
+    localStorage.removeItem(draftKey); // 저장 후 draft 삭제
   };
 
   const handleFileChange = (selectedFile: File | null) => {
@@ -30,40 +67,61 @@ export default function BoardWrite() {
     setFile(selectedFile);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !summary.trim()) {
+
+    if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해주세요.");
       return;
     }
 
+    const token = localStorage.getItem("token");
+    let postType = "FREE";
+    if (token) {
+      const decoded = jwtDecode<JwtPayload>(token);
+      if (decoded.role === "ADMIN") postType = "NOTICE";
+    }
+
+
+    const dto = { type: "FREE", title, content };
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("summary", summary);
+    formData.append("req", new Blob([JSON.stringify(dto)], { type: "application/json" }));
     if (file) formData.append("file", file);
 
-    axios
-      .post(`${API_BASE}/api/boards`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(() => {
+    try {
+      if (isEditMode) {
+        // 수정 모드
+        await axios.put(`${API_BASE}/api/boards/${editPost.id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
+        alert("글이 수정되었습니다.");
+      } else {
+        // 작성 모드
+        await axios.post(`${API_BASE}/api/boards`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         alert("글이 등록되었습니다.");
-        resetForm();
-      })
-      .catch((err) => {
-        console.error("등록 실패:", err);
-        alert("등록에 실패했습니다.");
-      });
+      }
+      resetForm();
+      navigate("/board");
+    } catch (err) {
+      console.error("저장 실패:", err);
+      alert("저장에 실패했습니다.");
+    }
   };
+
 
   return (
     <Layout>
       <div className="pw-container">
         <div className="pw-card">
-          <h1 className="pw-heading">글 작성</h1>
+          <h1 className="pw-heading">{isEditMode ? "글 수정" : "글 작성"}</h1>
           <form className="pw-form" onSubmit={handleSubmit}>
             <div className="pw-form-group">
               <label className="pw-label">제목 *</label>
@@ -81,16 +139,15 @@ export default function BoardWrite() {
               <textarea
                 className="pw-textarea"
                 placeholder="내용을 입력하세요"
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 required
               />
             </div>
-
+            
             <div className="pw-form-group">
               <label className="pw-label">파일 업로드</label>
               <div className="pw-file-upload">
-                {/* 파일 input은 숨김 */}
                 <input
                   type="file"
                   id="file-upload"
@@ -100,7 +157,6 @@ export default function BoardWrite() {
                     handleFileChange(e.target.files?.[0] ?? null)
                   }
                 />
-                {/* label을 버튼처럼 */}
                 <label htmlFor="file-upload" className="pw-file-label">
                   파일 선택
                 </label>
@@ -108,12 +164,26 @@ export default function BoardWrite() {
                   {file ? file.name : "선택된 파일 없음"}
                 </span>
               </div>
+              {/* 수정 모드일 때 기존 이미지 표시 */}
+              {isEditMode && editPost?.imageUrl && !file && (
+                <div style={{ marginTop: "8px" }}>
+                  <img
+                    src={editPost.imageUrl}
+                    alt="첨부 이미지"
+                    style={{
+                      maxWidth: "200px",
+                      height: "auto",
+                      border: "1px solid #ddd"
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="pw-actions">
               <button
                 type="button"
-                onClick={resetForm}
+                onClick={() => navigate("/board")}
                 className="pw-btn pw-btn-cancel"
               >
                 취소

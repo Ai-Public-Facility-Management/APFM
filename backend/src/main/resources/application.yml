@@ -10,6 +10,11 @@ my:
   admin_mail: ${ADMIN_EMAIL}
   admin_password: ${ADMIN_PASSWORD}
 
+azure:
+  account_key: ${ACCOUNT_KEY}
+  account_name: ${ACCOUNT_NAME}
+  connection_string: ${CONNECTION_STRING}
+  container_name: ${CONTAINER_NAME}
 spring:
   config:
     activate:

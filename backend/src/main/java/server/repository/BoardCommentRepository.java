@@ -9,8 +9,15 @@ import server.domain.BoardComment;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
 
+    /**
+     * 게시글 ID로 댓글 목록 조회 (삭제되지 않은 것만)
+     * Pageable에서 정렬 가능
+     */
     Page<BoardComment> findAllByPostIdAndDeletedAtIsNullOrderByIdAsc(Long postId, Pageable pageable);
 
+    /**
+     * 삭제되지 않은 댓글 개수
+     */
     @Query("select count(c) from BoardComment c where c.post.id = :postId and c.deletedAt is null")
     long countActiveByPostId(Long postId);
 }

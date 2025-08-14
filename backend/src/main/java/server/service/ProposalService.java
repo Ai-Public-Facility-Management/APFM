@@ -22,7 +22,7 @@ public class ProposalService {
             Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 이슈가 존재하지 않습니다."));
 
-            if (issue.getProposal() != null) continue;
+
 
             Proposal proposal = new Proposal();
             proposal.setIssue(issue);

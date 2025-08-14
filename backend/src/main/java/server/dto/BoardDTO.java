@@ -16,31 +16,13 @@ public class BoardDTO {
         public BoardPost.PostType type;
         public String title;
         public String content;
-        public boolean pinned;
-        public String department; // optional
-        public List<AttachmentReq> attachments;
     }
 
     @Getter @Setter
     public static class PostUpdateReq {
         public String title;
         public String content;
-        public Boolean pinned;
-        public String department; // optional
-        public List<AttachmentReq> attachments; // 전체 교체
-    }
-
-    @Getter @AllArgsConstructor @NoArgsConstructor
-    public static class AttachmentReq {
-        public String originalName;
-        public String storedUrl;
-    }
-
-    @Getter @Builder
-    public static class AttachmentResp {
-        public Long id;
-        public String originalName;
-        public String storedUrl;
+        public String imageUrl;
     }
 
     @Getter @Builder
@@ -49,31 +31,37 @@ public class BoardDTO {
         public String type;
         public String title;
         public String content;
-        public boolean pinned;
+        public String imageUrl; // 이미지 주소
         public long viewCount;
-        public String authorEmail;
-        public String department;
-        public long commentCount;     // ← 목록/상세에서 뱃지용으로 권장
+        public String authorEmail;   // Users.email
+        public String authorName;    // Users.username
+        public String authorDepartment;   // Users.department (enum -> name)
+        public long commentCount;    // 목록/상세에서 뱃지용
         public Instant createdAt;
         public Instant updatedAt;
-        public List<AttachmentResp> attachments;
+        public boolean isAuthor;
     }
 
     // ====== Comment ======
     @Getter @Setter
-    public static class CommentCreateReq { public String content; }
+    public static class CommentCreateReq {
+        public String content;
+    }
 
     @Getter @Setter
-    public static class CommentUpdateReq { public String content; }
+    public static class CommentUpdateReq {
+        public String content;
+    }
 
     @Getter @Builder
     public static class CommentResp {
         public Long id;
         public String content;
-        public String authorEmail;
+        public String authorName;    // Users.username
         public boolean edited;
         public Instant createdAt;
         public Instant updatedAt;
+        public boolean isAuthor;
     }
 
     // ====== Page ======
