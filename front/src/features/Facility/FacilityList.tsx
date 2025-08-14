@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import "./FacilityList.css";
 import { fetchFacilities, Facility, createProposal } from "../../api/publicFa";
+import {Backdrop, CircularProgress} from "@mui/material";
 
 
 const FacilityList = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -48,10 +50,13 @@ const FacilityList = () => {
 
   const handleProposalRequest = async () => {
     try {
+      setLoading(true); // ✅ 로딩 시작
       await createProposal(selectedIds); // ✅ API 호출
       navigate("/proposal", { state: { ids: selectedIds } }); // ✅ 이동 + 선택 ID 전달
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,6 +64,11 @@ const FacilityList = () => {
 
   return (
     <Layout>
+      {/* 로딩 화면 */}
+      <Backdrop open={loading} sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <div className="facility-page">
         {/* 페이지 제목 */}
         <h1 className="page-title">시설물 관리</h1>
