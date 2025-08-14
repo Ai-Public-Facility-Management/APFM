@@ -2,8 +2,34 @@
     padding: 16px;
 }
 
+
+.MuiTabs-root {
+    min-height: 5vh; /* 세로 크기 줄임 */
+}
+
+.MuiTab-root {
+    min-width: 20% !important;
+    height: 5vh !important;
+    font-size: 1.1vw !important;
+    font-weight: bold;
+}
+
+
+
+/* 헤더 (제목 + 버튼) */
 .proposal-header {
+    display: flex;
+    justify-content: space-between; /* 제목 왼쪽, 버튼 오른쪽 */
+    align-items: center;            /* 세로 중앙 정렬 */
     margin-bottom: 16px;
+
+    /* 스크롤 내려도 항상 상단 고정 */
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 10;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd;
 }
 
 .proposal-header h1 {
@@ -11,34 +37,65 @@
     font-weight: bold;
 }
 
+/* 저장 버튼 스타일 */
+.proposal-header button {
+    margin-left: auto;
+    min-width: 100px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+.proposal-header button:hover {
+    background-color: #0056b3;
+}
+
+/* 각 항목 카테고리 타이틀 */
 .proposal-category-title {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 12px;
+    padding-bottom: 4px;
 }
 
+/* 필드 영역 */
 .proposal-field {
     margin-bottom: 16px;
 }
 
 .proposal-field-label {
-    font-size: 14px;
+    font-size: 15px !important;
     font-weight: bold;
     margin-bottom: 8px;
 }
 
 .proposal-textarea {
-    width: 100%;
-    min-height: 80px;
+    width: 95%;
+    min-height: 80px; /* 시작 높이 */
     border-radius: 4px;
     border: 1px solid #ccc;
-    padding: 8px;
-    resize: none;
+    padding: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: none; /* 사용자가 크기 조절 못 하게 */
+    overflow-y: hidden; /* 스크롤바 제거 */
 }
 
+
+
 .proposal-box {
+    min-height: 500px; /* 최소 높이만 */
+    height: auto;      /* 내용에 맞게 늘어나게 */
     border: 1px dashed #ccc;
     border-radius: 8px;
     padding: 12px;
     background-color: #f9f9f9;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
+

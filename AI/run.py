@@ -300,12 +300,17 @@ latest_proposal: dict = {}
 def generate_from_spring(req: FromSpringRequest):
     global latest_proposal
     items = [
-        {"vision_analysis": e.vision_analysis, "output_text": build_output_text(e)}
+        {
+            "vision_analysis": e.vision_analysis,
+            "estimate": e.estimate,
+            "estimate_basis": e.estimateBasis
+        }
         for e in req.estimations
     ]
     proposal = generate_proposal(items)
     latest_proposal = proposal
     return {"proposal": proposal}
+
 
 
 

@@ -93,3 +93,27 @@ export const fetchProposal = async (): Promise<ProposalData> => {
   return res.data.proposal;
 };
 
+export const saveProposal = async (proposal: ProposalData) => {
+  try {
+    const res = await api.post(
+        "http://localhost:8080/proposal-to-docx",
+        { proposal },
+        {
+          responseType: "blob", // DOCX는 바이너리 파일
+        }
+    );
+
+    // 다운로드 처리
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "proposal.docx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("DOCX 다운로드 실패:", error);
+    throw error;
+  }
+};
