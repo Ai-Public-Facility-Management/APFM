@@ -11,8 +11,6 @@ import server.repository.BoardCommentRepository;
 import server.repository.BoardPostRepository;
 import server.repository.UsersRepository;
 
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class BoardService {
@@ -33,25 +31,13 @@ public class BoardService {
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
                 .content(req.content)
+                .imageUrl(req.imageUrl) // 이미지 주소 저장
                 .author(author) // Users 매핑
-                .isPinned(req.pinned)
-                .department(req.department)
-                .author(author)
                 .build();
 
-        if (req.attachments != null) {
-            for (AttachmentReq a : req.attachments) {
-                post.getAttachments().add(BoardAttachment.builder()
-                        .post(post)
-                        .originalName(a.originalName)
-                        .storedUrl(a.storedUrl)
-                        .build());
-            }
-        }
-
         post = postRepo.save(post);
-        long commentCount = 0L;
-        return toPostResp(post, commentCount);
+        boolean isAuthor = true;
+        return toPostResp(post, 0L, isAuthor);
     }
 
     // [기능 요약] 게시글 단건 조회(+조회수 증가, 댓글수 포함)
@@ -62,7 +48,17 @@ public class BoardService {
 
         post.setViewCount(post.getViewCount() + 1);
         long commentCount = commentRepo.countActiveByPostId(postId);
-        return toPostResp(post, commentCount);
+        String currentUserEmail = null;
+        try {
+            currentUserEmail = userResolver.currentUserEmail();
+        } catch (Exception ignored) {
+            // 비로그인 사용자는 null
+        }
+
+        boolean isAuthor = currentUserEmail != null &&
+                currentUserEmail.equals(post.getAuthor().getEmail());
+
+        return toPostResp(post, commentCount, isAuthor);
     }
 
     // [변경됨] 게시글 검색/목록
@@ -85,7 +81,7 @@ public class BoardService {
             }
         }
 
-        return posts.map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId())));
+        return posts.map(p -> toPostResp(p, commentRepo.countActiveByPostId(p.getId()), false));
     }
 
     // [기능 요약] 게시글 수정(작성자/관리자)
@@ -98,22 +94,12 @@ public class BoardService {
 
         if (req.title != null) post.setTitle(req.title);
         if (req.content != null) post.setContent(req.content);
-        if (req.pinned != null) post.setPinned(req.pinned);
-        if (req.department != null) post.setDepartment(req.department);
+        if (req.imageUrl != null) post.setImageUrl(req.imageUrl);
 
-        if (req.attachments != null) {
-            post.getAttachments().clear();
-            for (AttachmentReq a : req.attachments) {
-                post.getAttachments().add(BoardAttachment.builder()
-                        .post(post)
-                        .originalName(a.originalName)
-                        .storedUrl(a.storedUrl)
-                        .build());
-            }
-        }
-
+        String currentUserEmail = userResolver.currentUserEmail();
+        boolean isAuthor = currentUserEmail.equals(post.getAuthor().getEmail());
         long commentCount = commentRepo.countActiveByPostId(postId);
-        return toPostResp(post, commentCount);
+        return toPostResp(post, commentCount, isAuthor);
     }
 
     // [기능 요약] 게시글 삭제(소프트)
@@ -123,7 +109,7 @@ public class BoardService {
             .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
-        post.softDelete();
+        post.softDelete(userResolver.currentUser());
     }
 
     // [기능 요약] 댓글 목록(페이징)
@@ -169,45 +155,47 @@ public class BoardService {
         BoardComment c = commentRepo.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
         userResolver.ensureOwnerOrAdmin(c.getAuthor().getEmail());
-        c.softDelete();
+        c.softDelete(userResolver.currentUser());
     }
 
     // ===== mapper =====
-    private PostResp toPostResp(BoardPost p, long commentCount) {
+    private PostResp toPostResp(BoardPost p, long commentCount, boolean isAuthor) {
         return PostResp.builder()
                 .id(p.getId())
                 .type(p.getType().name())
                 .title(p.getTitle())
                 .content(p.getContent())
-                .pinned(p.isPinned())
+                .imageUrl(p.getImageUrl()) // 이미지 주소 내려줌
                 .viewCount(p.getViewCount())
                 .authorEmail(p.getAuthor().getEmail())
                 .authorName(p.getAuthor().getUsername())
-                .department(p.getDepartment())
+                .authorDepartment(p.getAuthor().getDepartment().name())
                 .commentCount(commentCount)
                 .createdAt(p.getCreatedAt())
                 .updatedAt(p.getUpdatedAt())
-                .attachments(
-                        p.getAttachments().stream()
-                                .map(a -> AttachmentResp.builder()
-                                        .id(a.getId())
-                                        .originalName(a.getOriginalName())
-                                        .storedUrl(a.getStoredUrl())
-                                        .build())
-                                .collect(Collectors.toList())
-                )
+                .isAuthor(isAuthor)
                 .build();
     }
 
     private CommentResp toCommentResp(BoardComment c) {
+        String currentUserEmail = null;
+        try {
+            currentUserEmail = userResolver.currentUserEmail();
+        } catch (Exception ignored) {
+            // 비로그인 시 null
+        }
+
+        boolean isAuthor = currentUserEmail != null &&
+                currentUserEmail.equals(c.getAuthor().getEmail());
+
         return CommentResp.builder()
                 .id(c.getId())
                 .content(c.getContent())
-                .authorEmail(c.getAuthor().getEmail())
                 .authorName(c.getAuthor().getUsername())
                 .edited(c.isEdited())
                 .createdAt(c.getCreatedAt())
                 .updatedAt(c.getUpdatedAt())
+                .isAuthor(isAuthor)
                 .build();
     }
 }

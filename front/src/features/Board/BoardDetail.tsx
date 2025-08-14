@@ -1,27 +1,25 @@
 // src/pages/BoardDetail.tsx
 import React, { useEffect, useState } from "react";
-import { useParams , useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
-
 import {
-  getPostDetail,
-  getComments,
-  addComment,
-  PostDetail,
+  fetchBoardDetail,
+  fetchComments,
+  createComment,
+  deleteComment,
+  updateComment,
+  BoardDetail as PostDetail,
   Comment,
 } from "../../api/board";
 import "./BoardDetail.css";
 
-// ✅ 이름/이메일 마스킹 함수
 const maskAuthor = (value: string) => {
   if (!value) return "";
   if (value.includes("@")) {
-    // 이메일 마스킹
     const [local, domain] = value.split("@");
     if (local.length <= 2) return local[0] + "*".repeat(local.length - 1) + "@" + domain;
     return local[0] + "*".repeat(local.length - 2) + local[local.length - 1] + "@" + domain;
   } else {
-    // 이름 마스킹
     if (value.length <= 2) return value[0] + "*";
     return value[0] + "*".repeat(value.length - 2) + value[value.length - 1];
   }
@@ -30,26 +28,28 @@ const maskAuthor = (value: string) => {
 export default function BoardDetail() {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
-
   const [post, setPost] = useState<PostDetail | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
+  const [editContent, setEditContent] = useState("");
 
-//   const currentUserEmail = localStorage.getItem("userEmail"); // 로그인 사용자
-//   const isAuthor = post?.authorEmail === currentUserEmail; // 작성자 여부
+  const reloadComments = async () => {
+    const res = await fetchComments(Number(postId));
+    setComments(res.content);
+  };
 
-  // 데이터 로딩
   useEffect(() => {
     if (!postId) return;
     const fetchData = async () => {
       try {
         const [postRes, commentsRes] = await Promise.all([
-          getPostDetail(postId),
-          getComments(postId),
+          fetchBoardDetail(Number(postId)),
+          fetchComments(Number(postId)),
         ]);
-        setPost(postRes.data);
-        setComments(commentsRes.data.content);
+        setPost(postRes);
+        setComments(commentsRes.content);
       } catch (err) {
         console.error("게시글/댓글 로드 실패", err);
       } finally {
@@ -62,11 +62,9 @@ export default function BoardDetail() {
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
     try {
-      await addComment(postId!, newComment);
+      await createComment(Number(postId), newComment);
       setNewComment("");
-      const commentsRes = await getComments(postId!);
-      setComments(commentsRes.data.content);
-      // ✅ 댓글 수 즉시 반영
+      await reloadComments();
       setPost((prev) =>
         prev ? { ...prev, commentCount: prev.commentCount + 1 } : prev
       );
@@ -75,38 +73,87 @@ export default function BoardDetail() {
     }
   };
 
-  if (loading) return <div className="loading">로딩 중...</div>;
-  if (!post) return <div className="error">게시글을 찾을 수 없습니다.</div>;
+  const handleDeleteComment = async (id: number) => {
+    if (!window.confirm("정말 삭제하시겠습니까?")) return;
+    try {
+      await deleteComment(id);
+      await reloadComments();
+      setPost((prev) =>
+        prev ? { ...prev, commentCount: prev.commentCount - 1 } : prev
+      );
+    } catch (err) {
+      console.error("댓글 삭제 실패", err);
+    }
+  };
+
+  const handleStartEdit = (id: number, content: string) => {
+    setEditingCommentId(id);
+    setEditContent(content);
+  };
+
+  const handleUpdateComment = async (id: number) => {
+    if (!editContent.trim()) return;
+    try {
+      await updateComment(id, editContent);
+      setEditingCommentId(null);
+      setEditContent("");
+      await reloadComments();
+    } catch (err) {
+      console.error("댓글 수정 실패", err);
+    }
+  };
+
+  const handleEditPost = () => {
+    if (!post) return;
+    navigate("/board/write", {
+        state: {
+          title: post.title,
+          content: post.content,
+          imageUrl: post.imageUrl
+        }
+      });
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="loading">로딩 중...</div>
+      </Layout>
+    );
+  }
+
+  if (!post) {
+    return (
+      <Layout>
+        <div className="no-post">게시글을 찾을 수 없습니다.</div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="board-detail">
         <h2 className="title">{post.title}</h2>
-
         <div className="meta">
-          {/* ✅ 백엔드에서 authorEmail 내려주면 프론트에서 마스킹 */}
           <span>작성자: {maskAuthor(post.authorName || post.authorEmail)}</span>
-          <span>부서: {post.department || "없음"}</span>
+          <span>부서: {post.authorDepartment}</span>
           <span>작성일: {new Date(post.createdAt).toLocaleString()}</span>
           <span>조회수: {post.viewCount}</span>
         </div>
+        <hr className="section-divider" />
 
-        <div className="content">{post.content}</div>
+        <div className="post-content">{post.content}</div>
 
-        {post.attachments?.length > 0 && (
-          <div className="attachments">
-            <h4>첨부파일</h4>
-            <ul>
-              {post.attachments.map((a) => (
-                <li key={a.id}>
-                  <a href={a.storedUrl} target="_blank" rel="noopener noreferrer">
-                    {a.originalName}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <hr className="section-divider" />
+
+        <div className="post-actions">
+          {post.isAuthor && (
+            <button className="action-btn" onClick={handleEditPost}>수정</button>
+          )}
+          <button className="action-btn" onClick={() => navigate("/board")}>뒤로가기</button>
+        </div>
+
+        <hr className="section-divider" />
 
         <div className="comments-section">
           <h3>댓글 ({post.commentCount})</h3>
@@ -114,12 +161,39 @@ export default function BoardDetail() {
             {comments.map((c) => (
               <li key={c.id} className="comment-item">
                 <div className="comment-meta">
-                  {/* ✅ 댓글도 이메일/이름 마스킹 */}
                   <span>{maskAuthor(c.authorName || c.authorEmail)}</span>
                   <span>{new Date(c.createdAt).toLocaleString()}</span>
                   {c.edited && <span className="edited">(수정됨)</span>}
+                  {c.isAuthor && (
+                    <>
+                      <button onClick={() => handleStartEdit(c.id, c.content)}>
+                        수정
+                      </button>
+                      <button onClick={() => handleDeleteComment(c.id)}>
+                        삭제
+                      </button>
+                    </>
+                  )}
                 </div>
-                <div className="comment-content">{c.content}</div>
+                {editingCommentId === c.id ? (
+                  <div className="comment-edit">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                    />
+                    <button onClick={() => handleUpdateComment(c.id)}>저장</button>
+                    <button
+                      onClick={() => {
+                        setEditingCommentId(null);
+                        setEditContent("");
+                      }}
+                    >
+                      취소
+                    </button>
+                  </div>
+                ) : (
+                  <div className="comment-content">{c.content}</div>
+                )}
               </li>
             ))}
           </ul>

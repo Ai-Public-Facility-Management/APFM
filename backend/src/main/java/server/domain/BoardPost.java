@@ -34,19 +34,18 @@ public class BoardPost extends BaseTimeEntity {
 
     /**
      * 작성자(User) 매핑
-     * Users의 PK(email)과 FK(user_email)로 연결
+     * Users의 PK(email)과 FK(author_email)로 연결
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
+    @JoinColumn(name = "author_email", referencedColumnName = "email", nullable = false)
     private Users author;
 
     @Comment("조회수")
     private long viewCount;
 
-    // 첨부/댓글: orphanRemoval=true로 교체/삭제 편의
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<BoardAttachment> attachments = new ArrayList<>();
+    @Comment("게시글 대표 이미지 URL")
+    @Column(length = 500)
+    private String imageUrl;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")

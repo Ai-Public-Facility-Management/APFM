@@ -8,13 +8,21 @@ import { fetchBoards, BoardItem } from "../../api/board";
 // 이름 마스킹 함수
 const maskName = (name: string) => {
   if (!name) return "";
-  if (name.length === 1) return '*';
-  return name.slice(0, -1) + '*';
+    if (name.includes("@")) {
+      // 이메일 마스킹
+      const [local, domain] = name.split("@");
+      if (local.length <= 2) return local[0] + "*".repeat(local.length - 1) + "@" + domain;
+      return local[0] + "*".repeat(local.length - 2) + local[local.length - 1] + "@" + domain;
+    } else {
+      // 이름 마스킹
+      if (name.length <= 2) return name[0] + "*";
+      return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+    }
 };
 
 const BoardList = () => {
   const navigate = useNavigate();
-  const [posts, setPosts] = useState<Post[]>([]);
+//   const [posts, setPosts] = useState<Post[]>([]);
   const [posts, setPosts] = useState<BoardItem[]>([]);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,6 +74,13 @@ const BoardList = () => {
             </select>
 
           <button className="search-btn">검색</button>
+
+          <button
+            className="write-btn"
+            onClick={() => navigate("/board/write")}
+          >
+            작성
+          </button>
         </div>
 
         {/* 테이블 */}
@@ -82,13 +97,11 @@ const BoardList = () => {
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
                 <tr key={post.id}
-                    onClick={() => navigate(`/boards/${post.id}`)}>
-                  <td>{post.id}</td>
-                <tr key={post.id}>
+                    onClick={() => navigate(`/board/${post.id}`)}>
                   <td className="title-cell">{post.title}</td>
                   <td>{maskName(post.authorName)}</td>
-                  <td>{post.department}</td>
-                  <td>{post.createdAt.slice(0,10)}</td>
+                  <td>{post.authorDepartment}</td>
+                  <td>{post.createdAt ? post.createdAt.slice(0, 10) : ""}</td>
                 </tr>
               ))
             ) : (
@@ -109,7 +122,7 @@ const BoardList = () => {
           >
             이전
           </button>
-          {[1, 2, 3, 4, 5].map((n) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
             <button
               key={n}
               className={page === n ? "active" : ""}
@@ -118,7 +131,11 @@ const BoardList = () => {
               {n}
             </button>
           ))}
-          <button onClick={() => setPage((p) => p + 1)}>다음</button>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}>
+            다음
+          </button>
         </div>
       </div>
     </Layout>

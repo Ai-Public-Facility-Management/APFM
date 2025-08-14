@@ -5,8 +5,9 @@ export interface BoardItem {
   title: string;
   type: string;
   authorName: string;
-  department: string;
+  authorDepartment: string;
   createdAt: string;
+  imageUrl: string; // ✅ 게시글 대표 이미지 URL
 }
 
 export interface BoardPage {
@@ -14,6 +15,33 @@ export interface BoardPage {
   totalElements: number;
   totalPages: number;
   // 필요에 따라 pageable 등 추가 가능
+}
+
+export interface BoardDetail {
+  id: number;
+  type: string;
+  title: string;
+  content: string;
+  authorName: string;
+  authorEmail: string;
+  authorDepartment: string;
+  createdAt: string;
+  updatedAt: string;
+  viewCount: number;
+  commentCount: number;
+  imageUrl?: string; // ✅ 본문 이미지 URL
+  isAuthor: boolean; // ✅ 현재 로그인 사용자가 작성자인지 여부
+}
+
+export interface Comment {
+  id: number;
+  content: string;
+  authorEmail: string;
+  authorName: string;
+  edited: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isAuthor: boolean;
 }
 
 /**
@@ -49,3 +77,37 @@ export async function fetchBoards(
 //   const response = await api.get("/api/boards/" + id);
 //   return response.data;
 // }
+
+// 게시글 상세 조회
+export async function fetchBoardDetail(id: number): Promise<BoardDetail> {
+  const response = await api.get(`/api/boards/${id}`);
+  return response.data;
+}
+
+// 📌 댓글 목록 조회
+export async function fetchComments(
+  postId: number,
+  page = 0,
+  size = 10,
+  sort = "latest"
+): Promise<{ content: Comment[] }> {
+  const response = await api.get(`/api/boards/${postId}/comments`, {
+    params: { page, size, sort },
+  });
+  return response.data;
+}
+
+// 📌 댓글 작성
+export async function createComment(postId: number, content: string): Promise<void> {
+  await api.post(`/api/boards/${postId}/comments`, { content });
+}
+
+// 📌 댓글 수정
+export async function updateComment(commentId: number, content: string): Promise<void> {
+  await api.put(`/api/boards/comments/${commentId}`, { content });
+}
+
+// 📌 댓글 삭제
+export async function deleteComment(commentId: number): Promise<void> {
+  await api.delete(`/api/boards/comments/${commentId}`);
+}

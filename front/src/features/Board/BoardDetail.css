@@ -1,80 +1,104 @@
+/* src/features/Board/BoardDetail.css */
+
+/* 게시글 전체 컨테이너 */
 .board-detail {
   max-width: 900px;
   margin: 0 auto;
   padding: 24px;
   font-family: "Pretendard", sans-serif;
-  background: #fff;
 }
 
+/* 제목 */
 .board-detail .title {
-  font-size: 1.8rem;
-  font-weight: bold;
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+/* 버튼 그룹 (상단) */
+.detail-header {
+  display: flex;
+  justify-content: flex-end;
   margin-bottom: 12px;
 }
 
-.board-detail .meta {
+.button-group button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.button-group button:hover {
+  background: #f0f0f0;
+}
+
+/* 작성자/부서/작성일/조회수 */
+.meta {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 12px;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 20px;
+  gap: 16px;
 }
 
-.board-detail .content {
-  font-size: 1rem;
-  line-height: 1.6;
-  white-space: pre-wrap; /* 줄바꿈 유지 */
+/* 구분선 */
+.section-divider {
+  border: none;
   border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-  padding: 16px 0;
+  margin: 16px 0;
+}
+
+/* 게시글 본문 */
+.post-content {
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-wrap;
   margin-bottom: 20px;
 }
 
-.attachments {
-  margin-bottom: 20px;
+/* 수정 / 뒤로 버튼 (본문 하단) */
+.post-actions {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  gap: 8px;
 }
 
-.attachments h4 {
-  font-size: 1rem;
-  font-weight: bold;
-  margin-bottom: 8px;
+.post-actions .action-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #003b7a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.attachments ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.attachments li {
-  margin-bottom: 6px;
-}
-
-.attachments a {
-  color: #0066cc;
-  text-decoration: none;
-}
-
-.attachments a:hover {
-  text-decoration: underline;
+.post-actions .action-btn:hover {
+  background: #002f60;
 }
 
 /* 댓글 영역 */
 .comments-section {
-  border-top: 2px solid #ddd;
   padding-top: 16px;
 }
 
 .comments-section h3 {
-  font-size: 1.2rem;
   margin-bottom: 12px;
+  font-size: 18px;
 }
 
+/* 댓글 목록 */
 .comment-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 .comment-item {
@@ -83,47 +107,82 @@
 }
 
 .comment-meta {
-  font-size: 0.85rem;
-  color: #666;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
+  font-size: 14px;
+  color: #666;
   margin-bottom: 6px;
 }
 
-.comment-meta .edited {
-  font-style: italic;
-  color: #999;
+.comment-meta button {
+  border: none;
+  background: none;
+  color: #007bff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.comment-meta button:hover {
+  text-decoration: underline;
 }
 
 .comment-content {
-  font-size: 1rem;
+  font-size: 15px;
+  line-height: 1.4;
 }
 
+/* 댓글 수정 영역 */
+.comment-edit textarea {
+  width: 100%;
+  min-height: 60px;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  margin-bottom: 6px;
+}
+
+.comment-edit button {
+  margin-right: 6px;
+  padding: 4px 10px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 댓글 작성 폼 */
 .comment-form {
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: flex-end;
 }
 
 .comment-form textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
   resize: vertical;
-  min-height: 80px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: inherit;
+  margin-bottom: 6px;
 }
 
+/* 댓글 작성 버튼 */
 .comment-form button {
-  align-self: flex-end;
-  padding: 8px 14px;
-  background: #0066cc;
-  color: white;
+  padding: 10px 16px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
+  background: #003b7a;
+  color: #fff;
+  font-weight: 600;
   cursor: pointer;
 }
 
 .comment-form button:hover {
-  background: #0052a3;
+  background: #002f60;
 }
