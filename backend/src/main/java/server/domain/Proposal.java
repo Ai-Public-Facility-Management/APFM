@@ -3,22 +3,26 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "Proposal_table")
 @Data
-public class Proposal {
+public class Proposal{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id; // 고유 식별자
+    private Long id;
 
-    private Integer totalEstimate;
-
-    // ✅ 제안서 파일 URL 및 설명
     private String fileUrl;
-    private String fileDescription;
 
-    @OneToOne
-    @JoinColumn(name = "issue_id")
-    private Issue issue;
+    @ManyToMany
+    @JoinTable(
+            name = "proposal_issue",
+            joinColumns = @JoinColumn(name = "proposal_id"),
+            inverseJoinColumns = @JoinColumn(name = "issue_id")
+    )
+    private Set<Issue> issues = new HashSet<>();
 }

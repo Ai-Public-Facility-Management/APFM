@@ -58,3 +58,38 @@ export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {
   const response = await api.get("/api/publicfa/detail", { params: { id } });
   return response.data.publicFa;
 }
+
+
+/**
+ * 제안 요청서 생성 API
+ * @param ids 선택된 시설물 ID 배열
+ */
+export const createProposal = async (ids: number[]) => {
+  try {
+    const response = await api.post("/api/proposal/generate", ids, {
+      headers: { "Content-Type": "application/json" }
+    });
+  } catch (error) {
+    console.error("제안 요청서 전송 실패:", error);
+    throw error;
+  }
+};
+
+export interface ProposalData {
+  project_name: string;
+  project_overview: string;
+  construction_period: string;
+  site_analysis_summary: string[];
+  estimation_details_with_basis: string[];
+  total_cost: string;
+  manpower_plan: string;
+  equipment_plan: string;
+  safety_quality_plan: string;
+  conclusion_expected_effect: string;
+}
+
+export const fetchProposal = async (): Promise<ProposalData> => {
+  const res = await api.get<{ proposal: ProposalData }>("http://localhost:8080/proposal/latest");
+  return res.data.proposal;
+};
+

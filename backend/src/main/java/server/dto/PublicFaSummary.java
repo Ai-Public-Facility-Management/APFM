@@ -16,20 +16,16 @@ public class PublicFaSummary {
     private FacilityStatus status;
     private Boolean isProcessing;
 
-    public PublicFaSummary(PublicFa fa){
+    public PublicFaSummary(PublicFa fa) {
         this.publicFaId = fa.getId();
         this.cameraName = fa.getCamera().getLocation();
         this.publicFaType = fa.getType();
-        if(fa.getIssue() != null){
+        if (fa.getIssue() != null) {
             this.issueId = fa.getIssue().getId();
             this.condition = fa.getIssue().getType();
-            if(fa.getIssue().getProposal() != null)
-                this.isProcessing = Boolean.TRUE;
-            else
-                this.isProcessing = Boolean.FALSE;
+
+            this.status = fa.getStatus();
         }
-        this.status = fa.getStatus();
     }
+
 }
-
-

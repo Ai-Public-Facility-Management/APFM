@@ -3,12 +3,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/Layout";
 import "./FacilityList.css";
-import { fetchFacilities, Facility } from "../../api/publicFa";
+import { fetchFacilities, Facility, createProposal } from "../../api/publicFa";
+
 
 const FacilityList = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [page, setPage] = useState(1);
+
+
 
   useEffect(() => {
     fetchFacilities(page - 1, 15)
@@ -42,6 +45,15 @@ const FacilityList = () => {
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
+
+  const handleProposalRequest = async () => {
+    try {
+      await createProposal(selectedIds); // ✅ API 호출
+      navigate("/proposal", { state: { ids: selectedIds } }); // ✅ 이동 + 선택 ID 전달
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -132,7 +144,7 @@ const FacilityList = () => {
         {/* 선택 영역 */}
         <div className="facility-selection-bar">
           <span>{selectedIds.length}개 선택됨</span>
-          <button className="facility-request-btn">제안 요청서 작성</button>
+          <button className="facility-request-btn" onClick={handleProposalRequest}>제안 요청서 작성</button>
         </div>
       </div>
     </Layout>

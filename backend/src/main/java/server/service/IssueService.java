@@ -32,26 +32,6 @@ public class IssueService {
     @Autowired
     private InspectionRepository inspectionRepository;
 
-    public Proposal generateProposalForIssue(Long issueId) {
-        Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 이슈가 존재하지 않습니다."));
-
-        // 이미 제안서가 존재하면 예외 처리
-        if (issue.getProposal() != null) {
-            throw new IllegalStateException("이미 제안서가 생성된 이슈입니다.");
-        }
-
-        Proposal proposal = new Proposal();
-        // proposal.setTitle("자동 생성 제안서 - Issue #" + issueId);
-        // proposal.setContent("이슈 내용에 기반한 제안서입니다.");   -> 나중에 필요하면 생성 - 지금은 setTitle, setContent import 가 안돼서 방치
-        proposal.setIssue(issue); // 연관 설정
-        proposalRepository.save(proposal);
-
-        issue.setProposal(proposal);
-        issueRepository.save(issue);
-
-        return proposal;
-    }
 
     public int countRepairIssues(Long inspectionId) {
         return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);

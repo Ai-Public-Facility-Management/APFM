@@ -1,30 +1,27 @@
 package server.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import jakarta.transaction.Transactional;
-
-import server.dto.ProposalDTO;
+import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
 import server.service.ProposalService;
 
-
-
-import server.dto.ProposalDTO;
-
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/proposal")  // prefix 유지
+@RequestMapping("/api/proposal")
 @RequiredArgsConstructor
-@Transactional
 public class ProposalController {
 
     private final ProposalService proposalService;
 
+    /**
+     * 선택된 ID들로 제안서 생성 (Spring → FastAPI 호출)
+     */
     @PostMapping("/generate")
-    public ResponseEntity<ProposalDTO> generateProposals(@RequestBody ProposalDTO dto) {
-        proposalService.handleProposalGeneration(dto.getIds(), dto.getFileUrl());
-        return ResponseEntity.ok(dto);  // 요청으로 받은 DTO를 그대로 응답
+    public Mono<ResponseEntity<String>> generateProposal(@RequestBody List<Long> ids) {
+        return proposalService.generateProposalForIds(ids)
+                .map(body -> ResponseEntity.ok(body));
     }
 
 }

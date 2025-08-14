@@ -7,6 +7,8 @@ import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -21,8 +23,6 @@ public class Issue {
 
     private Long resultId;
 
-    @OneToOne(mappedBy = "issue", cascade = CascadeType.ALL)
-    private Proposal proposal;
 
     private Date creationDate;
 

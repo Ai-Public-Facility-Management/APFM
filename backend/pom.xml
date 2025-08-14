@@ -71,6 +71,12 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- WebClient(WebFlux) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
