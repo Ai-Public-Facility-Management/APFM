@@ -11,6 +11,7 @@ from estimate_util import run_estimate
 from proposal.generate import generate_proposal
 from proposal.word import convert_to_word
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from routes import (predict_high, predict_board)  
 from pydantic import BaseModel
 from typing import List
@@ -24,6 +25,16 @@ from model_config import (
 
 load_dotenv()
 app = FastAPI()
+
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 또는 ["http://localhost:3000"] 로 제한 가능
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 logger = logging.getLogger("uvicorn.error")
 
 def expand_box(x1, y1, x2, y2, img_w, img_h, pad_px=20):

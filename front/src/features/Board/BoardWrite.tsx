@@ -3,12 +3,10 @@ import axios from "axios";
 import Layout from "../../components/Layout";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./BoardWrite.css";
-
 import { jwtDecode } from "jwt-decode";
-
+import { predictBoard, PredictBoardResponse } from "../../api/ai";
 
 const API_BASE = "http://localhost:8082"; // API 서버 주소
-
 
 interface JwtPayload {
   role: string;
@@ -17,7 +15,7 @@ interface JwtPayload {
 export default function BoardWrite() {
   const navigate = useNavigate();
   const location = useLocation();
-  const editPost = location.state; // BoardDetail에서 navigate로 넘긴 데이터
+  const editPost = location.state;
   const isEditMode = !!editPost?.id;
 
   const [title, setTitle] = useState(isEditMode ? editPost?.title || "" : "");
@@ -25,24 +23,22 @@ export default function BoardWrite() {
   const [pinned, setPinned] = useState(false);
   const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false); // 🔹 전체 화면 로딩 상태
 
-  // 글 작성/수정 데이터 저장 key
   const draftKey = isEditMode ? `editPostDraft-${editPost.id}` : "newPostDraft";
 
-    // ✅ 진입 시 저장된 draft 불러오기 (있으면 덮어씀)
-    useEffect(() => {
-      const savedDraft = localStorage.getItem(draftKey);
-      if (savedDraft) {
-        const { title: savedTitle, content: savedContent } = JSON.parse(savedDraft);
-        setTitle(savedTitle || "");
-        setContent(savedContent || "");
-      }
-    }, [draftKey]);
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(draftKey);
+    if (savedDraft) {
+      const { title: savedTitle, content: savedContent } = JSON.parse(savedDraft);
+      setTitle(savedTitle || "");
+      setContent(savedContent || "");
+    }
+  }, [draftKey]);
 
-    // ✅ 입력값이 변경될 때마다 draft 저장
-    useEffect(() => {
-      localStorage.setItem(draftKey, JSON.stringify({ title, content }));
-    }, [title, content, draftKey]);
+  useEffect(() => {
+    localStorage.setItem(draftKey, JSON.stringify({ title, content }));
+  }, [title, content, draftKey]);
 
   const resetForm = () => {
     setTitle("");
@@ -50,7 +46,7 @@ export default function BoardWrite() {
     setPinned(false);
     setDepartment("");
     setFile(null);
-    localStorage.removeItem(draftKey); // 저장 후 draft 삭제
+    localStorage.removeItem(draftKey);
   };
 
   const handleFileChange = (selectedFile: File | null) => {
@@ -67,7 +63,38 @@ export default function BoardWrite() {
     setFile(selectedFile);
   };
 
-   const handleSubmit = async (e: FormEvent) => {
+  /** 🔹 AI 견적 생성 */
+  const handleAiEstimate = async () => {
+    if (!file) {
+      alert("AI 분석을 위해 이미지를 업로드해주세요.");
+      return;
+    }
+    try {
+      setLoading(true);
+      const result: PredictBoardResponse = await predictBoard(file);
+
+      const formatted = result.detections
+        .map(
+          (det, idx) =>
+            `시설물 ${idx + 1}:\n` +
+            `- 클래스: ${det.class}\n` +
+            `- 상태: ${det.status || "정보 없음"}\n` +
+            `- 분석: ${det.vision_analysis || "정보 없음"}\n` +
+            `- 견적: ${det.estimate !== null ? det.estimate + " 원" : "정보 없음"}\n` +
+            `- 근거: ${det.estimate_basis || "정보 없음"}`
+        )
+        .join("\n\n");
+
+      setContent((prev: string) => (prev ? prev + "\n\n" + formatted : formatted));
+    } catch (error) {
+      console.error("🚨 AI 분석 실패", error);
+      alert("AI 분석 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!title.trim() || !content.trim()) {
@@ -83,14 +110,12 @@ export default function BoardWrite() {
     }
 
     const dto = { type: postType, title, content };
-
     const formData = new FormData();
     formData.append("req", new Blob([JSON.stringify(dto)], { type: "application/json" }));
     if (file) formData.append("file", file);
 
     try {
       if (isEditMode) {
-        // 수정 모드
         await axios.put(`${API_BASE}/api/boards/${editPost.id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -99,7 +124,6 @@ export default function BoardWrite() {
         });
         alert("글이 수정되었습니다.");
       } else {
-        // 작성 모드
         await axios.post(`${API_BASE}/api/boards`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -116,9 +140,18 @@ export default function BoardWrite() {
     }
   };
 
-
   return (
     <Layout>
+      {/* 🔹 로딩 오버레이 */}
+      {loading && (
+        <div style={overlayStyle}>
+          <div style={spinnerStyle}></div>
+          <p style={{ color: "#fff", marginTop: "10px", fontSize: "18px" }}>
+            AI가 이미지를 분석 중입니다. 잠시만 기다려주세요...
+          </p>
+        </div>
+      )}
+
       <div className="pw-container">
         <div className="pw-card">
           <h1 className="pw-heading">{isEditMode ? "글 수정" : "글 작성"}</h1>
@@ -144,7 +177,7 @@ export default function BoardWrite() {
                 required
               />
             </div>
-            
+
             <div className="pw-form-group">
               <label className="pw-label">파일 업로드</label>
               <div className="pw-file-upload">
@@ -153,9 +186,7 @@ export default function BoardWrite() {
                   id="file-upload"
                   accept=".jpg,.jpeg,.png"
                   style={{ display: "none" }}
-                  onChange={(e) =>
-                    handleFileChange(e.target.files?.[0] ?? null)
-                  }
+                  onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                 />
                 <label htmlFor="file-upload" className="pw-file-label">
                   파일 선택
@@ -164,20 +195,19 @@ export default function BoardWrite() {
                   {file ? file.name : "선택된 파일 없음"}
                 </span>
               </div>
-              {/* 수정 모드일 때 기존 이미지 표시 */}
-              {isEditMode && editPost?.imageUrl && !file && (
-                <div style={{ marginTop: "8px" }}>
-                  <img
-                    src={editPost.imageUrl}
-                    alt="첨부 이미지"
-                    style={{
-                      maxWidth: "200px",
-                      height: "auto",
-                      border: "1px solid #ddd"
-                    }}
-                  />
-                </div>
-              )}
+            </div>
+
+            {/* 🔹 AI 견적 생성 버튼 */}
+            <div className="pw-form-group">
+              <button
+                type="button"
+                className="pw-btn pw-btn-secondary"
+                onClick={handleAiEstimate}
+                disabled={loading}
+                style={{ marginTop: "8px" }}
+              >
+                AI 견적 생성
+              </button>
             </div>
 
             <div className="pw-actions">
@@ -198,3 +228,28 @@ export default function BoardWrite() {
     </Layout>
   );
 }
+
+/** 🔹 전체 화면 오버레이 스타일 */
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.6)",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 9999
+};
+
+/** 🔹 CSS 스피너 스타일 */
+const spinnerStyle: React.CSSProperties = {
+  border: "8px solid rgba(255, 255, 255, 0.3)",
+  borderTop: "8px solid #fff",
+  borderRadius: "50%",
+  width: "60px",
+  height: "60px",
+  animation: "spin 1s linear infinite"
+};
