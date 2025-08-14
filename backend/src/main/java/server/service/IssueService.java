@@ -7,15 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.Issue;
-import server.domain.Proposal;
 import server.domain.PublicFa;
 import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 import server.dto.IssueDetail;
-import server.repository.InspectionRepository;
 import server.repository.IssueRepository;
-import server.repository.ProposalRepository;
-import server.repository.PublicFaRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +22,6 @@ public class IssueService {
 
     @Autowired
     private IssueRepository issueRepository;
-    @Autowired
-    private ProposalRepository proposalRepository;
-    @Autowired
-    private PublicFaRepository publicFaRepository;
-    @Autowired
-    private InspectionRepository inspectionRepository;
 
 
     public int countRepairIssues(Long inspectionId) {
@@ -53,15 +44,6 @@ public class IssueService {
 
     public void deleteIssue(IssueDTO issueDTO) {
         issueRepository.deleteById(issueDTO.getId());
-    }
-
-    public Proposal requestProposal(Long issue_id) {
-
-        Issue issue= issueRepository.findById(issue_id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        /*
-           파이썬에 이슈사항 내용을 바탕으로 제안서 생성 요청
-        */
-        return proposalRepository.save(new Proposal());
     }
 
     public List<Issue> getAllIssue(){

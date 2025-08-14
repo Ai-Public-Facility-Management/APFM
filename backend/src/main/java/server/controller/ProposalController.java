@@ -21,7 +21,7 @@ public class ProposalController {
     @PostMapping("/generate")
     public Mono<ResponseEntity<String>> generateProposal(@RequestBody List<Long> ids) {
         return proposalService.generateProposalForIds(ids)
-                .map(body -> ResponseEntity.ok(body));
+                .map(ResponseEntity::ok);
     }
 
 }

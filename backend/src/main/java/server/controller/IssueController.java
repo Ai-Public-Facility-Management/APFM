@@ -37,12 +37,6 @@ public class IssueController {
         issueService.deleteIssue(issueDTO);
     }
 
-    @PostMapping(value = "/makeproposal")
-    @ResponseBody
-    public Proposal makeProposal(@RequestBody IssueDTO issueDTO) {
-        return issueService.requestProposal(issueDTO.getId());
-    }
-
     @GetMapping(value="/all")
     @ResponseBody
     public List<Issue> viewAllIssue() {
