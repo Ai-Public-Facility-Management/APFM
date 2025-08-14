@@ -58,7 +58,15 @@ const BoardList = () => {
     const matchesTitle = post.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = searchType === "전체" || post.type === searchType; // type 비교
     return matchesTitle && matchesType;
-    });
+  });
+
+  // NOTICE 먼저, 그 외 게시글 뒤로 정렬
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
+    if (a.type === "NOTICE" && b.type !== "NOTICE") return -1;
+    if (a.type !== "NOTICE" && b.type === "NOTICE") return 1;
+    return 0;
+  });
+
 
   return (
     <Layout>
@@ -104,9 +112,10 @@ const BoardList = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {sortedPosts.length > 0 ? (
+              sortedPosts.map((post) => (
                 <tr key={post.id}
+                  className={post.type === "NOTICE" ? "notice-row" : ""}
                     onClick={() => navigate(`/board/${post.id}`)}>
                   <td className="title-cell">{post.title}</td>
                   <td>{maskName(post.authorName)}</td>

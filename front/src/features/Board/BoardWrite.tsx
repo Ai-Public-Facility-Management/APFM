@@ -127,7 +127,7 @@ export default function BoardWrite() {
             <div className="pw-actions">
               <button
                 type="button"
-                onClick={resetForm}
+                onClick={() => navigate("/board")}
                 className="pw-btn pw-btn-cancel"
               >
                 취소
