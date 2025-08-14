@@ -100,7 +100,6 @@ export default function InspectionDetailPage() {
                           />
                         </div>
                         <div className="inspDetail-fieldsCol">
-                          <FieldLine label="견적 근거" value={issue.estimateBasis} />
                           <FieldLine
                             label="방해도"
                             value={
@@ -109,6 +108,7 @@ export default function InspectionDetailPage() {
                                 : "-"
                             }
                           />
+                          <FieldLine label="견적 근거" value={issue.estimateBasis} />
                         </div>
                       </div>
                     </article>
