@@ -1,7 +1,6 @@
 import Layout from "../../components/Layout";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Tabs, Tab, Typography, Button } from "@mui/material";
-
 import "./ProposalPage.css";
 import { fetchProposal, ProposalData, saveProposal } from "../../api/publicFa";
 
@@ -28,10 +27,27 @@ const subTitleMapping: Record<string, string> = {
 const ProposalPage = () => {
     const [value, setValue] = useState(0);
     const [proposal, setProposal] = useState<ProposalData | null>(null);
+    const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
     useEffect(() => {
-        fetchProposal().then(setProposal).catch(console.error);
+        fetchProposal()
+            .then((data) => setProposal(data))
+            .catch(console.error);
     }, []);
+
+    // proposal이 바뀌면 높이 자동 조절
+    useEffect(() => {
+        if (!proposal) return;
+        requestAnimationFrame(() => {
+            Object.keys(textareaRefs.current).forEach((key) => {
+                const ta = textareaRefs.current[key];
+                if (ta) {
+                    ta.style.height = "auto";
+                    ta.style.height = `${ta.scrollHeight}px`;
+                }
+            });
+        });
+    }, [proposal, value]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -40,7 +56,7 @@ const ProposalPage = () => {
     const handleSave = async () => {
         if (!proposal) return;
         try {
-            await saveProposal(proposal); // FastAPI로 전송 + DOCX 다운로드
+            await saveProposal(proposal);
             alert("제안서가 다운로드되었습니다.");
         } catch (err) {
             console.error(err);
@@ -59,24 +75,28 @@ const ProposalPage = () => {
             <div className="proposal-container">
                 <div className="proposal-header">
                     <h1>제안 요청서 수정</h1>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSave}
-
-                    >
+                    <Button variant="contained" color="primary" onClick={handleSave}>
                         저장하기
                     </Button>
                 </div>
 
-                {/* 탭 버튼 */}
-                <Tabs value={value} onChange={handleChange}>
+                <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    sx={{
+                        minHeight: "40px",
+                        "& .MuiTab-root": {
+                            minWidth: "20%",
+                            minHeight: "40px",
+                            fontSize: "1rem"
+                        }
+                    }}
+                >
                     {categories.map((cat, idx) => (
                         <Tab key={idx} label={cat} />
                     ))}
                 </Tabs>
 
-                {/* 탭 내용 */}
                 <div className="proposal-box">
                     <Typography className="proposal-category-title">
                         {currentCategory}
@@ -88,18 +108,22 @@ const ProposalPage = () => {
                                 {subTitleMapping[fieldKey] || fieldKey}
                             </Typography>
                             <textarea
+                                ref={(el) => {
+                                    textareaRefs.current[fieldKey] = el;
+                                }}
                                 className="proposal-textarea"
                                 value={
                                     Array.isArray(proposal[fieldKey])
                                         ? (proposal[fieldKey] as string[]).join("\n")
                                         : (proposal[fieldKey] as string)
                                 }
-
                                 onChange={(e) => {
                                     const newValue = e.target.value;
                                     const textarea = e.target;
-                                    textarea.style.height = "auto"; // 높이 초기화
-                                    textarea.style.height = `${textarea.scrollHeight}px`; // 내용에 맞춰 높이 조정
+
+                                    textarea.style.height = "auto";
+                                    textarea.style.height = `${textarea.scrollHeight}px`;
+
                                     setProposal((prev) => {
                                         if (!prev) return prev;
                                         return {
