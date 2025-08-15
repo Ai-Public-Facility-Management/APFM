@@ -112,6 +112,8 @@ async def predict_regular_video(req: FolderPathRequest):
 
                 b64_cropped = pil_to_base64(cropped)
 
+                obstruction = None
+                obstructionBasis = None
                 # ---- 고급 분석 & 견적 ----
                 est_result = run_estimate(b64_original, b64_cropped, [x1e, y1e, x2e, y2e], "gpt-5")
 
@@ -124,7 +126,9 @@ async def predict_regular_video(req: FolderPathRequest):
                     "vision_analysis": est_result.get("vision_analysis"),
                     "estimate": est_result.get("estimate"),
                     "estimate_basis": est_result.get("estimate_basis"),
-                    "crop_path": crop_path
+                    "crop_path": crop_path,
+                    "obstruction": obstruction,
+                    "obstructionBasis": obstructionBasis
                 })
 
             # 박스가 그려진 원본 이미지 저장

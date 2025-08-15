@@ -21,7 +21,8 @@ def run_estimate(original_b64: str, crop_b64: str, box: list):
         "base64_image": original_b64,
         "crop_base64_image": crop_b64,
         "box": box,
-        "vectordb": vectordb
+        "vectordb": vectordb,
+        "model_name": "gpt-5"
     }
     result = graph.invoke(state)
     return {
