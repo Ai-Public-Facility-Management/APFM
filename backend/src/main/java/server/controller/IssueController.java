@@ -31,19 +31,6 @@ public class IssueController {
     @Autowired
     IssueService issueService;
 
-//    @PutMapping
-//    @ResponseBody
-//    public Issue updateIssue(@RequestBody IssueDTO issueDTO) {
-//        return issueService.updateIssue(issueDTO);
-//    }
-
-//    @DeleteMapping
-//    @ResponseBody
-//    public void deleteIssue(@RequestBody IssueDTO issueDTO) {
-//        issueService.deleteIssue(issueDTO);
-//    }
-
-
 
     @GetMapping(value="/all")
     @ResponseBody
@@ -68,6 +55,7 @@ public class IssueController {
         return ResponseEntity.ok(response);
 
     }
+
 
 }
 

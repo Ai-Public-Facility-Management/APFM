@@ -9,7 +9,7 @@ import lombok.Data;
 @Table(name = "ResultReport")
 @Data
 public class ResultReport {
-
+    //시공 완료 보고서
     @Id
     private Long id;
 

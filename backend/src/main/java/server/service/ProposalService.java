@@ -51,6 +51,9 @@ public class ProposalService {
                 })
                 .collect(Collectors.toList());
 
+        found.forEach(i -> {
+            i.setProcessing(true);
+        });
 
         // 3. FastAPI 호출
         return webClientBuilder.build()
