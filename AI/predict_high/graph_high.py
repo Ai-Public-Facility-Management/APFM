@@ -13,6 +13,7 @@ class EstimationState(TypedDict, total=False):
     estimate: int
     estimate_basis: str
     vectordb: object
+    model_name: str
 
 builder = StateGraph(EstimationState)
 

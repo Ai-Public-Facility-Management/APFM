@@ -13,6 +13,7 @@ class EstimationState(TypedDict, total=False):
     estimate: int                # 견적 금액 (정수)
     estimate_basis: str          # 계산 근거 + 참고 문서 요약
     vectordb: object
+    model_name: str
 
 # 그래프 정의
 builder = StateGraph(EstimationState)

@@ -4,7 +4,7 @@ from langchain_openai import ChatOpenAI
 from langchain.chains.llm import LLMChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 
-def run_hybrid_rag_query(vectordb, query):
+def run_hybrid_rag_query(vectordb, query, model_name="gpt-5"):
     retriever = vectordb.as_retriever(search_kwargs={"k": 3})
     docs = retriever.invoke(query)
 
@@ -43,7 +43,7 @@ def run_hybrid_rag_query(vectordb, query):
 """.strip()
     )
 
-    llm = ChatOpenAI(model_name="gpt-5")
+    llm = ChatOpenAI(model_name=model_name)
     llm_chain = LLMChain(llm=llm, prompt=prompt_template)
     stuff_chain = StuffDocumentsChain(
         llm_chain=llm_chain,

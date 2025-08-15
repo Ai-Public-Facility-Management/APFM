@@ -6,7 +6,7 @@ from predict_high.graph_high import graph  # graph.py에서 정의한 graph 객�
 from model_config import embedding_model, vectordb  
 
 
-def run_estimate(original_b64: str, crop_b64: str, box: list):
+def run_estimate(original_b64: str, crop_b64: str, box: list, model: str):
     """
     original_b64: 전체 이미지 (base64)
     crop_b64: 크롭 이미지 (base64)
@@ -18,7 +18,8 @@ def run_estimate(original_b64: str, crop_b64: str, box: list):
         "base64_image": original_b64,
         "crop_base64_image": crop_b64,
         "box": box,
-        "vectordb": vectordb
+        "vectordb": vectordb,
+        "model_name": model
     }
 
     result = graph.invoke(state)

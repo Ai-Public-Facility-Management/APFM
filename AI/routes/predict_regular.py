@@ -3,9 +3,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os, uuid, io, base64
 from PIL import Image, ImageDraw
+import cv2
 from model_config import (
-    yolo_model, class_names, clip_device, clip_model,
-    clip_preprocess, status_texts, status_tokens
+    yolo_model, class_names, clip_device,
+    status_texts, status_tokens
 )
 from predict_high.estimate_util import run_estimate    # 고급 견적 실행 함수
 
@@ -25,35 +26,47 @@ def expand_box(x1, y1, x2, y2, img_w, img_h, pad_px=40):
         min(img_h, y2 + pad_px)
     )
 
+def get_first_frame(video_path):
+    """동영상에서 첫 번째 프레임을 PIL 이미지로 반환"""
+    cap = cv2.VideoCapture(video_path)
+    success, frame = cap.read()
+    cap.release()
+    if not success or frame is None:
+        raise ValueError(f"첫 프레임을 읽을 수 없습니다: {video_path}")
+    # BGR → RGB 변환
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    return Image.fromarray(frame_rgb)
+
 # ---------- 요청 모델 ----------
 class FolderPathRequest(BaseModel):
-    image_folder: str
+    video_folder: str
 
 # ---------- 라우트 ----------
-@router.post("/predict-high")
-async def predict_high(req: FolderPathRequest):
-    image_folder = req.image_folder
+@router.post("/predict-regular-video")
+async def predict_regular_video(req: FolderPathRequest):
+    video_folder = req.video_folder
 
-    if not os.path.exists(image_folder) or not os.path.isdir(image_folder):
-        raise HTTPException(status_code=400, detail="유효한 이미지 폴더 경로가 아닙니다.")
+    if not os.path.exists(video_folder) or not os.path.isdir(video_folder):
+        raise HTTPException(status_code=400, detail="유효한 동영상 폴더 경로가 아닙니다.")
 
-    valid_exts = {'.jpg', '.jpeg', '.png'}
-    image_paths = sorted([
-        os.path.join(image_folder, f)
-        for f in os.listdir(image_folder)
+    # 동영상 확장자 목록
+    valid_exts = {'.mp4', '.avi', '.mov', '.mkv'}
+    video_paths = sorted([
+        os.path.join(video_folder, f)
+        for f in os.listdir(video_folder)
         if os.path.splitext(f)[1].lower() in valid_exts
     ])
 
-    if not image_paths:
-        raise HTTPException(status_code=404, detail="폴더 내에 이미지 파일이 없습니다.")
+    if not video_paths:
+        raise HTTPException(status_code=404, detail="폴더 내에 동영상 파일이 없습니다.")
 
     result_dict = {}
 
-    for image_path in image_paths:
-        camera_id = os.path.splitext(os.path.basename(image_path))[0]
+    for video_path in video_paths:
+        camera_id = os.path.splitext(os.path.basename(video_path))[0]
         try:
-            # 원본 이미지 로드
-            img = Image.open(image_path).convert('RGB')
+            # 첫 프레임 추출
+            img = get_first_frame(video_path)
             img_w, img_h = img.size
             b64_original = pil_to_base64(img)
 
@@ -64,7 +77,7 @@ async def predict_high(req: FolderPathRequest):
 
             # YOLO 추론
             results = yolo_model.predict(
-                source=image_path,
+                source=img,
                 save=False,
                 imgsz=1024,
                 conf=0.25,
@@ -126,6 +139,6 @@ async def predict_high(req: FolderPathRequest):
             }
 
         except Exception as e:
-            result_dict[camera_id] = {"error": f"이미지 처리 중 오류: {str(e)}"}
+            result_dict[camera_id] = {"error": f"동영상 처리 중 오류: {str(e)}"}
 
     return result_dict

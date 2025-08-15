@@ -56,7 +56,7 @@ async def predict_board(image: UploadFile = File(...)):
             b64_cropped = pil_to_base64(cropped)
 
             # ---- 고급 분석 & 견적 ----
-            est_result = run_estimate(b64_original, b64_cropped, [x1e, y1e, x2e, y2e])
+            est_result = run_estimate(b64_original, b64_cropped, [x1e, y1e, x2e, y2e], "gpt-5-nano")
 
             detection_results.append({
                 "class": class_name,
