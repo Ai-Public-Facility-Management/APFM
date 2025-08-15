@@ -62,11 +62,11 @@ public class BoardController {
         return ResponseEntity.ok(boardService.update(postId, file, req));
     }
 
-    // [기능 요약] 게시글 삭제(소프트)
+    // [기능 요약] 게시글 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long postId) {
+    public ResponseEntity<Void> delete(@PathVariable Long postId) {
         boardService.delete(postId);
-        return ResponseEntity.ok(Map.of("deleted", true));
+        return ResponseEntity.noContent().build();
     }
 
     // ===== 댓글 =====

@@ -8,14 +8,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.Issue;
-import server.domain.Proposal;
 import server.domain.PublicFa;
 import server.dto.InspectionResultDTO;
 import server.dto.IssueDTO;
 import server.dto.IssueDetail;
+
 import server.repository.*;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,7 @@ public class IssueService {
 
     @Autowired
     private IssueRepository issueRepository;
+
     @Autowired
     private PublicFaRepository publicFaRepository;
     @Autowired
@@ -46,6 +48,7 @@ public class IssueService {
     public List<Issue> getIssuesByInspectionId(Long inspectionId) {
         return issueRepository.findByInspection_Id(inspectionId);
     }
+
 
 
     public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
@@ -70,6 +73,7 @@ public class IssueService {
         }
         return "해당 시설물에 이슈사항이 없습니다.";
     }
+
 
     public List<Issue> getAllIssue(){
         return issueRepository.findAll();
@@ -96,8 +100,15 @@ public class IssueService {
         return details;
     }
 
-    public Issue updateIssue(IssueDTO issueDTO) {
-        return issueRepository.findById(issueDTO.getId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public String setProcessing(List<Long> ids) {
+        List<Issue> issues =  issueRepository.findAllById(ids);
+        if(!issues.isEmpty()){
+            issues.forEach(issue -> {
+                issue.setProcessing(true);
+            });
+        }else
+            return "fail";
+        return "done";
     }
 
 }

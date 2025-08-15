@@ -15,6 +15,7 @@ import BoardDetail from "../features/Board/BoardDetail";
 import {getRoleFromToken, getToken} from "../api/login";
 import BoardWrite from "../features/Board/BoardWrite";
 import BoardList from "../features/Board/BoardList";
+import ProposalPage from "../features/Proposal/ProposalPage";
 
 // 토큰이 있어야 접근 가능
 const requireAuth = () => {
@@ -108,6 +109,12 @@ export const router = createBrowserRouter([
     path: "/board/write", // ✨ 작성 페이지 라우트
     element: <BoardWrite />,
     loader: requireAuth,
+  },
+
+  {
+    path: "/proposal",
+    element: <ProposalPage/>,
+    loader: requireAuth
   },
 
 

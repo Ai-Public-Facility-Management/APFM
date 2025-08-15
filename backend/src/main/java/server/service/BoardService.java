@@ -121,7 +121,13 @@ public class BoardService {
             .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         userResolver.ensureOwnerOrAdmin(post.getAuthor().getEmail());
-        post.softDelete(userResolver.currentUser());
+        // (선택) 첨부 이미지도 함께 삭제할 경우
+//        if (post.getImageUrl() != null) {
+//            try { azureService.azureBlobDeleteFromUrl(post.getImageUrl()); } catch (Exception ignore) {}
+//        }
+
+        // 댓글은 cascade + orphanRemoval 로 함께 삭제됨
+        postRepo.delete(post);
     }
 
     // [기능 요약] 댓글 목록(페이징)

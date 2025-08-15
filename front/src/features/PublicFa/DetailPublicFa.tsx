@@ -137,7 +137,6 @@ export default function DetailPublicFa(){
             </button>
         </div>
         <hr className="custom-hr" />
-            <hr className="custom-hr" />
             <div className="detail-content">
                 <table className="detail-table">
                 <tbody>
