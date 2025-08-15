@@ -10,7 +10,6 @@ import server.domain.*;
 import server.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.domain.Issue;
-import server.domain.Proposal;
 import server.domain.ResultReport;
 import server.dto.IssueDTO;
 import server.repository.ResultReportRepository;

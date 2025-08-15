@@ -81,8 +81,8 @@ public class InspectionService {
                 List<Issue> issues = inspection.getIssues();
                 Issue issue = issues.get(issues.size() - 1);
                 ins.setCameraName(issue.getPublicFa().getCamera().getLocation());
-                ins.setPublicFaType(issue.getPublicFa().getType());
-                ins.setIssueType(issue.getType());
+                ins.setPublicFaType(issue.getPublicFa().getType().getDisplayName());
+                ins.setIssueType(issue.getType() != null ? issue.getType().getDisplayName() : null);
             } else {
                 ins.setCameraName(null);
                 ins.setPublicFaType(null);
@@ -164,7 +164,7 @@ public class InspectionService {
                         InspectionDetailDTO.IssueItem issueItem = new InspectionDetailDTO.IssueItem();
                         issueItem.setId(issue.getId());
                         issueItem.setPublicFaType(issue.getPublicFa().getType().getDisplayName());
-                        issueItem.setType(issue.getType().toString());
+                        issueItem.setType(issue.getType() != null ? issue.getType().getDisplayName() : null);
                         issueItem.setEstimate(issue.getEstimate());
                         issueItem.setEstimateBasis(issue.getEstimateBasis());
                         issueItem.setObstruction(issue.getObstruction());

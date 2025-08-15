@@ -10,14 +10,14 @@ import java.util.Date;
 public class PublicFaDetail {
     private Long id;
     private String cameraName;
-    private PublicFaType type;
-    private String image;
+    private String type;
+    private File image;
     private Section section;
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date installDate;
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date lastRepair;
-    private FacilityStatus status;
+    private String status;
     private Long obstruction;
     private Long estimate;
     private String estimateBasis;
@@ -25,16 +25,18 @@ public class PublicFaDetail {
     public PublicFaDetail(PublicFa publicFa) {
         this.id = publicFa.getId();
         this.cameraName = publicFa.getCamera().getLocation();
-        this.type = publicFa.getType();
+        this.type = publicFa.getType() != null ? publicFa.getType().getDisplayName() : null;
+        if (publicFa.getCamera() != null) {
+            this.image = publicFa.getCamera().getImage();
+        }
         if (publicFa.getIssue() != null) {
-            this.image = publicFa.getImage().getUrl();
             this.estimate = publicFa.getIssue().getEstimate();
             this.estimateBasis = publicFa.getIssue().getEstimateBasis();
         }
         this.section = publicFa.getSection();
         this.installDate = publicFa.getInstallDate();
         this.lastRepair = publicFa.getLastRepair();
-        this.status = publicFa.getStatus();
+        this.status = publicFa.getStatus() != null ? publicFa.getStatus().getDisplayName() : null;
         this.obstruction = publicFa.getObstruction();
     }
 }

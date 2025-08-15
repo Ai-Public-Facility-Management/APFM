@@ -11,19 +11,21 @@ public class PublicFaSummary {
     private Long publicFaId;
     private Long issueId;
     private String cameraName;
-    private PublicFaType publicFaType;
-    private IssueType condition;
+    private String publicFaType;
+    private String condition;
     private FacilityStatus status;
 
     public PublicFaSummary(PublicFa fa) {
         this.publicFaId = fa.getId();
         this.cameraName = fa.getCamera().getLocation();
-        this.publicFaType = fa.getType();
+        this.publicFaType = fa.getType() != null ? fa.getType().getDisplayName() : null;
         if (fa.getIssue() != null) {
             this.issueId = fa.getIssue().getId();
-            this.condition = fa.getIssue().getType();
+            IssueType issueType = fa.getIssue().getType();
+            this.condition = (issueType != null) ? issueType.getDisplayName() : null;
 
         }
+        this.status = fa.getStatus();
     }
 
 }

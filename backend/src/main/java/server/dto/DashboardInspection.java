@@ -12,8 +12,8 @@ public class DashboardInspection {
     private Long inspectionId;
     private Date inspectionDate;
     private String cameraName;
-    private PublicFaType publicFaType;
-    private IssueType issueType;
+    private String publicFaType;
+    private String issueType;
 
 }
 
