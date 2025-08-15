@@ -15,6 +15,7 @@ vectordb = Chroma(
 
 # YOLO 모델 로드
 yolo_model = YOLO('weights/yolo/v8/best.pt')
+tracking_model = YOLO('weights/yolo/tracking/best.pt')
 
 # 클래스 이름
 class_names = [

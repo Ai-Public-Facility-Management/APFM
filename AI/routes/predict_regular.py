@@ -1,14 +1,14 @@
-# routes/predict_high.py
+# routes/predict_regular.py
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import os, uuid, io, base64
 from PIL import Image, ImageDraw
 import cv2
 from model_config import (
-    yolo_model, class_names, clip_device,
-    status_texts, status_tokens
+    yolo_model, class_names, clip_device
 )
-from predict_high.estimate_util import run_estimate    # 고급 견적 실행 함수
+from predict_high.estimate_util import run_estimate
+from tracking_module.tracking import track_multiple_facilities_analysis  # ← 방해도 분석 함수 import
 
 router = APIRouter()
 
@@ -33,7 +33,6 @@ def get_first_frame(video_path):
     cap.release()
     if not success or frame is None:
         raise ValueError(f"첫 프레임을 읽을 수 없습니다: {video_path}")
-    # BGR → RGB 변환
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     return Image.fromarray(frame_rgb)
 
@@ -49,7 +48,6 @@ async def predict_regular_video(req: FolderPathRequest):
     if not os.path.exists(video_folder) or not os.path.isdir(video_folder):
         raise HTTPException(status_code=400, detail="유효한 동영상 폴더 경로가 아닙니다.")
 
-    # 동영상 확장자 목록
     valid_exts = {'.mp4', '.avi', '.mov', '.mkv'}
     video_paths = sorted([
         os.path.join(video_folder, f)
@@ -70,12 +68,11 @@ async def predict_regular_video(req: FolderPathRequest):
             img_w, img_h = img.size
             b64_original = pil_to_base64(img)
 
-            # 저장 폴더 준비
             os.makedirs("temp/original", exist_ok=True)
             os.makedirs("temp/crops", exist_ok=True)
             unique_id = uuid.uuid4().hex
 
-            # YOLO 추론
+            # 첫 프레임에서 YOLO 시설물 탐지
             results = yolo_model.predict(
                 source=img,
                 save=False,
@@ -93,17 +90,21 @@ async def predict_regular_video(req: FolderPathRequest):
 
             detection_results = []
             crop_paths = []
+            facility_boxes_for_analysis = []
 
             for idx, (box, score, cls_id) in enumerate(zip(boxes, scores, class_ids)):
                 x1, y1, x2, y2 = map(int, box)
                 x1e, y1e, x2e, y2e = expand_box(x1, y1, x2, y2, img_w, img_h)
                 class_name = class_names[int(cls_id)]
 
+                # 시설물 박스 저장 (분석용)
+                facility_boxes_for_analysis.append([x1, y1, x2, y2])
+
                 # 박스 표시
                 draw.rectangle([x1, y1, x2, y2], outline="red", width=8)
                 draw.text((x1, y1 - 10), f"{class_name} {score:.2f}", fill="red")
 
-                # 크롭 이미지 저장
+                # 크롭 저장
                 cropped = img.crop((x1e, y1e, x2e, y2e))
                 crop_filename = f"crop_{camera_id}_{unique_id}_{idx}.jpg"
                 crop_path = os.path.join("temp/crops", crop_filename)
@@ -112,9 +113,7 @@ async def predict_regular_video(req: FolderPathRequest):
 
                 b64_cropped = pil_to_base64(cropped)
 
-                obstruction = None
-                obstructionBasis = None
-                # ---- 고급 분석 & 견적 ----
+                # 견적 분석
                 est_result = run_estimate(b64_original, b64_cropped, [x1e, y1e, x2e, y2e], "gpt-5")
 
                 detection_results.append({
@@ -127,11 +126,22 @@ async def predict_regular_video(req: FolderPathRequest):
                     "estimate": est_result.get("estimate"),
                     "estimate_basis": est_result.get("estimate_basis"),
                     "crop_path": crop_path,
-                    "obstruction": obstruction,
-                    "obstructionBasis": obstructionBasis
+                    "obstruction": None,           # 나중에 채움
+                    "obstructionBasis": None       # 나중에 채움
                 })
 
-            # 박스가 그려진 원본 이미지 저장
+            # 방해도 분석 (영상 전체 한 번만 실행)
+            if facility_boxes_for_analysis:
+                obstruction_results = track_multiple_facilities_analysis(
+                    video_path=video_path,
+                    damaged_facility_boxes=facility_boxes_for_analysis
+                )
+                # 결과 매칭
+                for det, obs in zip(detection_results, obstruction_results):
+                    det["obstruction"] = obs["score"]
+                    det["obstructionBasis"] = obs["analysis_text"]
+
+            # 원본+박스 이미지 저장
             boxed_image_path = f"temp/original/boxed_{camera_id}_{unique_id}.jpg"
             img_with_boxes.save(boxed_image_path)
 
