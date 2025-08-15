@@ -81,7 +81,7 @@ public class InspectionService {
                 List<Issue> issues = inspection.getIssues();
                 Issue issue = issues.get(issues.size() - 1);
                 ins.setCameraName(issue.getPublicFa().getCamera().getLocation());
-                ins.setPublicFaType(issue.getPublicFa().getType());
+                ins.setPublicFaType(issue.getPublicFa().getType().getDisplayName());
                 ins.setIssueType(issue.getType());
             } else {
                 ins.setCameraName(null);

@@ -84,10 +84,10 @@ public class PublicFaService {
         Fas.forEach(fas->{
             DashboardIssue issue = new DashboardIssue();
             issue.setPublicFaId(fas.getId());
-            issue.setPublicFaType(fas.getType());
+            issue.setPublicFaType(fas.getType() != null ? fas.getType().getDisplayName() : null);
             issue.setCameraName(fas.getCamera().getLocation());
             if(fas.getStatus().equals(FacilityStatus.ABNORMAL) && fas.getIssue() != null) {
-                issue.setIssueType(fas.getIssue().getType());
+                issue.setIssueType(fas.getIssue().getType() != null ? fas.getIssue().getType().getDisplayName() : null);
             }
             else
                 issue.setIssueType(null);
