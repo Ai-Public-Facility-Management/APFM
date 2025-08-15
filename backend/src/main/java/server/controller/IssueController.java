@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.domain.Issue;
-import server.domain.Proposal;
 import server.domain.ResultReport;
 import server.dto.IssueDTO;
 import server.repository.ResultReportRepository;
