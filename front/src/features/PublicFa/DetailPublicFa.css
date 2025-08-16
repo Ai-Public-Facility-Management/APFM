@@ -1,97 +1,86 @@
 .detailMain {
-    display: flex;
-    flex-direction: column; /* 제목, 표+이미지 묶음은 세로 */
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
 }
 .detail-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 60%;         /* hr과 동일하게 맞추면 깔끔 */
-    margin-left: 25px;
-    margin-top: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.detail-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .back-to-list-btn {
-    background: #0b63f6;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-size: 14px;
+  color: #374151;
+  font-size: 14px;
+  text-decoration: none;
+  margin-left: auto;
 }
 .back-to-list-btn:hover {
-    background: #0954cf;
+  text-decoration: underline;
 }
 
 
-.detailMain h1 {
-    align-self: flex-start;
-    margin-left: 25px;
+.custom-hr,
+.custom-hr-2 {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
 }
 
-.custom-hr {
-    width: 60%;
-    border: none;
-    border-top: 1px solid grey;
-    margin-left: 25px;
-}
-/* 표 + 이미지 가로 배치 */
 .detail-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 450px;                 /* 표-이미지 사이 간격 넉넉히 */
-    margin: 0 25px 32px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+  margin: 0 0 32px;
 }
 
-/* 표(유동 폭) */
 .detail-table {
-    flex: 1 1 60%;
-    border-collapse: collapse;
-    min-width: 480px;
+  flex: 1 1 60%;
+  border-collapse: collapse;
+  min-width: 480px;
 }
 .detail-table th {
-    text-align: left;
-    font-weight: bold;
-    padding: 15px 0;
-    vertical-align: top;
-    width: 160px;
+  text-align: left;
+  font-weight: 600;
+  padding: 12px 0;
+  vertical-align: top;
+  width: 160px;
 }
 .detail-table td {
-    padding: 15px 0;
+  padding: 12px 0;
 }
-
 .detail-table td div {
-    line-height: 1.6; /* 줄간격 비율 */
-    margin-bottom: 6px; /* 각 줄 하단 여백 */
+  line-height: 1.6;
+  margin-bottom: 6px;
 }
 .detail-table td div:last-child {
-    margin-bottom: 0; /* 마지막 줄은 여백 제거 */
+  margin-bottom: 0;
 }
 
-/* 이미지(고정 폭) */
 .detail-image {
-    flex: 0 0 520px;
-    width: 520px;
+  flex: 0 0 480px;
+  width: 480px;
 }
 .detail-image img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 28px;       /* 둥근 모서리 */
-    object-fit: cover;
-    box-shadow: 0 2px 12px rgba(0,0,0,.08);
-    border: 1px solid #e5e5e5;
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e0e0e0;
 }
 
-.custom-hr-2 {
-    width: 60%;
-    border: none;
-    border-top: 1px solid grey;
-    margin-left: 25px;
-    margin-top: 0;
-}
 
 /* 결과 보고서 */
 .report-section{
