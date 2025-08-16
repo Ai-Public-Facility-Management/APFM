@@ -24,6 +24,7 @@ export default function BoardWrite() {
   const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false); // 🔹 전체 화면 로딩 상태
+  const [submitting, setSubmitting] = useState(false); // ✅ 저장 중복 방지 상태
 
   const draftKey = isEditMode ? `editPostDraft-${editPost.id}` : "newPostDraft";
 
@@ -97,8 +98,12 @@ export default function BoardWrite() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    if (submitting) return; // ✅ 이미 저장 중이면 무시
+    setSubmitting(true); // ✅ 저장 시작
+
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해주세요.");
+      setSubmitting(false); // ✅ 실패 시 다시 활성화
       return;
     }
 
@@ -137,6 +142,8 @@ export default function BoardWrite() {
     } catch (err) {
       console.error("저장 실패:", err);
       alert("저장에 실패했습니다.");
+    } finally {
+      setSubmitting(false); // ✅ 저장 완료 후 버튼 다시 활성화
     }
   };
 
@@ -177,7 +184,8 @@ export default function BoardWrite() {
                 required
               />
             </div>
-
+            
+            {/*파일 업로드 부분*/}
             <div className="pw-form-group">
               <label className="pw-label">파일 업로드</label>
               <div className="pw-file-upload">
@@ -191,9 +199,30 @@ export default function BoardWrite() {
                 <label htmlFor="file-upload" className="pw-file-label">
                   파일 선택
                 </label>
-                <span className="pw-file-name">
-                  {file ? file.name : "선택된 파일 없음"}
-                </span>
+
+                {/* 파일명 + 삭제 X 버튼 */}
+                {file ? (
+                  <span className="pw-file-name" style={{ display: "inline-flex", alignItems: "center" }}>
+                    {file.name}
+                    <button
+                      type="button"
+                      onClick={() => setFile(null)}
+                      style={{
+                        marginLeft: "3px",
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        color: "gray"
+                      }}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ) : (
+                  <span className="pw-file-name">선택된 파일 없음</span>
+                )}
               </div>
             </div>
 
@@ -218,8 +247,12 @@ export default function BoardWrite() {
               >
                 취소
               </button>
-              <button type="submit" className="pw-btn pw-btn-primary">
-                저장
+              <button
+                type="submit"
+                className="pw-btn pw-btn-primary"
+                disabled={submitting} // ✅ 저장 중에는 비활성화
+              >
+                {submitting ? "저장" : "저장"} {/* ✅ 상태에 따라 텍스트 변경 */}
               </button>
             </div>
           </form>
