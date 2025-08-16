@@ -91,8 +91,6 @@ const BoardList = () => {
                 <option value="FREE">자유</option>
             </select>
 
-          <button className="search-btn">검색</button>
-
           <button
             className="write-btn"
             onClick={() => navigate("/board/write")}
