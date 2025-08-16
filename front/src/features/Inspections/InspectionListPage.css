@@ -78,28 +78,24 @@
   font-size: 13px;
   color: #6b7280;
 }
-
 .inspList-pagination {
   display: flex;
+  gap: 6px;
   justify-content: center;
-  gap: 4px;
-  margin-top: 20px;
+  margin-top: 24px;
 }
-
 .inspList-pagination button {
-  padding: 6px 10px;
-  border: 1px solid #e5e7eb;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  transition: background 0.2s;
 }
-
+.inspList-pagination button:hover {
+  background: #f0f0f0;
+}
 .inspList-pagination button.active {
-  background: #2563eb;
-  color: white;
-}
-
-.inspList-pagination button:disabled {
-  opacity: 0.5;
-  cursor: default;
+  background: #003b7a;
+  color: #fff;
 }

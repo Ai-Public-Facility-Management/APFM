@@ -11,6 +11,7 @@ const FacilityList = () => {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("전체");
   const [conditionFilter, setConditionFilter] = useState("전체");
@@ -20,7 +21,9 @@ const FacilityList = () => {
 
   useEffect(() => {
     fetchFacilities(page - 1, 15)
-      .then((data) => setFacilities(data.content))
+      .then((data) => {setFacilities(data.content);
+        setTotalPages(data.totalPages);
+      })
       .catch((err) => console.error("공공시설물 목록 로드 실패:", err));
   }, [page]);
 
@@ -167,17 +170,32 @@ const FacilityList = () => {
           >
             이전
           </button>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              className={page === n ? "active" : ""}
-              onClick={() => setPage(n)}
-            >
-              {n}
-            </button>
-          ))}
-          <button onClick={() => setPage((p) => p + 1)}>다음</button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter((n) => {
+              // 최대 5개 버튼만 보여주고 현재 페이지 중심으로 슬라이딩
+              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+              return n >= start && n <= start + 4;
+            })
+            .map((n) => (
+              <button
+                key={n}
+                className={page === n ? "active" : ""}
+                onClick={() => setPage(n)}
+              >
+                {n}
+              </button>
+            ))}
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
+            다음
+          </button>
         </div>
+
+
 
         {/* 선택 영역 */}
         <div className="facility-selection-bar">
