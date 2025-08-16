@@ -2,11 +2,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import koreaLogo from "../assets/korea1.png";
-import search from "../assets/ico_sch.svg";
+import board from "../assets/ico_faq.svg"
 import loginImg from "../assets/ico_login.svg";
 import signup from "../assets/ico_join.svg";
 
-// 로그인 후에 쓸 PNG 아이콘 (네가 만든 파일 경로/이름에 맞춰 수정)
+// 로그인 후에 쓸 PNG 아이콘
 import settings from "../assets/ico_calendar.svg";
 import userIcon from "../assets/ico_my.svg";
 import logoutIcon from "../assets/ico_logout.svg";
@@ -17,6 +17,7 @@ import {
   clearToken,
   getSavedEmail,
   logoutAPI,
+  getUserName
 } from "../api/login";
 import "./Common.css";
 
@@ -38,15 +39,18 @@ const Header: React.FC = () => {
 
   // 저장된 이메일에서 사용자명 추출
   useEffect(() => {
-    const saved = getSavedEmail();
-    if (!saved) return;
-    try {
-      const email = atob(saved);
-      setUserName(email.split("@")[0] || "사용자");
-    } catch {
-      setUserName("사용자");
-    }
+    const name = getUserName();
+    if (name) setUserName(name);
   }, []);
+
+  // 이름 마스킹 함수
+  const maskName = (name: string) => {
+    if (!name) return "";
+      {
+        if (name.length <= 2) return name[0] + "*";
+        return name[0] + "*".repeat(name.length - 2) + name[name.length - 1];
+      }
+  };
 
   // 로그아웃
   const onLogout = useCallback(async () => {
@@ -73,7 +77,7 @@ const Header: React.FC = () => {
       <div className="headerTop">
         <Link to="/" className="logo">
           <img src={koreaLogo} alt="정부로고" className="logo-image" />
-          <span className="logo-text">시설닥터 | APFM</span>
+          <span className="logo-text">공공시설물 관리 | APFM</span>
         </Link>
 
         {/* 오른쪽 아이콘들: 기존 디자인 유지 (세로 배치) */}
@@ -90,20 +94,10 @@ const Header: React.FC = () => {
           </div>
         ) : (
           <div className="headerIcons">
-            {/* 통합검색 유지 */}
             <Link to="/board">
-              {/* 새 아이콘도 기존 크기 규칙을 재사용하려면 className을 search-image로 통일해도 됩니다 */}
-              <img src={search} alt="검색" className="search-image" />
+              <img src={board} alt="검색" className="search-image" />
               <span>게시판</span>
             </Link>
-          {/* 페이지 띄어서 하는 점검 주기 나중에 모달 신경 안쓰면 지워도됨
-            
-            <Link to="/inspection/interval">
-              <img src={settings} alt="설정" className="search-image" />
-              <span>점검 주기 설정</span>
-            </Link> */}
-
-                        {/* 점검 주기 설정 (메인 위에 모달) */}
           <button
               type="button"
               onClick={() => open()}
@@ -128,7 +122,7 @@ const Header: React.FC = () => {
             {/* 사용자명 */}
             <div className="userItem">
               <img src={userIcon} alt="사용자" className="search-image" />
-              <span>{userName} 님</span>
+              <span>{maskName(userName)} 님</span>
             </div>
 
             {/* 로그아웃 버튼 (세로 배치 맞춤) */}

@@ -5,12 +5,14 @@ export interface LoginResponse {
   token: string;
   userType: string; // "ADMIN" | "USER" ...
   message: string;
+  username: string;
 }
 
 export async function loginAPI(data: { email: string; password: string; rememberId: boolean; }): Promise<LoginResponse> {
   const res = await api.post<LoginResponse>("/api/auth/login", data);
   // 토큰 필수 확인
   if (!res.data?.token) throw new Error("로그인 응답에서 토큰을 찾지 못했습니다.");
+  if (res.data.username) saveUserName(res.data.username);
   return res.data;
 }
 
@@ -38,6 +40,12 @@ export const ID_KEY = "rememberedEmail";
 export const saveEmail = (email: string) => localStorage.setItem(ID_KEY, btoa(email));
 export const getSavedEmail = () => localStorage.getItem(ID_KEY);
 export const clearEmail = () => localStorage.removeItem(ID_KEY);
+
+// 사용자 이름 저장/조회
+export const USER_NAME_KEY = "userName";
+export const saveUserName = (name: string) => localStorage.setItem(USER_NAME_KEY, name);
+export const getUserName = () => localStorage.getItem(USER_NAME_KEY);
+export const clearUserName = () => localStorage.removeItem(USER_NAME_KEY);
 
 
 // 로그아웃도 api 사용 (Authorization 자동 주입)

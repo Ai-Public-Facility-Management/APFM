@@ -31,6 +31,7 @@ public class LoginController {
         response.put("token", token);
         response.put("userType", user.getType().name());
         response.put("message", message);
+        response.put("username", user.getUsername());
 
         return ResponseEntity.ok(response);
     }

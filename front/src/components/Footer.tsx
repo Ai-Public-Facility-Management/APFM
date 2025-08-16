@@ -15,9 +15,9 @@ const Footer = () => {
           <div className="footer-left">
             <div className="footer-logo">
               <img src={koreaLogo} alt="로고" className="logo-image" />
-              <span className="footer-text">시설닥터 | APFM</span>
+              <span className="footer-text">공공시설물 관리 | APFM</span>
             </div>
-            <p>(04383) 서울특별시 용산구 이태원로 22</p>
+            <p>(48819) 부산광역시 동구 초량중로 29</p>
             <p><strong>대표전화</strong> 1234-5678 (유료, 평일 09시-18시)</p>
             <p><strong>해외이용</strong> +82-1234-5678 (유료, 평일 09시-18시)</p>
           </div>

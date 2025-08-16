@@ -33,7 +33,7 @@ public class Users {
     public Users(String email,String paasword){
         this.email = email;
         this.password = paasword;
-        this.username = "Admin";
+        this.username = "관리자";
         this.department = Department.DEVELOPMENT;
         this.approvalStatus = ApprovalStatus.APPROVED;
         this.type = UserType.ADMIN;
