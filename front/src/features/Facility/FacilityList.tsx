@@ -12,6 +12,9 @@ const FacilityList = () => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("전체");
+  const [conditionFilter, setConditionFilter] = useState("전체");
+
 
 
 
@@ -27,26 +30,38 @@ const FacilityList = () => {
     );
   };
 
-  const getStatusLabel = (status: string, isProcessing: boolean) => {
+  const getStatusLabel = (status: string, processing: boolean) => {
     if (status === "NORMAL") {
       return { text: "정상", className: "status-normal" };
     }
-    if (status === "ABNORMAL" && isProcessing) {
+    if (status === "ABNORMAL" && processing) {
       return { text: "공사중", className: "status-processing" };
     }
-    if (status === "ABNORMAL" && !isProcessing) {
+    if (status === "ABNORMAL" && !processing) {
       return { text: "수리 필요", className: "status-repair" };
     }
     return { text: "-", className: "" };
   };
 
+
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredFacilities = facilities.filter((fa) =>
-    `${fa.cameraName} ${fa.publicFaId}번 ${fa.publicFaType} ${fa.condition}`
+  const filteredFacilities = facilities.filter((fa) => {
+    const label = getStatusLabel(fa.status, fa.processing);
+
+    const matchSearch = `${fa.cameraName} ${fa.publicFaId}번 ${fa.publicFaType} ${fa.condition}`
       .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+      .includes(searchTerm.toLowerCase());
+
+    const matchStatus =
+      statusFilter === "전체" || label.text === statusFilter;
+
+    const matchCondition =
+      conditionFilter === "전체" || fa.condition === conditionFilter;
+
+    return matchSearch && matchStatus && matchCondition;
+  });
+
 
   const handleProposalRequest = async () => {
     try {
@@ -82,24 +97,37 @@ const FacilityList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <select className="facility-select">
-            <option>종류</option>
+          <select
+            className="facility-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <option>전체</option>
             <option>공사중</option>
-            <option>완료</option>
+            <option>수리 필요</option>
+            <option>정상</option>
           </select>
-          <select className="facility-select">
-            <option>상태</option>
+
+          <select
+            className="facility-select"
+            value={conditionFilter}
+            onChange={(e) => setConditionFilter(e.target.value)}
+          >
             <option>전체</option>
-            <option>진행</option>
-            <option>종료</option>
+            <option>정상</option>
+            <option>표면 벗겨짐</option>
+            <option>파손</option>
+            <option>변형</option>
+            <option>변색</option>
+            <option>균열</option>
           </select>
+
         </div>
 
         {/* 카드 리스트 */}
         <div className="facility-card-grid">
           {filteredFacilities.map((fa) => {
-            const label = getStatusLabel(fa.status, fa.isProcessing);
+            const label = getStatusLabel(fa.status, fa.processing);
             return (
               <div
                 key={`facility-${fa.publicFaId}`}

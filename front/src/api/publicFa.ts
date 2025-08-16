@@ -7,7 +7,7 @@ export interface Facility {
   publicFaType: string;
   condition: string;
   status: string;
-  isProcessing: boolean;
+  processing: boolean;
 }
 
 export interface FacilityPage {
