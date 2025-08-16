@@ -88,6 +88,7 @@ public class PublicFaService {
             issue.setCameraName(fas.getCamera().getLocation());
             if(fas.getStatus().equals(FacilityStatus.ABNORMAL) && fas.getIssue() != null) {
                 issue.setIssueType(fas.getIssue().getType() != null ? fas.getIssue().getType().getDisplayName() : null);
+                issue.setIsProcessing(fas.getIssue().isProcessing());
             }
             else
                 issue.setIssueType(null);
