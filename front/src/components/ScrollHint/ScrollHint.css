@@ -1,0 +1,15 @@
+.sh-wrap {
+  width: 100%; max-width: 1280px; margin: 8px auto;
+  display: flex; justify-content: center; position: relative; z-index: 40;
+}
+.sh-inner {
+  pointer-events: none; display: inline-flex; align-items: center; gap: 10px;
+  font-size: 18px; font-weight: 700; color: rgba(55,65,81,0.9);
+  text-shadow: 0 1px 1px rgba(255,255,255,.6);
+}
+.sh-dot { color: #9ca3af; margin-right: 4px; animation: sh-sparkle 1.8s ease-in-out infinite; }
+.sh-chevrons { display: inline-flex; gap: 2px; margin-left: 6px; opacity: .9; animation: sh-bounce 1.6s ease-in-out infinite; }
+.sh-chevrons svg { animation: sh-bounce 1.6s ease-in-out infinite; }
+
+@keyframes sh-sparkle { 0%,100%{filter:brightness(.9);transform:translateY(0)} 50%{filter:brightness(1.2);transform:translateY(-1px)} }
+@keyframes sh-bounce { 0%,100%{transform:translateY(0);opacity:.9} 50%{transform:translateY(2px);opacity:1} }

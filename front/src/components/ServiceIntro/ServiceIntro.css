@@ -1,0 +1,65 @@
+/* 전역 기본값(헤더 높이 보정) */
+:root { --sticky-top: 72px; }
+
+/* 래퍼/타이틀 */
+.si-wrap { width: 100%; max-width: 1280px; margin: 24px auto 0; }
+.si-title { font-size: 20px; font-weight: 700; margin: 8px 0 16px; color: #111; }
+
+/* 가로 네비 (sticky) */
+.si-stepNavWrap {
+  position: sticky; top: var(--sticky-top); z-index: 900;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: saturate(115%) blur(6px);
+  border: 1px solid #e5e7eb; border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  padding: 10px; margin-bottom: 16px;
+}
+.si-stepNav {
+  display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+}
+.si-stepNav::-webkit-scrollbar { height: 6px; }
+.si-stepNav::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+
+.si-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 12px; background: #fff;
+  border: 1px solid #e5e7eb; border-radius: 9999px;
+  font-size: 14px; color: #111; font-weight: 700; cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+  white-space: nowrap;
+}
+.si-pill:hover { background: #f7faff; }
+.si-pill.isActive { border-color: #1d4ed8; background: #eef6ff; color: #1d4ed8; }
+.si-pillNum { width: 22px; height: 22px; border-radius: 9999px; background: currentColor; color:#fff; display:grid; place-items:center; font-size:12px; font-weight:800; }
+.si-pillText { line-height: 1; }
+
+/* 섹션 레이아웃(테두리 없음) */
+.si-rows { display: grid; row-gap: 48px; } /* 필요 시 props로 조절 */
+.si-row {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 24px; align-items: center; padding: 4px 2px;
+}
+@media (max-width: 960px) { .si-row { grid-template-columns: 1fr; gap: 16px; } }
+
+/* 좌측 미디어 */
+.si-media { background: #000; border-radius: 14px; overflow: hidden; }
+.si-video { width: 100%; height: 100%; display: block; aspect-ratio: 16/9; }
+
+/* 이미지 슬라이드쇼 */
+.si-slideWrap { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background:#000; }
+.si-slideImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.si-slideStage { position: relative; width: 100%; height: 100%; }
+
+/* 플레이스홀더 */
+.si-placeholder { width: 100%; aspect-ratio: 16/9; display: grid; place-items: center; background: #0a0a0a; color: #ccc; text-align: center; }
+.si-phThumb { width: 320px; max-width: 80%; height: 180px; border-radius: 8px; background: linear-gradient(90deg,#1a1a1a,#333,#1a1a1a); animation: si-pulse 1.6s ease-in-out infinite; margin: 0 auto 10px; }
+.si-phText { font-size: 13px; color: #bbb; }
+@keyframes si-pulse { 0%{filter:brightness(.9)} 50%{filter:brightness(1.08)} 100%{filter:brightness(.9)} }
+
+/* 우측 텍스트 */
+.si-text { padding: 4px 6px; }
+.si-textHead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.si-num { width: 26px; height: 26px; border-radius: 9999px; background: #1d4ed8; color:#fff; display:grid; place-items:center; font-weight: 800; font-size: 12px; }
+.si-textTitle { margin: 0; font-size: 20px; font-weight: 800; color: #111; }
+.si-textDesc { margin: 8px 2px 0; color: #374151; line-height: 1.6; }
