@@ -1,5 +1,6 @@
 from azure.storage.blob import BlobServiceClient
 import os
+from datetime import datetime
 
 
 def savefile(file_obj, file_type):
@@ -11,11 +12,11 @@ def savefile(file_obj, file_type):
     container_client = blob_service_client.get_container_client(CONTAINER_NAME)
 
     import uuid
-    if file_type.lower() == '.jpeg':
+    if file_type.lower() == '.png':
         blob_name = "image-" + str(uuid.uuid4())
         blob_path = "images/" + blob_name + file_type
     elif file_type.lower() == '.pdf':
-        blob_name = "report-" + str(uuid.uuid4())
+        blob_name = "report_" + datetime.today().strftime("%Y-%m-%d")
         blob_path = "reports/" + blob_name + file_type
     elif file_type.lower() == '.docx':
         blob_name = "proposal-" + str(uuid.uuid4())

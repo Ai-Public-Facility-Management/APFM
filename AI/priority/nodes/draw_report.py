@@ -9,6 +9,8 @@ from datetime import datetime, date
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 import textwrap
+from azure_save import savefile
+from io import BytesIO
 
 def format_inspection_date(inspection_date):
     if isinstance(inspection_date, (datetime, date)):
@@ -88,8 +90,9 @@ BOTTOM_MARGIN = 60
 LINE_SPACING = 20
 PAGE_WIDTH, PAGE_HEIGHT = A4
 
-def draw_report(parsed_sections, inspection_date, facilities, output="report.pdf"):
-    c = canvas.Canvas(output, pagesize=A4)
+def draw_report(parsed_sections, inspection_date, facilities):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
     width, height = PAGE_WIDTH, PAGE_HEIGHT
     y = height - TOP_MARGIN
 
@@ -176,12 +179,14 @@ def draw_report(parsed_sections, inspection_date, facilities, output="report.pdf
             max_width = PAGE_WIDTH - RIGHT_MARGIN - x  # 글자가 들어갈 최대 너비 계산
             y = draw_wrapped_text(c, line, x, y, fontname, fontsize, max_width, LINE_SPACING)
     c.save()
+    buffer.seek(0)
+    return buffer
 
 def draw_report_node(state: dict) -> dict:
     parsed_sections = state.get("parsed_sections")
     date = state.get("inspection_date")
     facilities = state.get("facilities")
-    output = state.get("pdf_report_path", "정기점검보고서.pdf")
-    draw_report(parsed_sections, date, facilities, output=output)
-    state["pdf_report_path"] = output
+    file = draw_report(parsed_sections, date, facilities)
+    path = savefile(file,'.pdf')
+    state["pdf_report_path"] = path
     return state
