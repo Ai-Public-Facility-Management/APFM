@@ -16,7 +16,7 @@ import java.util.Date;
 public class PublicFa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     //시설물 종류

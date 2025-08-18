@@ -14,7 +14,7 @@ import java.util.List;
 public class Camera {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //카메라 위치(ex) 5번지 4번 카메라)
     private String location;

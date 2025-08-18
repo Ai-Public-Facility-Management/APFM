@@ -15,6 +15,7 @@ azure:
   account_name: ${ACCOUNT_NAME}
   connection_string: ${CONNECTION_STRING}
   container_name: ${CONTAINER_NAME}
+
 spring:
   config:
     activate:
@@ -30,17 +31,17 @@ spring:
 
 
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://apfm-mysql-server.mysql.database.azure.com:3306/apfm?useSSL=true&requireSSL=false&serverTimezone=UTC
+    username: mysqladmin
+    password: root1234!
+    driver-class-name: com.mysql.cj.jdbc.Driver
     
-  h2:
-    console:
-      enabled: true
-      path: /h2-console  
-      settings:
-        web-allow-others: true
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
+#      settings:
+#        web-allow-others: true
 
 
   jpa:
@@ -53,12 +54,6 @@ spring:
         show_sql: true
         format_sql: true
         implicit_naming_strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
-
-  # sql:
-  #   init:
-  #     mode: always
-
-
 
   mail:
     host: smtp.gmail.com
@@ -105,10 +100,10 @@ spring:
           destination: server
 #>>> EDA / Topic Name
           contentType: application/json
-  sql:
-    init:
-      mode: always
-      encoding: UTF-8
+#  sql:
+#    init:
+#      mode: always
+#      encoding: UTF-8
 
 logging:
   level:
