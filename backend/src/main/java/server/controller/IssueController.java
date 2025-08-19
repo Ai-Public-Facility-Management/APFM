@@ -5,15 +5,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
-import server.domain.*;
-import server.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 import server.domain.Issue;
-import server.domain.ResultReport;
-import server.dto.IssueDTO;
-import server.repository.ResultReportRepository;
-import server.service.AzureService;
 import server.service.IssueService;
 
 import java.io.IOException;

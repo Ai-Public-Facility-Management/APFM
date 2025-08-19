@@ -33,13 +33,6 @@ public class Issue {
     @Column(length = 500)
     private String estimateBasis;
 
-    @Column(length = 500)
-    private String estimateReferences;
-
-    private Long obstruction;
-
-    @Column(length = 500)
-    private String obstructionBasis;
 
     @Column(length = 500)
     private String visionAnalysis;
@@ -62,8 +55,6 @@ public class Issue {
         this.type = IssueType.valueOf(detection.getIssueType());
         this.estimate = detection.getEstimate();
         this.estimateBasis = detection.getEstimateBasis();
-        this.obstruction = detection.getObstruction();
-        this.obstructionBasis = detection.getObstructionBasis();
         this.visionAnalysis = detection.getVisionAnalysis();
         this.creationDate = new Date();
         this.isProcessing = false;

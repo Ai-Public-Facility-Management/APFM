@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import server.domain.*;
-import server.dto.*;
-import server.repository.CameraRepository;
+import server.dto.DashboardIssue;
+import server.dto.InspectionResultDTO;
+import server.dto.PublicFaDetail;
+import server.dto.PublicFaSummary;
 import server.repository.PublicFaRepository;
 
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class PublicFaService {
     @Autowired
     PublicFaRepository publicFaRepository;
     @Autowired
-    CameraRepository  cameraRepository;
+    AzureService azureService;
 
 
     // 수정 필요
@@ -41,40 +43,19 @@ public class PublicFaService {
             if (iou >= IOU_THRESHOLD) {
                 if (savedFa.getType() == type)
                     return savedFa;
-                else
-                    return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,image));
+                return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,detection));
             }
         }
         // 중복 아닌 경우 저장
-        return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,image));
+        return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,detection));
     }
 
-//    @Transactional
-//    public PublicFa addPublicFa(Long cameraId, String publicFaType,List<Integer> box,String publicFaStatus,String image) {
-//        // 저장된 상태인 객체들만 조회
-//        List<PublicFa> savedFas = publicFaRepository.findByCameraId(cameraId);
-//        Camera camera = cameraRepository.findById(cameraId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-//        PublicFaType type = PublicFaType.valueOf(publicFaType);
-//        Section section = new Section(box);
-//        PublicFaDTO dto = new PublicFaDTO(type,section,FacilityStatus.valueOf(publicFaStatus));
-//        for (PublicFa savedFa : savedFas) {
-//            double iou = calculateIoU(section, savedFa.getSection());
-//            double IOU_THRESHOLD = 0.5;
-//            if (iou >= IOU_THRESHOLD) {
-//                if (savedFa.getType() == type)
-//                    return savedFa;
-//                else
-//                    return publicFaRepository.save(new PublicFa(dto,camera));
-//            }
-//        }
-//        // 중복 아닌 경우 저장
-//        return publicFaRepository.save(new PublicFa(dto,camera));
-//    }
 
 
     public PublicFaDetail viewFa(Long id){
         PublicFa publicFa = publicFaRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return new PublicFaDetail(publicFa);
+
+        return new PublicFaDetail(publicFa,azureService.azureBlobSas(publicFa.getImage().getUrl()));
     }
 
     public List<DashboardIssue>viewTopFas(int count){
@@ -93,8 +74,6 @@ public class PublicFaService {
             else
                 issue.setIssueType(null);
 
-            //이슈사항에 제안서가 작성되어 있으면 공사중 표시
-
             issues.add(issue);
         });
         return issues;
@@ -105,20 +84,14 @@ public class PublicFaService {
         return publicFaPage.map(PublicFaSummary::new);
     }
 
-    // 수정 필요
-    public PublicFa approveFa(Long id){
-        PublicFa publicFa = publicFaRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        publicFa.setStatus(FacilityStatus.NORMAL);
-        return publicFaRepository.save(publicFa);
-    }
 
-    @Transactional
-    public PublicFa updateFa(PublicFaDTO publicFaDTO){
-        PublicFa publicFa = publicFaRepository.findById(publicFaDTO.getId()).orElseThrow(
-                () -> new RuntimeException("해당 Id의 시설물이 없습니다.")
-        );
-        return publicFaRepository.save(publicFa.updateFa(publicFaDTO));
-    }
+//    @Transactional
+//    public PublicFa updateFa(PublicFaDTO publicFaDTO){
+//        PublicFa publicFa = publicFaRepository.findById(publicFaDTO.getId()).orElseThrow(
+//                () -> new RuntimeException("해당 Id의 시설물이 없습니다.")
+//        );
+//        return publicFaRepository.save(publicFa.updateFa(publicFaDTO));
+//    }
 
     @Transactional
     public void deleteFa(Long id){

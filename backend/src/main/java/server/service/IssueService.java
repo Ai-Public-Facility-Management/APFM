@@ -1,22 +1,23 @@
 package server.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import server.domain.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import server.domain.File;
 import server.domain.Issue;
 import server.domain.PublicFa;
+import server.domain.ResultReport;
 import server.dto.InspectionResultDTO;
-import server.dto.IssueDTO;
 import server.dto.IssueDetail;
-
-import server.repository.*;
+import server.repository.InspectionRepository;
+import server.repository.IssueRepository;
+import server.repository.PublicFaRepository;
+import server.repository.ResultReportRepository;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,17 +38,17 @@ public class IssueService {
     @Autowired
     private ResultReportRepository resultRepository;
 
-    public int countRepairIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
-    }
-
-    public int countRemovalIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
-    } // 점검별 remove 이슈
-
-    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
-        return issueRepository.findByInspection_Id(inspectionId);
-    }
+//    public int countRepairIssues(Long inspectionId) {
+//        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
+//    }
+//
+//    public int countRemovalIssues(Long inspectionId) {
+//        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
+//    } // 점검별 remove 이슈
+//
+//    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
+//        return issueRepository.findByInspection_Id(inspectionId);
+//    }
 
 
 
@@ -56,9 +57,6 @@ public class IssueService {
         return issueRepository.save(issue);
     }
 
-    public void deleteIssue(IssueDTO issueDTO) {
-        issueRepository.deleteById(issueDTO.getId());
-    }
 
     public String uploadResult(MultipartFile file, Long publicFaId) throws IOException {
         ResultReport resultReport = new ResultReport();

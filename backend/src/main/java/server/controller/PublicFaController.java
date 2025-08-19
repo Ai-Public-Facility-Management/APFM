@@ -6,8 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.domain.PublicFa;
-import server.dto.PublicFaDTO;
 import server.service.PublicFaService;
 
 import java.util.HashMap;
@@ -25,7 +23,7 @@ public class PublicFaController {
 
     @GetMapping(value="/all")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> viewAllPublicFa(@PageableDefault(size = 15) Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> viewAllPublicFa(@PageableDefault(size = 16) Pageable pageable) {
         Map<String, Object> response = new HashMap<>();
         response.put("publicFas", publicFaService.viewAllFas(pageable));
         return ResponseEntity.ok(response);
@@ -48,24 +46,18 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-
-
-    @PostMapping("/approve")
-    public PublicFa approveBox(@RequestParam Long id) {
-        return publicFaService.approveFa(id);
-    }
-
-    @PutMapping
-    @ResponseBody
-    public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
-        return publicFaService.updateFa(publicFaDTO);
-    }
-
-    @DeleteMapping
-    @ResponseBody
-    public void deleteFa(@RequestParam Long id) {
-        publicFaService.deleteFa(id);
-    }
+//
+//    @PutMapping
+//    @ResponseBody
+//    public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
+//        return publicFaService.updateFa(publicFaDTO);
+//    }
+//
+//    @DeleteMapping
+//    @ResponseBody
+//    public void deleteFa(@RequestParam Long id) {
+//        publicFaService.deleteFa(id);
+//    }
 
 }
 

@@ -29,6 +29,7 @@ public class InspectionService {
     private final IssueService issueService;
     private final PublicFaService publicFaService;
     private final CameraRepository cameraRepository;
+    private final AzureService azureService;
 
     private static final SimpleDateFormat DETAIL_FMT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
@@ -157,7 +158,11 @@ public class InspectionService {
 
                     InspectionDetailDTO.Camera camDto = new InspectionDetailDTO.Camera();
                     camDto.setCameraName(camera.getLocation()); // 또는 camera.getName()
-                    camDto.setImageUrl(camera.getImage() != null ? camera.getImage().getUrl() : null); // 엔티티 필드명에 맞게 조정
+                    if(camera.getImage() != null){
+                        camDto.setImageUrl(azureService.azureBlobSas(camera.getImage().getUrl()));
+                    }else{
+                        camDto.setImageUrl(null);
+                    }
 
                     List<InspectionDetailDTO.IssueItem> issueItems = new ArrayList<>();
                     for (Issue issue : cameraIssues) {
@@ -167,7 +172,7 @@ public class InspectionService {
                         issueItem.setType(issue.getType() != null ? issue.getType().getDisplayName() : null);
                         issueItem.setEstimate(issue.getEstimate());
                         issueItem.setEstimateBasis(issue.getEstimateBasis());
-                        issueItem.setObstruction(issue.getObstruction());
+                        issueItem.setObstruction(issue.getPublicFa().getObstruction());
                         issueItems.add(issueItem);
                     }
 

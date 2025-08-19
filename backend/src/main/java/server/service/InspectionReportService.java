@@ -44,7 +44,7 @@ public class InspectionReportService {
             dto.setName(issue.getPublicFa().getType().name());
             dto.setDamage(issue.getType().name());
             dto.setEstimated_cost(Math.toIntExact(issue.getEstimate()));
-            dto.setHindrance_level(String.valueOf(issue.getObstruction()));
+            dto.setHindrance_level(String.valueOf(issue.getPublicFa().getObstruction()));
             dto.setComplaints(0);
             dto.setLast_repair_date(issue.getPublicFa().getLastRepair());
             dto.setCost_basis(issue.getEstimateBasis());

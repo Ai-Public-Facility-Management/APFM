@@ -23,6 +23,7 @@ import server.repository.InspectionSettingRepository;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -67,7 +68,7 @@ public class InspectionSchedulerService {
     public void callDetect() {
         try {
             // 1️⃣ FastAPI 서버 URL
-            List<Camera> cameras = cameraRepository.findAll();
+            List<Long> camera_ids = cameraRepository.findAll().stream().map(Camera::getId).collect(Collectors.toList());
             String fastapiUrl = "http://localhost:8000/predict";
 
 //            // 2️⃣ 이미지 파일 준비 (나중에 CCTV 캡처 이미지로 교체)
@@ -76,7 +77,7 @@ public class InspectionSchedulerService {
 
             // 3️⃣ Multipart Form 구성
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("cctv", cameras);
+            body.add("camera_ids", camera_ids);
 
             // 4️⃣ HTTP Header 설정
             HttpHeaders headers = new HttpHeaders();
