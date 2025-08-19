@@ -36,10 +36,7 @@ export interface FacilityDetail {
   id: number;
   cameraName: string;
   type: string;
-  image: {
-    url: string;
-    description: string;
-  };
+  image: string;
   section: {
     width: number;
     height: number;
