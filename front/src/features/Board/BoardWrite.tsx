@@ -224,6 +224,9 @@ export default function BoardWrite() {
                   <span className="pw-file-name">선택된 파일 없음</span>
                 )}
               </div>
+              <small style={{ color: "red", display: "block", marginTop: "5px", fontSize: "12px", opacity: 0.8, fontWeight: "300" }}>
+              20MB 이하 jpg, jpeg, png 파일만 업로드 가능합니다.
+              </small>
             </div>
 
             {/* 🔹 AI 견적 생성 버튼 */}
