@@ -12,6 +12,7 @@ import {
 } from "../../api/dashboard";
 import { generateCCTVMarkerSvg } from "../../lib/markerSvg";
 import { useNavigate } from "react-router-dom";
+import em from "../../assets/emergency.png";
 
 export default function MainPage() {
   const mapRef = useRef<HTMLDivElement | null>(null);
@@ -250,7 +251,7 @@ export default function MainPage() {
                   <div className="table__cell w-120">종류</div>
                   <div className="table__cell w-220">카메라</div>
                   <div className="table__cell w-120">이슈</div>
-                  <div className="table__cell w-120">처리상태</div>
+                  <div className="table__cell w-120"></div>
                   <div className="table__cell" />
                 </div>
 
@@ -272,8 +273,18 @@ export default function MainPage() {
                     </div>
                     <div className="table__cell w-220 ellipsis">{fa.cameraName}</div>
                     <div className="table__cell w-120">{fa.issueType}</div>
-                    <div className="table__cell w-120">{fa.isProcessing ? "처리중" : "미처리"}</div>
-                    <div className="table__cell" />
+                    <div className="table__cell w-120 flex-end">
+                      {!fa.isProcessing ? (
+                          <div className="badge_em">
+                            <img src={em} alt="eme"/>
+                          </div>
+                      ) : (
+                          <div className="badge">
+                            <img src={em} alt="neme"/>
+                            <span>수리중</span>
+                          </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

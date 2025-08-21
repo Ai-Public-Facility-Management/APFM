@@ -12,6 +12,7 @@ import server.dto.InspectionDetailDTO;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,10 +55,10 @@ public class InspectionController {
 
     // ✅ 점검 보고서 생성 요청 (LLM)
     @PostMapping("/generate")
-    public ResponseEntity<InspectionReportDTO> generateReport(
-            @RequestBody InspectionReportDTO requestDTO) {
-        InspectionReportDTO response = inspectionReportService.generateReport(requestDTO.getIssueIds());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<String> generateReport(
+            @RequestBody InspectionReportDTO requestDTO) throws IOException {
+        inspectionReportService.generateReport(requestDTO);
+        return ResponseEntity.ok("");
     }
 
     // 점검 상세 페이지
@@ -68,14 +69,5 @@ public class InspectionController {
         res.put("data", data);
         return ResponseEntity.ok(res);
     }
-
-    //매 주기 마다 자동 실행됨
-//    // ✅ FastAPI 점검 결과 저장
-//    //점검 정보 저장
-//    @PostMapping("/result")
-//    public ResponseEntity<Void> saveInspectionResult(@RequestBody InspectionResultDTO dto) {
-//        inspectionService.saveInspectionResult(dto);
-//        return ResponseEntity.ok().build(); // 저장만 하고 응답은 200 OK
-//    }
 
 }

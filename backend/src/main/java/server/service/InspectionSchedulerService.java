@@ -2,17 +2,12 @@
 
 package server.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import server.domain.Camera;
 import server.domain.InspectionSetting;
@@ -21,8 +16,10 @@ import server.repository.CameraRepository;
 import server.repository.InspectionSettingRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,6 +30,7 @@ public class InspectionSchedulerService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final InspectionService inspectionService;
     private final CameraRepository  cameraRepository;
+    private final AzureService azureService;
 
     // ✅ [1] 주기적으로 점검 수행 (매시 정각 실행)
     @Scheduled(cron = "0 0 * * * *")
@@ -67,31 +65,34 @@ public class InspectionSchedulerService {
     public void callDetect() {
         try {
             // 1️⃣ FastAPI 서버 URL
-            List<Camera> cameras = cameraRepository.findAll();
-            String fastapiUrl = "http://localhost:8000/predict";
-
-//            // 2️⃣ 이미지 파일 준비 (나중에 CCTV 캡처 이미지로 교체)
-//            File imageFile = new File("AI/testimg/sample_image.png"); // 실제 경로로 수정 필요
-//            FileSystemResource fileResource = new FileSystemResource(imageFile);
+            List<Long> camera_ids = cameraRepository.findAll().stream().map(Camera::getId).collect(Collectors.toList());
+            camera_ids = azureService.getVideos(camera_ids);
+            String fastapiUrl = "http://localhost:8080/predict";
 
             // 3️⃣ Multipart Form 구성
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("cctv", cameras);
+            Map<String, Object> body = new HashMap<>();
+            body.put("camera_ids", camera_ids);
 
             // 4️⃣ HTTP Header 설정
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
             // 5️⃣ 요청 Entity 생성
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
     
-            // 6️⃣ 요청 전송
-            ResponseEntity<String> response = restTemplate.postForEntity(fastapiUrl, requestEntity, String.class);
-            log.info("✅ FastAPI 응답 수신 : {}", response.getBody());
 
-            // 7️⃣ 결과 DTO로 파싱 후 저장
-            ObjectMapper objectMapper = new ObjectMapper();
-            List<InspectionResultDTO> dtos = Collections.singletonList(objectMapper.readValue(response.getBody(), InspectionResultDTO.class));
+            ResponseEntity<List<InspectionResultDTO>> response =
+                    restTemplate.exchange(
+                            fastapiUrl,
+                            HttpMethod.POST,
+                            requestEntity,
+                            new ParameterizedTypeReference<>() {
+                            }
+                    );
+
+            log.info("✅ FastAPI 응답 수신 : {}", response.getBody());
+            List<InspectionResultDTO> dtos = response.getBody();
+            assert dtos != null;
             inspectionService.saveInspectionResult(dtos);
     
         } catch (Exception e) {

@@ -59,6 +59,11 @@
 .w-160 { width: 160px; }
 .w-220 { width: 220px; }
 .w-120 { width: 120px; }
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center; /* 세로 중앙 정렬 */
+}
 
 /* 상태/경고 */
 .color-danger { color: #d93025; }
@@ -178,4 +183,41 @@
 .link-like:hover {
   opacity: 0.7;
   text-decoration: none;
+}
+
+
+.badge_em {
+  display: flex;
+  align-items: center;     /* 세로 중앙 */
+  justify-content: center; /* 가로 중앙 */
+  padding: 6px 6px;
+  border-radius: 8px;
+  background-color: #e53935; /* 예: 긴급 빨강 */
+  width: 30px;   /* 필요에 맞게 크기 지정 */
+  height: 20px;  /* 필요에 맞게 크기 지정 */
+}
+
+.badge {
+  display: flex;
+  align-items: center;     /* 세로 중앙 */
+  justify-content: center; /* 가로 중앙 */
+  padding: 6px 28px;
+  border-radius: 8px;
+  background-color: #FFCE95; /* 예: 긴급 빨강 */
+  width: 30px;   /* 필요에 맞게 크기 지정 */
+  height: 20px;
+  gap: 5px;/* 필요에 맞게 크기 지정 */
+}
+.badge span {
+  color: #ffffff;
+  font-size: 15px;   /* 글자 크기 */
+  font-weight: bold; /* 굵게 */
+}
+.badge img {
+    width: 20px;
+    height: 20px;
+}
+.badge_em img {
+  width: 20px;   /* 원하는 크기 */
+  height: 20px;
 }

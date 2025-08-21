@@ -2,6 +2,7 @@ package server.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -18,6 +19,7 @@ public class Report {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "inspection_id", unique = true)
+    @ToString.Exclude
     private Inspection inspection;
 
 }

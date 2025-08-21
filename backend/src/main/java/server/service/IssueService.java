@@ -1,22 +1,22 @@
 package server.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import server.domain.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import server.domain.File;
 import server.domain.Issue;
 import server.domain.PublicFa;
+import server.domain.ResultReport;
 import server.dto.InspectionResultDTO;
-import server.dto.IssueDTO;
 import server.dto.IssueDetail;
-
-import server.repository.*;
+import server.repository.IssueRepository;
+import server.repository.PublicFaRepository;
+import server.repository.ResultReportRepository;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,34 +31,25 @@ public class IssueService {
     @Autowired
     private PublicFaRepository publicFaRepository;
     @Autowired
-    private InspectionRepository inspectionRepository;
-    @Autowired
     private AzureService azureService;
     @Autowired
     private ResultReportRepository resultRepository;
 
-    public int countRepairIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
+
+
+    public void deleteIssue(Issue issue){
+        if(issue != null){
+            issueRepository.deleteById(issue.getId());
+        }
     }
 
-    public int countRemovalIssues(Long inspectionId) {
-        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
-    } // 점검별 remove 이슈
-
-    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
-        return issueRepository.findByInspection_Id(inspectionId);
+    public void updateIssue(PublicFa fa, InspectionResultDTO.Detection detection) {
+        issueRepository.save(fa.getIssue().update(fa, detection));
+    }
+    public Issue addIssue(PublicFa fa,InspectionResultDTO.Detection detection) {
+        return issueRepository.save(new Issue(fa,detection));
     }
 
-
-
-    public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
-        Issue issue = new Issue(publicFa,detection);
-        return issueRepository.save(issue);
-    }
-
-    public void deleteIssue(IssueDTO issueDTO) {
-        issueRepository.deleteById(issueDTO.getId());
-    }
 
     public String uploadResult(MultipartFile file, Long publicFaId) throws IOException {
         ResultReport resultReport = new ResultReport();
@@ -68,6 +59,7 @@ public class IssueService {
             resultReport.setCreationDate(new Date());
             String path = azureService.azureBlobUpload(file,".pdf");
             resultReport.setFile(new File(path,"pdf"));
+            pfa.setLastRepair(new Date());
             resultRepository.save(resultReport);
             return azureService.azureBlobSas(path);
         }
@@ -100,16 +92,6 @@ public class IssueService {
         return details;
     }
 
-    public String setProcessing(List<Long> ids) {
-        List<Issue> issues =  issueRepository.findAllById(ids);
-        if(!issues.isEmpty()){
-            issues.forEach(issue -> {
-                issue.setProcessing(true);
-            });
-        }else
-            return "fail";
-        return "done";
-    }
 
 }
 

@@ -3,6 +3,7 @@ package server.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Inspection {
     @OneToMany(mappedBy = "inspection",fetch = FetchType.LAZY)
     private List<Issue> issues;
 
+    @ToString.Exclude
     @OneToOne(mappedBy = "inspection", cascade = CascadeType.ALL)
     private Report report;
 

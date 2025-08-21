@@ -170,7 +170,7 @@ export default function DetailPublicFa(){
 
                 <div className="detail-image">
                     {detail.image ? (
-                        <img src={detail.image.url} alt={detail.image.description || "이미지"} />
+                        <img src={detail.image} alt={"이미지"} />
                     ) : (
                         <p>이미지 없음</p>
                     )}

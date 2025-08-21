@@ -3,9 +3,11 @@ package server.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.dto.PublicFaDTO;
+import server.dto.InspectionResultDTO;
+
 
 import java.util.Date;
+import java.util.Objects;
 
 
 @Entity
@@ -16,7 +18,7 @@ import java.util.Date;
 public class PublicFa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     //시설물 종류
@@ -38,7 +40,9 @@ public class PublicFa {
     @Enumerated(EnumType.STRING)
     private FacilityStatus status;
 
-    private Long obstruction;
+    private String obstruction;
+
+    private String obstruction_basis;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "camera_id")
@@ -48,39 +52,28 @@ public class PublicFa {
     private Issue issue;
 
 
-    public PublicFa updateFa(PublicFaDTO publicFaDTO) {
-        this.setStatus(publicFaDTO.getStatus());
-        this.setObstruction(publicFaDTO.getObstruction());
-        this.setLastRepair(publicFaDTO.getLastRepair());
-        return this;
-    }
-
-    public PublicFa(PublicFaDTO publicFaDTO) {
-        this.setStatus(publicFaDTO.getStatus());
-        this.setObstruction(publicFaDTO.getObstruction());
-        this.setLastRepair(publicFaDTO.getLastRepair());
-        this.setType(publicFaDTO.getType());
-        this.setSection(publicFaDTO.getSection());
-        this.setInstallDate(publicFaDTO.getInstallDate());
-    }
-
-    public PublicFa(PublicFaDTO publicFaDTO,Camera camera) {
-        //수정 필요
-        this.setStatus(publicFaDTO.getStatus());
-        this.setType(publicFaDTO.getType());
-        this.setSection(publicFaDTO.getSection());
-        this.setCamera(camera);
-        this.setInstallDate(publicFaDTO.getInstallDate());
-        this.setLastRepair(publicFaDTO.getLastRepair());
-        this.setObstruction(publicFaDTO.getObstruction());
-    }
-
-    public PublicFa(PublicFaType type,Section section,FacilityStatus publicFaStatus,Camera camera,File image) {
+    public PublicFa(PublicFaType type,Section section,FacilityStatus publicFaStatus,Camera camera,InspectionResultDTO.Detection detection) {
         this.type = type;
         this.section = section;
         this.camera = camera;
         this.status = publicFaStatus;
-        this.image = image;
+        this.installDate = new Date();
+        this.lastRepair = new Date();
+        this.obstruction = detection.getObstruction();
+        this.obstruction_basis = detection.getObstructionBasis();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PublicFa other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
 }
 

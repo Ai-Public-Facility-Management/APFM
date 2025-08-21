@@ -14,6 +14,7 @@ import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class InspectionService {
     private final IssueService issueService;
     private final PublicFaService publicFaService;
     private final CameraRepository cameraRepository;
+    private final AzureService azureService;
 
     private static final SimpleDateFormat DETAIL_FMT = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
@@ -109,24 +111,38 @@ public class InspectionService {
 
     // ✅ FastAPI 응답 결과를 저장하는 메서드
     @Transactional
-    public void saveInspectionResult(List<InspectionResultDTO> results) {
+    public void saveInspectionResult(List<InspectionResultDTO> results) throws IOException {
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
+        inspection.setIssues(new ArrayList<>());
         inspectionRepository.save(inspection);
         // 리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            Camera camera = cameraRepository.findById(dto.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-            camera.setImage(dto.getOriginal_image(),"image");
+            Camera camera = cameraRepository.findById(dto.getCamera_id()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+            camera.setImage(new File(azureService.azureSaveFile(dto.getOriginal_image(),camera.getId(),"camera"),"image"));
             camera = cameraRepository.save(camera);
             for(InspectionResultDTO.Detection detection : dto.getDetections()){
-                if(detection.getIssueType().equals("NONE")) {
-                    publicFaService.addPublicFa(camera,detection,"NORMAL");
+                if(detection.getIssueType().equals("정상")) {
+                    PublicFa fa = publicFaService.addPublicFa(camera,detection,"NORMAL");
+                    if(fa.getStatus().equals(FacilityStatus.ABNORMAL)){
+                        issueService.deleteIssue(fa.getIssue());
+                        fa.setIssue(null);
+                        fa.setStatus(FacilityStatus.NORMAL);
+                    }
                 }else{
-                    PublicFa publicFa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
-                    Issue issue = issueService.addIssue(publicFa,detection);
-                    publicFa.setIssue(issue);
+                    PublicFa fa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
+                    fa.setStatus(FacilityStatus.ABNORMAL);
+                    if(fa.getIssue() != null ){
+                        if(!fa.getIssue().isProcessing())
+                            issueService.updateIssue(fa,detection);
+
+                        return;
+                    }
+                    Issue issue = issueService.addIssue(fa,detection);
+                    fa.setIssue(issue);
                     inspection.getIssues().add(issue);
+                    issue.setInspection(inspection);
                 }
             }
         }
@@ -157,7 +173,11 @@ public class InspectionService {
 
                     InspectionDetailDTO.Camera camDto = new InspectionDetailDTO.Camera();
                     camDto.setCameraName(camera.getLocation()); // 또는 camera.getName()
-                    camDto.setImageUrl(camera.getImage() != null ? camera.getImage().getUrl() : null); // 엔티티 필드명에 맞게 조정
+                    if(camera.getImage() != null){
+                        camDto.setImageUrl(azureService.azureBlobSas(camera.getImage().getUrl()));
+                    }else{
+                        camDto.setImageUrl(null);
+                    }
 
                     List<InspectionDetailDTO.IssueItem> issueItems = new ArrayList<>();
                     for (Issue issue : cameraIssues) {
@@ -167,7 +187,7 @@ public class InspectionService {
                         issueItem.setType(issue.getType() != null ? issue.getType().getDisplayName() : null);
                         issueItem.setEstimate(issue.getEstimate());
                         issueItem.setEstimateBasis(issue.getEstimateBasis());
-                        issueItem.setObstruction(issue.getObstruction());
+                        issueItem.setObstruction(issue.getPublicFa().getObstruction());
                         issueItems.add(issueItem);
                     }
 

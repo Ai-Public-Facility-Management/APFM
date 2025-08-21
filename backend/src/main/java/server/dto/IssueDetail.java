@@ -10,7 +10,7 @@ public class IssueDetail {
     private PublicFaType publicFaType;
     private String cameraName;
     private IssueType condition;
-    private Long obstruction;
+    private String obstruction;
     private File image;
     private Long estimate;
     private String estimateBasis;
