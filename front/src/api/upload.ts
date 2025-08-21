@@ -3,12 +3,14 @@ import { AxiosProgressEvent } from "axios";
 
 export async function uploadResult(
     file: File,
+    publicFa_id: number,
     onProgress: (percent: number) => void
 ) {
     const formData = new FormData();
     formData.append("file", file);
-
-    await api.post("/api/upload/result", formData, {
+    // @ts-ignore
+    formData.append("publicFa_id",publicFa_id);
+    await api.post("/api/issue/result", formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         },

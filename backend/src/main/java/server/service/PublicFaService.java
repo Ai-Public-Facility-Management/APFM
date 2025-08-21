@@ -16,6 +16,7 @@ import server.dto.PublicFaDetail;
 import server.dto.PublicFaSummary;
 import server.repository.PublicFaRepository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,30 +32,34 @@ public class PublicFaService {
 
     // 수정 필요
     @Transactional
-    public PublicFa addPublicFa(Camera camera,InspectionResultDTO.Detection detection,String publicFaStatus) {
+    public PublicFa addPublicFa(Camera camera,InspectionResultDTO.Detection detection,String publicFaStatus) throws IOException {
         // 저장된 상태인 객체들만 조회
         List<PublicFa> savedFas = publicFaRepository.findByCameraId(camera.getId());
-        PublicFaType type = PublicFaType.valueOf(detection.getPublicFaType());
+        PublicFaType type = PublicFaType.valueOf(detection.getPublicFaType().toUpperCase());
+        FacilityStatus status = FacilityStatus.valueOf(publicFaStatus);
         Section section = new Section(detection.getBox());
-        File image = new File(detection.getCrop_image(),"image");
         for (PublicFa savedFa : savedFas) {
             double iou = calculateIoU(section, savedFa.getSection());
             double IOU_THRESHOLD = 0.5;
             if (iou >= IOU_THRESHOLD) {
-                if (savedFa.getType() == type)
+                if (savedFa.getType() == type) {
                     return savedFa;
-                return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,detection));
+                }
+                PublicFa fa = publicFaRepository.save(new PublicFa(type,section,status,camera,detection));
+                fa.setImage(new File(azureService.azureSaveFile(detection.getCrop_image(),fa.getId(),"facility"),"image"));
+                return publicFaRepository.save(fa);
             }
         }
         // 중복 아닌 경우 저장
-        return publicFaRepository.save(new PublicFa(type,section,FacilityStatus.valueOf(publicFaStatus),camera,detection));
+        PublicFa fa = publicFaRepository.save(new PublicFa(type,section,status,camera,detection));
+        fa.setImage(new File(azureService.azureSaveFile(detection.getCrop_image(),fa.getId(),"facility"),"image"));
+        return publicFaRepository.save(fa);
     }
 
 
 
     public PublicFaDetail viewFa(Long id){
         PublicFa publicFa = publicFaRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-
         return new PublicFaDetail(publicFa,azureService.azureBlobSas(publicFa.getImage().getUrl()));
     }
 
@@ -85,18 +90,7 @@ public class PublicFaService {
     }
 
 
-//    @Transactional
-//    public PublicFa updateFa(PublicFaDTO publicFaDTO){
-//        PublicFa publicFa = publicFaRepository.findById(publicFaDTO.getId()).orElseThrow(
-//                () -> new RuntimeException("해당 Id의 시설물이 없습니다.")
-//        );
-//        return publicFaRepository.save(publicFa.updateFa(publicFaDTO));
-//    }
 
-    @Transactional
-    public void deleteFa(Long id){
-        publicFaRepository.deleteById(id);
-    }
 
     private double calculateIoU(Section boxA, Section boxB) {
         //좌표 배열 [x_center, y_center, width, height]

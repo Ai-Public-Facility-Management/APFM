@@ -4,18 +4,21 @@ from pydantic import BaseModel
 import os, uuid, io, base64
 from PIL import Image, ImageDraw
 import cv2
+import re
+from io import BytesIO
+from typing import List
+from pathlib import Path
 from model_config import (
     yolo_model, class_names, clip_device
 )
 from predict_high.estimate_util import run_estimate
 from tracking_module.tracking import track_multiple_facilities_analysis  # ← 방해도 분석 함수 import
-
 router = APIRouter()
 
 # ---------- 유틸 ----------
 def pil_to_base64(pil_img):
     buf = io.BytesIO()
-    pil_img.save(buf, format='JPEG')
+    pil_img.save(buf, format='PNG')
     return base64.b64encode(buf.getvalue()).decode('utf-8')
 
 def expand_box(x1, y1, x2, y2, img_w, img_h, pad_px=40):
@@ -36,32 +39,35 @@ def get_first_frame(video_path):
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     return Image.fromarray(frame_rgb)
 
-# ---------- 요청 모델 ----------
-class FolderPathRequest(BaseModel):
-    video_folder: str
+# # ---------- 요청 모델 ----------
+# class FolderPathRequest(BaseModel):
+#     camera_ids : List[int]
 
 # ---------- 라우트 ----------
-@router.post("/predict-regular-video")
-async def predict_regular_video(req: FolderPathRequest):
-    video_folder = req.video_folder
-
-    if not os.path.exists(video_folder) or not os.path.isdir(video_folder):
+@router.post("/predict")
+async def predict_regular_video():
+    BASE_DIR = Path(__file__).parent
+    save_folder = BASE_DIR / "videos"
+    if not os.path.exists(save_folder) or not os.path.isdir(save_folder):
         raise HTTPException(status_code=400, detail="유효한 동영상 폴더 경로가 아닙니다.")
 
     valid_exts = {'.mp4', '.avi', '.mov', '.mkv'}
+
     video_paths = sorted([
-        os.path.join(video_folder, f)
-        for f in os.listdir(video_folder)
+        os.path.join(save_folder, f)
+        for f in os.listdir(save_folder)
         if os.path.splitext(f)[1].lower() in valid_exts
     ])
 
     if not video_paths:
         raise HTTPException(status_code=404, detail="폴더 내에 동영상 파일이 없습니다.")
 
-    result_dict = {}
+    result_dict = []
 
     for video_path in video_paths:
-        camera_id = os.path.splitext(os.path.basename(video_path))[0]
+        filename = os.path.splitext(os.path.basename(video_path))[0]
+        match = re.search(r'\d+', filename)
+        camera_id = int(match.group()) if match else None
         try:
             # 첫 프레임 추출
             img = get_first_frame(video_path)
@@ -106,26 +112,20 @@ async def predict_regular_video(req: FolderPathRequest):
 
                 # 크롭 저장
                 cropped = img.crop((x1e, y1e, x2e, y2e))
-                crop_filename = f"crop_{camera_id}_{unique_id}_{idx}.jpg"
-                crop_path = os.path.join("temp/crops", crop_filename)
-                cropped.save(crop_path)
-                crop_paths.append(crop_path)
-
+                # base64
                 b64_cropped = pil_to_base64(cropped)
 
                 # 견적 분석
                 est_result = run_estimate(b64_original, b64_cropped, [x1e, y1e, x2e, y2e], "gpt-5")
 
                 detection_results.append({
-                    "class": class_name,
-                    "confidence": float(score),
-                    "box": [x1, y1, x2, y2],
-                    "expand_box": [x1e, y1e, x2e, y2e],
-                    "status": est_result.get("status"),
+                    "publicFaType": class_name,
+                    "box": [x1e, y1e, x2e, y2e],
+                    "issueType": est_result.get("status"),
                     "vision_analysis": est_result.get("vision_analysis"),
                     "estimate": est_result.get("estimate"),
                     "estimate_basis": est_result.get("estimate_basis"),
-                    "crop_path": crop_path,
+                    "crop_image": b64_cropped,
                     "obstruction": None,           # 나중에 채움
                     "obstructionBasis": None       # 나중에 채움
                 })
@@ -140,19 +140,26 @@ async def predict_regular_video(req: FolderPathRequest):
                 for det, obs in zip(detection_results, obstruction_results):
                     det["obstruction"] = obs["score"]
                     det["obstructionBasis"] = obs["analysis_text"]
-
-            # 원본+박스 이미지 저장
-            boxed_image_path = f"temp/original/boxed_{camera_id}_{unique_id}.jpg"
-            img_with_boxes.save(boxed_image_path)
-
-            result_dict[camera_id] = {
+            
+            b64_camera = pil_to_base64(img_with_boxes)
+                
+            
+            result_dict.append(
+                {
                 "camera_id": camera_id,
-                "original_image_path": boxed_image_path,
-                "crop_image_paths": crop_paths,
+                "original_image": b64_camera,
                 "detections": detection_results
             }
+            )
+            
 
         except Exception as e:
-            result_dict[camera_id] = {"error": f"동영상 처리 중 오류: {str(e)}"}
+            result_dict.append(
+                {
+                "camera_id": camera_id,
+                "original_image": "이미지 생성 실패",
+                "detections": detection_results
+            }
+            )
 
     return result_dict

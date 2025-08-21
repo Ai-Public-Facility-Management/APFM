@@ -11,6 +11,7 @@ import lombok.Data;
 public class ResultReport {
     //시공 완료 보고서
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Embedded

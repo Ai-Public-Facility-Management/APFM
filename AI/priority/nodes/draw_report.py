@@ -9,8 +9,8 @@ from datetime import datetime, date
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 import textwrap
-from azure_save import savefile
 from io import BytesIO
+import base64
 
 def format_inspection_date(inspection_date):
     if isinstance(inspection_date, (datetime, date)):
@@ -187,6 +187,6 @@ def draw_report_node(state: dict) -> dict:
     date = state.get("inspection_date")
     facilities = state.get("facilities")
     file = draw_report(parsed_sections, date, facilities)
-    path = savefile(file,'.pdf')
-    state["pdf_report_path"] = path
+    b64_file = base64.b64encode(file.read()).decode('utf-8')
+    state["pdf_report_path"] = b64_file
     return state

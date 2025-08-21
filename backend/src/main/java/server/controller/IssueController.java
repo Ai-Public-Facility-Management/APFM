@@ -44,7 +44,7 @@ public class IssueController {
     @Transactional
     public ResponseEntity<Map<String,String>> uploadReport(@RequestParam("file") MultipartFile file, @RequestParam Long publicFa_id) throws IOException {
         Map<String, String> response = new HashMap<>();
-        response.put("path", issueService.uploadResult(file,publicFa_id));
+        issueService.uploadResult(file,publicFa_id);
         return ResponseEntity.ok(response);
 
     }

@@ -14,6 +14,7 @@ import server.repository.CameraRepository;
 import server.repository.InspectionRepository;
 import server.repository.InspectionSettingRepository;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,24 +111,38 @@ public class InspectionService {
 
     // ✅ FastAPI 응답 결과를 저장하는 메서드
     @Transactional
-    public void saveInspectionResult(List<InspectionResultDTO> results) {
+    public void saveInspectionResult(List<InspectionResultDTO> results) throws IOException {
         // Inspection 생성
         Inspection inspection = new Inspection();
         inspection.setCreateDate(new Date());
+        inspection.setIssues(new ArrayList<>());
         inspectionRepository.save(inspection);
         // 리스트 순회하여 저장
         for (InspectionResultDTO dto : results) {
-            Camera camera = cameraRepository.findById(dto.getCameraId()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-            camera.setImage(dto.getOriginal_image(),"image");
+            Camera camera = cameraRepository.findById(dto.getCamera_id()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+            camera.setImage(new File(azureService.azureSaveFile(dto.getOriginal_image(),camera.getId(),"camera"),"image"));
             camera = cameraRepository.save(camera);
             for(InspectionResultDTO.Detection detection : dto.getDetections()){
-                if(detection.getIssueType().equals("NONE")) {
-                    publicFaService.addPublicFa(camera,detection,"NORMAL");
+                if(detection.getIssueType().equals("정상")) {
+                    PublicFa fa = publicFaService.addPublicFa(camera,detection,"NORMAL");
+                    if(fa.getStatus().equals(FacilityStatus.ABNORMAL)){
+                        issueService.deleteIssue(fa.getIssue());
+                        fa.setIssue(null);
+                        fa.setStatus(FacilityStatus.NORMAL);
+                    }
                 }else{
-                    PublicFa publicFa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
-                    Issue issue = issueService.addIssue(publicFa,detection);
-                    publicFa.setIssue(issue);
+                    PublicFa fa = publicFaService.addPublicFa(camera,detection,"ABNORMAL");
+                    fa.setStatus(FacilityStatus.ABNORMAL);
+                    if(fa.getIssue() != null ){
+                        if(!fa.getIssue().isProcessing())
+                            issueService.updateIssue(fa,detection);
+
+                        return;
+                    }
+                    Issue issue = issueService.addIssue(fa,detection);
+                    fa.setIssue(issue);
                     inspection.getIssues().add(issue);
+                    issue.setInspection(inspection);
                 }
             }
         }

@@ -18,9 +18,10 @@ public class PublicFaDetail {
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date lastRepair;
     private String status;
-    private Long obstruction;
+    private String obstruction;
     private Long estimate;
     private String estimateBasis;
+    private boolean hasReport;
 
     public PublicFaDetail(PublicFa publicFa,String url) {
         this.id = publicFa.getId();
@@ -32,6 +33,7 @@ public class PublicFaDetail {
         if (publicFa.getIssue() != null) {
             this.estimate = publicFa.getIssue().getEstimate();
             this.estimateBasis = publicFa.getIssue().getEstimateBasis();
+            this.hasReport = publicFa.getIssue().getResultReport() != null;
         }
         this.section = publicFa.getSection();
         this.installDate = publicFa.getInstallDate();

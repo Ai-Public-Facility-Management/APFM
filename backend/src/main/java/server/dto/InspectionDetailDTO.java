@@ -24,7 +24,7 @@ public class InspectionDetailDTO {
         private String type;                //이슈사항 타입
         private Long estimate;              //견적
         private String estimateBasis;       //견적 근거
-        private Long obstruction;         //방해도
+        private String obstruction;         //방해도
 
     }
 }

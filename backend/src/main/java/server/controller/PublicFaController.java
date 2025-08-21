@@ -46,18 +46,6 @@ public class PublicFaController {
         return ResponseEntity.ok(response);
     }
 
-//
-//    @PutMapping
-//    @ResponseBody
-//    public PublicFa updateFa(@RequestBody PublicFaDTO publicFaDTO) {
-//        return publicFaService.updateFa(publicFaDTO);
-//    }
-//
-//    @DeleteMapping
-//    @ResponseBody
-//    public void deleteFa(@RequestParam Long id) {
-//        publicFaService.deleteFa(id);
-//    }
 
 }
 

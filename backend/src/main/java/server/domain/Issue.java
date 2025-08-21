@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import server.dto.InspectionResultDTO;
 
 import java.util.Date;
+import java.util.Objects;
 
 
 @Entity
@@ -30,7 +31,7 @@ public class Issue {
 
     private Long estimate;
 
-    @Column(length = 500)
+    @Column(length = 2000)
     private String estimateBasis;
 
 
@@ -52,12 +53,35 @@ public class Issue {
 
     public Issue(PublicFa publicFa, InspectionResultDTO.Detection detection) {
         this.publicFa = publicFa;
-        this.type = IssueType.valueOf(detection.getIssueType());
+        this.type = IssueType.fromDisplayName(detection.getIssueType());
         this.estimate = detection.getEstimate();
-        this.estimateBasis = detection.getEstimateBasis();
+        this.estimateBasis = detection.getEstimate_basis();
         this.visionAnalysis = detection.getVisionAnalysis();
         this.creationDate = new Date();
         this.isProcessing = false;
+    }
+
+    public Issue update(PublicFa publicFa, InspectionResultDTO.Detection detection) {
+        this.publicFa = publicFa;
+        this.type = IssueType.fromDisplayName(detection.getIssueType());
+        this.estimate = detection.getEstimate();
+        this.estimateBasis = detection.getEstimate_basis();
+        this.visionAnalysis = detection.getVisionAnalysis();
+        this.creationDate = new Date();
+        this.isProcessing = false;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PublicFa other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
 }
