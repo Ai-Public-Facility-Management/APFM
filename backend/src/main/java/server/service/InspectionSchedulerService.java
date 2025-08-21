@@ -2,6 +2,7 @@
 
 package server.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,6 +32,13 @@ public class InspectionSchedulerService {
     private final InspectionService inspectionService;
     private final CameraRepository  cameraRepository;
     private final AzureService azureService;
+
+    @PostConstruct
+    public void init() {
+        if(inspectionSettingRepository.count() == 0) {
+            inspectionSettingRepository.saveAndFlush(new InspectionSetting());
+        }
+    }
 
     // ✅ [1] 주기적으로 점검 수행 (매시 정각 실행)
     @Scheduled(cron = "0 0 * * * *")
