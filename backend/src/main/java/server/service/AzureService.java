@@ -20,7 +20,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.UUID;
 
 
 @Service
@@ -55,8 +54,12 @@ public class AzureService {
         return blobClient.getBlobUrl() + "?" + sasToken;
     }
 
-    public String azureBlobUpload(MultipartFile file,String type) throws IOException {
-        String blobName = UUID.randomUUID() + type;
+    public String azureBlobUpload(MultipartFile file,String type,Long id) throws IOException {
+        String blobName = switch (type) {
+            case "result" -> "camera/facility/result-report_" + id.toString() + ".docx";
+            case "board" -> "board/image_" + id.toString() + ".png";
+            default -> "fail/"+type+"_"+id.toString();
+        };
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(cnnectionString)
                 .buildClient();
@@ -73,7 +76,7 @@ public class AzureService {
             case "camera" -> "camera/image/camera_" + id.toString() + ".png";
             case "facility" -> "camera/facility/facility_" + id.toString() + ".png";
             case "report" -> "inspection/report_" + id.toString() + "_" + LocalDate.now() + ".pdf";
-            default -> "fail";
+            default -> "fail/"+type+"_"+id.toString();
         };
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(cnnectionString)

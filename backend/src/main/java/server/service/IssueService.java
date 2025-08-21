@@ -51,20 +51,20 @@ public class IssueService {
     }
 
 
-    public String uploadResult(MultipartFile file, Long publicFaId) throws IOException {
+    public void uploadResult(MultipartFile file, Long publicFaId) throws IOException {
         ResultReport resultReport = new ResultReport();
         PublicFa pfa = publicFaRepository.findById(publicFaId).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         if(pfa.getIssue() != null){
             resultReport.setIssue(pfa.getIssue());
             resultReport.setCreationDate(new Date());
-            String path = azureService.azureBlobUpload(file,".pdf");
-            resultReport.setFile(new File(path,"pdf"));
             pfa.setLastRepair(new Date());
-            resultRepository.save(resultReport);
+            resultReport = resultRepository.save(resultReport);
+            String path = azureService.azureBlobUpload(file,"result",resultReport.getId());
+            resultReport.setFile(new File(path,"docx"));
             pfa.getIssue().setResultReport(resultReport);
-            return azureService.azureBlobSas(path);
+            pfa.setLastRepair(new Date());
         }
-        return "해당 시설물에 이슈사항이 없습니다.";
+
     }
 
 

@@ -30,18 +30,18 @@ public class BoardService {
         Users author = usersRepo.findById(email)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         String url = null;
-        if(file != null){
-            url = azureService.azureBlobUpload(file,".png");
-        }
+
         BoardPost post = BoardPost.builder()
                 .type(req.type == null ? BoardPost.PostType.FREE : req.type)
                 .title(req.title)
-                .content(req.content)
-                .imageUrl(url) // 이미지 주소 저장
+                .content(req.content)// 이미지 주소 저장
                 .author(author) // Users 매핑
                 .build();
-
         post = postRepo.save(post);
+        if(file != null){
+            url = azureService.azureBlobUpload(file,"board",post.getId());
+        }
+        post.setImageUrl(url);
         boolean isAuthor = true;
         return toPostResp(post, 0L, isAuthor);
     }
@@ -103,7 +103,7 @@ public class BoardService {
 
         // 파일이 있으면 Azure에 업로드 후 이미지 URL 교체
         if (file != null && !file.isEmpty()) {
-            String url = azureService.azureBlobUpload(file, ".png");
+            String url = azureService.azureBlobUpload(file, "board",post.getId());
             post.setImageUrl(url);
         }
 
