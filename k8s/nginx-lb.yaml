@@ -1,0 +1,38 @@
+# [기능 요약] 퍼블릭 nginx를 LoadBalancer로 외부 노출 (헬로 월드용)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apfm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: apfm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: nginx }
+  template:
+    metadata:
+      labels: { app: nginx }
+    spec:
+      containers:
+        - name: nginx
+          # 필요한 import(이미지): Docker Hub 퍼블릭 이미지 사용
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  namespace: apfm
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80

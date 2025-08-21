@@ -1,0 +1,39 @@
+# [기능 요약] FastAPI 외부 노출(LoadBalancer)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+  namespace: apfm
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: fastapi }
+  template:
+    metadata:
+      labels: { app: fastapi }
+    spec:
+      containers:
+        - name: fastapi
+          # 필요한 import(이미지): ACR 경로 최신 반영
+          image: apfmregistry.azurecr.io/fastapi:latest
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            initialDelaySeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi
+  namespace: apfm
+spec:
+  type: LoadBalancer
+  selector:
+    app: fastapi
+  ports:
+    - port: 80
+      targetPort: 8000
