@@ -77,7 +77,7 @@ export default function DetailPublicFa(){
 
             // 업로드 시작
             newRows.forEach(row => {
-                uploadResult(row.file, (percent) => {
+                uploadResult(row.file,Number(id),(percent) => {
                     setReports(prev =>
                         prev.map(r =>
                             r.id === row.id ? { ...r, progress: percent } : r
@@ -91,6 +91,7 @@ export default function DetailPublicFa(){
                                 : r
                         )
                     );
+                    setDetail(prev => prev ? { ...prev, hasReport: true } : prev);
                 }).catch(() => {
                     alert(`${row.name} 업로드 실패`);
                     setReports(prev => prev.filter(r => r.id !== row.id));
@@ -179,58 +180,81 @@ export default function DetailPublicFa(){
             <hr className="custom-hr-2"/>
             <section className="report-section">
                 <h1 className="report-title">결과 보고서</h1>
+                {detail.hasReport ? (
+                    // 이미 보고서 있는 경우
+                    <div
+                        className="dropzone already-exists"
+                        role="alert"
+                        aria-label="결과 보고서 존재 안내"
+                    >
+                        <p className="drop-hint">
+                             결과 보고서를 등록하였습니다.
+                        </p>
+                        <button
+                            type="button"
+                            className="btn-primary"
+                            disabled
+                        >
+                            파일선택 불가
+                        </button>
+                    </div>
+                ) : (
+                    // 보고서 없는 경우 → 업로드 가능
+                    <>
+                        <div
+                            className={`dropzone ${isDragging ? "dragging" : ""}`}
+                            onDragOver={onDragOver}
+                            onDragEnter={onDragEnter}
+                            onDragLeave={onDragLeave}
+                            onDrop={onDrop}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) =>
+                                (e.key === "Enter" || e.key === " " ? onBrowseClick() : null)
+                            }
+                            aria-label="파일을 드래그하여 업로드하거나 클릭하여 선택"
+                        >
+                            <p className="drop-hint">
+                                첨부할 파일을 여기로 끌어 놓거나, 파일 선택 버튼을 직접 선택해주세요.
+                            </p>
+                            <button type="button" className="btn-primary" onClick={onBrowseClick}>
+                                파일선택
+                            </button>
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                multiple
+                                accept={ACCEPT_EXT.join(",")}
+                                className="sr-only"
+                                onChange={onInputChange}
+                            />
+                        </div>
 
-                <div
-                    className={`dropzone ${isDragging ? "dragging" : ""}`}
-                    onDragOver={onDragOver}
-                    onDragEnter={onDragEnter}
-                    onDragLeave={onDragLeave}
-                    onDrop={onDrop}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => (e.key === "Enter" || e.key === " " ? onBrowseClick() : null)}
-                    aria-label="파일을 드래그하여 업로드하거나 클릭하여 선택"
-                >
-                    <p className="drop-hint">
-                        첨부할 파일을 여기로 끌어 놓거나, 파일 선택 버튼을 직접 선택해주세요.
-                    </p>
-                    <button type="button" className="btn-primary" onClick={onBrowseClick}>
-                        파일선택
-                    </button>
-                    <input
-                        ref={inputRef}
-                        type="file"
-                        multiple
-                        accept={ACCEPT_EXT.join(",")}
-                        className="sr-only"
-                        onChange={onInputChange}
-                    />
-                </div>
-                <ul className="report-list">
-                    {reports.map((r) => (
-                        <li key={r.id} className="report-row">
-                            <div className="report-info">
-                                결과 보고서 | {r.name} {r.ext} [{r.sizeLabel}]
-                            </div>
-                            <div className="report-actions">
-                                {r.status === "uploading" ? (
-                                    <span className="upload-spinner" aria-label="업로드 중"/>
-                                ) : (
-                                    <span className="upload-done-circle" title="업로드 완료"/>
-                                )}
-                                <button
-                                    className="icon-btn"
-                                    aria-label="삭제"
-                                    onClick={() => removeOne(r.id)}
-                                >
-                                    ✕
-                                </button>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-
-
+                        <ul className="report-list">
+                            {reports.map((r) => (
+                                <li key={r.id} className="report-row">
+                                    <div className="report-info">
+                                        결과 보고서 | {r.name} {r.ext} [{r.sizeLabel}]
+                                    </div>
+                                    <div className="report-actions">
+                                        {r.status === "uploading" ? (
+                                            <span className="upload-spinner" aria-label="업로드 중"/>
+                                        ) : (
+                                            <span className="upload-done-circle" title="업로드 완료"/>
+                                        )}
+                                        <button
+                                            className="icon-btn"
+                                            aria-label="삭제"
+                                            onClick={() => removeOne(r.id)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
             </section>
         </Layout>
     );

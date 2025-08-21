@@ -60,7 +60,6 @@ public class PublicFaService {
 
     public PublicFaDetail viewFa(Long id){
         PublicFa publicFa = publicFaRepository.findById(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-
         return new PublicFaDetail(publicFa,azureService.azureBlobSas(publicFa.getImage().getUrl()));
     }
 

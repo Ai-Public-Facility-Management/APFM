@@ -49,6 +49,8 @@ export interface FacilityDetail {
   obstruction: number;
   estimate: number;
   estimateBasis: string;
+  hasReport:boolean;
+
 }
 
 export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {

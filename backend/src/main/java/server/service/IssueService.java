@@ -61,6 +61,7 @@ public class IssueService {
             resultReport.setFile(new File(path,"pdf"));
             pfa.setLastRepair(new Date());
             resultRepository.save(resultReport);
+            pfa.getIssue().setResultReport(resultReport);
             return azureService.azureBlobSas(path);
         }
         return "해당 시설물에 이슈사항이 없습니다.";

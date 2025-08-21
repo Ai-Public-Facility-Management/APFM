@@ -21,6 +21,7 @@ public class PublicFaDetail {
     private String obstruction;
     private Long estimate;
     private String estimateBasis;
+    private boolean hasReport;
 
     public PublicFaDetail(PublicFa publicFa,String url) {
         this.id = publicFa.getId();
@@ -32,6 +33,7 @@ public class PublicFaDetail {
         if (publicFa.getIssue() != null) {
             this.estimate = publicFa.getIssue().getEstimate();
             this.estimateBasis = publicFa.getIssue().getEstimateBasis();
+            this.hasReport = publicFa.getIssue().getResultReport() != null;
         }
         this.section = publicFa.getSection();
         this.installDate = publicFa.getInstallDate();
