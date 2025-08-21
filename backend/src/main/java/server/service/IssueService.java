@@ -12,7 +12,6 @@ import server.domain.PublicFa;
 import server.domain.ResultReport;
 import server.dto.InspectionResultDTO;
 import server.dto.IssueDetail;
-import server.repository.InspectionRepository;
 import server.repository.IssueRepository;
 import server.repository.PublicFaRepository;
 import server.repository.ResultReportRepository;
@@ -32,29 +31,23 @@ public class IssueService {
     @Autowired
     private PublicFaRepository publicFaRepository;
     @Autowired
-    private InspectionRepository inspectionRepository;
-    @Autowired
     private AzureService azureService;
     @Autowired
     private ResultReportRepository resultRepository;
 
-//    public int countRepairIssues(Long inspectionId) {
-//        return issueRepository.countByInspectionIdAndStatus(inspectionId,IssueStatus.REPAIR);
-//    }
-//
-//    public int countRemovalIssues(Long inspectionId) {
-//        return issueRepository.countByInspectionIdAndStatus(inspectionId, IssueStatus.REMOVE);
-//    } // 점검별 remove 이슈
-//
-//    public List<Issue> getIssuesByInspectionId(Long inspectionId) {
-//        return issueRepository.findByInspection_Id(inspectionId);
-//    }
 
 
+    public void deleteIssue(Issue issue){
+        if(issue != null){
+            issueRepository.deleteById(issue.getId());
+        }
+    }
 
-    public Issue addIssue(PublicFa publicFa,InspectionResultDTO.Detection detection) {
-        Issue issue = new Issue(publicFa,detection);
-        return issueRepository.save(issue);
+    public void updateIssue(PublicFa fa, InspectionResultDTO.Detection detection) {
+        issueRepository.save(fa.getIssue().update(fa, detection));
+    }
+    public Issue addIssue(PublicFa fa,InspectionResultDTO.Detection detection) {
+        return issueRepository.save(new Issue(fa,detection));
     }
 
 
@@ -66,6 +59,7 @@ public class IssueService {
             resultReport.setCreationDate(new Date());
             String path = azureService.azureBlobUpload(file,".pdf");
             resultReport.setFile(new File(path,"pdf"));
+            pfa.setLastRepair(new Date());
             resultRepository.save(resultReport);
             return azureService.azureBlobSas(path);
         }

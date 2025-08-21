@@ -12,6 +12,7 @@ import server.dto.InspectionDetailDTO;
 import server.service.InspectionReportService;
 import server.service.InspectionService;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class InspectionController {
     // ✅ 점검 보고서 생성 요청 (LLM)
     @PostMapping("/generate")
     public ResponseEntity<String> generateReport(
-            @RequestBody InspectionReportDTO requestDTO) {
+            @RequestBody InspectionReportDTO requestDTO) throws IOException {
         inspectionReportService.generateReport(requestDTO);
         return ResponseEntity.ok("");
     }

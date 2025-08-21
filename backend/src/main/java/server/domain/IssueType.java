@@ -17,4 +17,13 @@ public enum IssueType {// 손상
     public String getDisplayName() {
         return displayName;
     }
+
+    public static IssueType fromDisplayName(String displayName) {
+        for (IssueType type : values()) {
+            if (type.displayName.equals(displayName)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown displayName: " + displayName);
+    }
 }

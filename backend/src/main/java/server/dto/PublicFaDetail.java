@@ -18,7 +18,7 @@ public class PublicFaDetail {
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
     private Date lastRepair;
     private String status;
-    private Long obstruction;
+    private String obstruction;
     private Long estimate;
     private String estimateBasis;
 

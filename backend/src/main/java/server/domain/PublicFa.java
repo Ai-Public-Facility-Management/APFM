@@ -7,6 +7,7 @@ import server.dto.InspectionResultDTO;
 
 
 import java.util.Date;
+import java.util.Objects;
 
 
 @Entity
@@ -39,7 +40,7 @@ public class PublicFa {
     @Enumerated(EnumType.STRING)
     private FacilityStatus status;
 
-    private Long obstruction;
+    private String obstruction;
 
     private String obstruction_basis;
 
@@ -52,18 +53,27 @@ public class PublicFa {
 
 
     public PublicFa(PublicFaType type,Section section,FacilityStatus publicFaStatus,Camera camera,InspectionResultDTO.Detection detection) {
-        File image = new File(detection.getCrop_image(),"image");
         this.type = type;
         this.section = section;
         this.camera = camera;
         this.status = publicFaStatus;
-        this.image = image;
         this.installDate = new Date();
-        this.lastRepair = null;
+        this.lastRepair = new Date();
         this.obstruction = detection.getObstruction();
         this.obstruction_basis = detection.getObstructionBasis();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PublicFa other)) return false;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 
 }
 
