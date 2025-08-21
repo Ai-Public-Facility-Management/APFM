@@ -92,16 +92,6 @@ public class IssueService {
         return details;
     }
 
-    public String setProcessing(List<Long> ids) {
-        List<Issue> issues =  issueRepository.findAllById(ids);
-        if(!issues.isEmpty()){
-            issues.forEach(issue -> {
-                issue.setProcessing(true);
-            });
-        }else
-            return "fail";
-        return "done";
-    }
 
 }
 

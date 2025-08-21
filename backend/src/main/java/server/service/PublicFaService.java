@@ -91,18 +91,7 @@ public class PublicFaService {
     }
 
 
-//    @Transactional
-//    public PublicFa updateFa(PublicFaDTO publicFaDTO){
-//        PublicFa publicFa = publicFaRepository.findById(publicFaDTO.getId()).orElseThrow(
-//                () -> new RuntimeException("해당 Id의 시설물이 없습니다.")
-//        );
-//        return publicFaRepository.save(publicFa.updateFa(publicFaDTO));
-//    }
 
-    @Transactional
-    public void deleteFa(Long id){
-        publicFaRepository.deleteById(id);
-    }
 
     private double calculateIoU(Section boxA, Section boxB) {
         //좌표 배열 [x_center, y_center, width, height]

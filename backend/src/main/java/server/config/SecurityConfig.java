@@ -57,7 +57,7 @@ public class SecurityConfig {
 
                                  "/api/auth/**","/api/publicfa/**","/api/issue/**","/api/users/**",
                                 "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**",
-                                "/api/proposal/**", "/api/boards/**"
+                                "/api/proposal/**", "/api/boards/**","/test/**"
 
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

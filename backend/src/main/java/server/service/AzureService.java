@@ -69,18 +69,12 @@ public class AzureService {
 
     public String azureSaveFile(String file_base64,Long id,String type) throws IOException {
         byte[] imageBytes = Base64.getDecoder().decode(file_base64);
-        String blobName ="";
-        switch(type){
-            case "camera":
-                blobName = "camera/image/camera_"+id.toString()+".png";
-                break;
-            case "facility":
-                blobName = "camera/facility/facility_"+id.toString()+".png";
-                break;
-            case "report":
-                blobName = "inspection/report_"+id.toString()+"_"+LocalDate.now()+".pdf";
-                break;
-        }
+        String blobName = switch (type) {
+            case "camera" -> "camera/image/camera_" + id.toString() + ".png";
+            case "facility" -> "camera/facility/facility_" + id.toString() + ".png";
+            case "report" -> "inspection/report_" + id.toString() + "_" + LocalDate.now() + ".pdf";
+            default -> "fail";
+        };
         BlobServiceClient blobServiceClient = new BlobServiceClientBuilder()
                 .connectionString(cnnectionString)
                 .buildClient();
