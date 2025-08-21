@@ -31,7 +31,7 @@ metadata:
   name: fastapi
   namespace: apfm
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: fastapi
   ports:

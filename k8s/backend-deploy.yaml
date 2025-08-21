@@ -19,17 +19,17 @@ spec:
             - containerPort: 8082   # ✅ 실제 앱 포트 맞춤
           env:
             - name: JWT_SECRET
-              value: "my-secret-key"          # 👉 실제 값으로 교체
+              value: "test-secret"          # 👉 실제 값으로 교체
             - name: JWT_EXPIRATION
               value: "3600000"
             - name: SPRING_PROFILES_ACTIVE
               value: "docker"
-            - name: SPRING_DATASOURCE_URL
-              value: "jdbc:mysql://<mysql-service>:3306/apfm"
-            - name: SPRING_DATASOURCE_USERNAME
-              value: "root"
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: "password"
+#            - name: SPRING_DATASOURCE_URL
+#              value: "jdbc:mysql://<mysql-service>:3306/apfm"
+#            - name: SPRING_DATASOURCE_USERNAME
+#              value: "root"
+#            - name: SPRING_DATASOURCE_PASSWORD
+#              value: "password"
           readinessProbe:
             httpGet:
               path: /actuator/health
@@ -47,7 +47,7 @@ metadata:
   name: backend
   namespace: apfm
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: backend
   ports:
