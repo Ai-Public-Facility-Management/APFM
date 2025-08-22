@@ -28,8 +28,8 @@ public class BoardPost extends BaseTimeEntity {
     @Column(nullable = false, length = 200)
     private String title;
 
-    @Lob
-    @Column(nullable = false)
+
+    @Column(nullable = false,length = 5000)
     private String content;
 
     /**
