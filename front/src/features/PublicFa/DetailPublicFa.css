@@ -58,6 +58,8 @@
 }
 .detail-table td {
   padding: 12px 0;
+  white-space: pre-line;
+  line-height: 1.1;
 }
 .detail-table td div {
   line-height: 1.6;

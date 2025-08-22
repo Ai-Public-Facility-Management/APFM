@@ -13,17 +13,18 @@ public class PublicFaDetail {
     private String type;
     private String image;
     private Section section;
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date installDate;
-    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date lastRepair;
     private String status;
     private String obstruction;
+    private String obstruction_basis;
     private Long estimate;
     private String estimateBasis;
     private boolean hasReport;
 
-    public PublicFaDetail(PublicFa publicFa,String url) {
+    public PublicFaDetail(PublicFa publicFa, String url) {
         this.id = publicFa.getId();
         this.cameraName = publicFa.getCamera().getLocation();
         this.type = publicFa.getType() != null ? publicFa.getType().getDisplayName() : null;
@@ -40,5 +41,6 @@ public class PublicFaDetail {
         this.lastRepair = publicFa.getLastRepair();
         this.status = publicFa.getStatus() != null ? publicFa.getStatus().getDisplayName() : null;
         this.obstruction = publicFa.getObstruction();
+        this.obstruction_basis = publicFa.getObstruction_basis();
     }
 }
