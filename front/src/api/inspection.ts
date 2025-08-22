@@ -67,7 +67,10 @@ export const saveInspectionSetting = (payload: InspectionSettingDTO) => {
 };
 
 // [기능 요약] 보고서 생성 (LLM)
-export const generateInspectionReport = async (issueIds: number[]) => {
-  const { data } = await api.post("/api/inspection/generate", { issueIds });
-  return data; // DTO 구조에 맞게 사용
+export const generateInspectionReport = async (inspectionId: number, issueIds: number[]) => {
+  const { data } = await api.post("/api/inspection/generate", {
+    inspection_id: inspectionId,
+    issueIds
+  });
+  return data;
 };

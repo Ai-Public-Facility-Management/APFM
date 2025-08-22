@@ -6,7 +6,8 @@ import {
   fetchInspectionDetail,
   type InspectionDetail,
   type Camera,
-  type IssueItem
+  type IssueItem,
+  generateInspectionReport
 } from "../../api/inspection";
 import "./InspectionDetailPage.css";
 
@@ -123,13 +124,26 @@ export default function InspectionDetailPage() {
             <div className="inspDetail-actions">
               <button
                 className="inspDetail-primaryBtn"
-                onClick={() => {
-                  alert("정기 점검 보고서 작성 기능은 추후 연결해주세요.");
+                onClick={async () => {
+                  if (!data) return;
+                  try {
+                    const inspectionId = data.id;
+                    const issueIds = data.cameras.flatMap(c =>
+                      c.issues.map(i => i.id)
+                    );
+
+                    await generateInspectionReport(inspectionId, issueIds);
+                    alert("보고서가 저장되었습니다 ✅");
+                  } catch (err) {
+                    console.error(err);
+                    alert("보고서 생성 중 오류가 발생했습니다.");
+                  }
                 }}
               >
                 정기 점검 보고서 작성
               </button>
             </div>
+
 
             {/* 리스트로 돌아가기 */}
             <div className="inspDetail-backRow">
