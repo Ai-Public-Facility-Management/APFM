@@ -230,7 +230,7 @@ export default function MainPage() {
                         // ✅ 변경: /inspection/{id} → /inspections/{id}
                         onClick={() => navigate(`/inspections/${it.inspectionId}`)}
                       >
-                        {detailText}...
+                        {detailText}
                       </div>
                     </div>
                   );
