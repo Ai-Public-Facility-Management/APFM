@@ -2,7 +2,7 @@ import axios from "axios";
 import { getToken } from "./login";
 
 export const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE ?? "http://localhost:8082", // 환경에 맞게
+    baseURL: process.env.REACT_APP_API_BASE ?? "/api", // 환경에 맞게
     // withCredentials: false // Bearer 토큰이면 보통 불필요
 });
 
