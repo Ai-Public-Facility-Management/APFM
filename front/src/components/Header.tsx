@@ -83,7 +83,11 @@ const Header: React.FC = () => {
         {/* 오른쪽 아이콘들: 기존 디자인 유지 (세로 배치) */}
         {!authed ? (
           <div className="headerIcons">
-            <Link to="/login">
+            <Link
+              to="/login"
+              state={{ scrollToTop: true }}            // ✅ 로그인 페이지에 신호 전달
+              onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "auto" })} // 보수적으로 한번
+            >
               <img src={loginImg} alt="로그인" className="login-image" />
               <span>로그인</span>
             </Link>

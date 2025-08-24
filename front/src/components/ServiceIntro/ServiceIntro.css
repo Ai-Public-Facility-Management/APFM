@@ -3,7 +3,7 @@
 
 /* 래퍼/타이틀 */
 .si-wrap { width: 100%; max-width: 1280px; margin: 24px auto 0; }
-.si-title { font-size: 20px; font-weight: 700; margin: 8px 0 16px; color: #111; }
+.si-title { font-size: 36px; font-weight: 700; margin: 8px 0 16px; color: #111; }
 
 /* 가로 네비 (sticky) */
 .si-stepNavWrap {
@@ -63,3 +63,176 @@
 .si-num { width: 26px; height: 26px; border-radius: 9999px; background: #1d4ed8; color:#fff; display:grid; place-items:center; font-weight: 800; font-size: 12px; }
 .si-textTitle { margin: 0; font-size: 20px; font-weight: 800; color: #111; }
 .si-textDesc { margin: 8px 2px 0; color: #374151; line-height: 1.6; }
+
+/* ───────── 자동화 4카드(원형) ───────── */
+/* ServiceIntro.css */
+
+.auto-wrap {
+  /* ✅ 풀-블리드: 뷰포트 기준으로 정확히 좌우 끝까지 */
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+
+  /* 배경/여백(원하시는 아주 연한 하늘색) */
+  background: linear-gradient(180deg, #f3f8ff 0%, #eef6ff 100%);
+  border-top: 1px solid #e6efff;
+  border-bottom: 1px solid #e6efff;
+  padding-block: clamp(42px, 7vw, 110px);
+}
+
+/* 내부는 기존처럼 중앙 정렬 + 최대폭 제한 */
+.auto-inner {
+  max-width: min(1600px, 96vw);
+  margin: 0 auto;
+  padding-inline: clamp(12px, 3vw, 32px);
+}
+
+
+/* 가운데 큰 카테고리 제목: 조금 더 크게 */
+.auto-title {
+  text-align: center;
+  font-size: clamp(24px, 2.6vw, 36px); /* 기존보다 살짝 증대 */
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+  margin: 8px 0 32px; /* 아래 간격도 조금 늘림 */
+}
+
+
+
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 2.8vw, 36px);
+  justify-items: center;   /* 각 카드 가운데 정렬 */
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .auto-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .auto-grid { grid-template-columns: 1fr; }
+}
+
+.auto-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* 배지(Feature) 스타일: 진한 파랑 배경 + 흰 글자 */
+.auto-badgeText {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 14px;
+
+  background: #0b5fe0;         /* 진한 파랑 */
+  color: #fff;                 /* 글자 흰색 */
+  border: 0;
+  box-shadow: 0 6px 16px rgba(11, 95, 224, .25);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* 배지 안의 번호(03~06)도 흰색으로 통일 */
+.auto-badgeText .auto-num { color: #fff; }
+
+.auto-circle {
+  /* 화면폭에 따라 자연스러운 크기 */
+  width: clamp(220px, 21vw, 340px);
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  margin: 0 auto;
+  background: radial-gradient(120% 120% at 20% 20%, #eef2ff 0%, #dbeafe 40%, #c7d2fe 70%, #e5e7eb 100%);
+  border: 6px solid #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08), inset 0 10px 30px rgba(255,255,255,.7);
+}
+
+.auto-itemTitle {
+  margin: 18px 0 8px;
+  font-size: clamp(18px, 1.5vw, 22px);
+  font-weight: 800;
+  color: #111827;
+}
+.auto-itemDesc  {
+  margin: 0;
+  font-size: 15px;
+  color: #374151;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+/* 섹션 텍스트 헤더(좌측 정렬, 심플) */
+.sec-head {
+  max-width: 1280px;
+  margin: 24px auto 8px;
+  padding: 0 16px;
+}
+
+.sec-kicker {               /* "주요 기능" — 더 크고 굵게 */
+  font-size: clamp(36px, 2.6vw, 50px);
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: .01em;
+}
+
+.sec-title {                /* "AI 탐지 시스템" — 작게, 보조 제목 느낌 */
+  margin-top: 6px;
+  font-size: clamp(18px, 1.8vw, 24px);
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* FEATURE 01 배지 */
+.si-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #1d4ed8;          /* 진한 파란색 */
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
+  transform: translateY(1px);
+}
+.si-badge b {
+  font-weight: 900;
+}
+
+/* 헤더 줄 간격 살짝 조정 (배지와 타이틀 사이) */
+.si-textHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;       /* 배지 ↔ 제목 간격 */
+  margin-bottom: 8px;
+}
+
+/* 주요 기능(= #features 섹션) 전체에 연한 회색 배경 깔기 */
+#features.si-wrap {
+  position: relative;
+  isolation: isolate;        /* z-index 간섭 방지 */
+  padding-block: 28px;       /* 상하 여백 (원하면 조절) */
+}
+
+#features.si-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;              /* 화면 좌우 끝까지 색 채우기 */
+  background: #f6f7f9;       /* 연한 회색 */
+  z-index: -1;               /* 내용 뒤로 */
+  border-top: 1px solid #eef0f3;    /* 선택: 위/아래 경계선 */
+  border-bottom: 1px solid #eef0f3;
+}
+
+

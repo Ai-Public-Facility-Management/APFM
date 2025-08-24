@@ -27,7 +27,7 @@ def analyze_facility_image(original_b64: str, crop_b64: str, box: list) -> dict:
         "규칙(아주 중요):\n"
         "• `vision_analysis`는 **문자열 하나**만 허용한다. 문자열 내부에 JSON/배열/객체/키:값/[]/{} 를 절대 쓰지 마라.\n"
         "• 줄바꿈은 허용. 문단/목록은 하이픈(-)으로 표현해라. 따옴표 이스케이프(\\\")는 최소화.\n"
-        f"• `status`는 다음 중 하나만: {', '.join(STATUS_CATEGORIES)}.\n"
+        f"• `status`는 다음 중 하나만: {', '.join(STATUS_CATEGORIES)}. 'status'를 선택할 때 기능적으로 미미한 문제인 것 같으면 '정상'으로 선택해\n"
         "• 최종 출력은 **순수 JSON**: {\"vision_analysis\": \"...\", \"status\": \"...\"}.\n"
         "\n"
         "분석 지침:\n"

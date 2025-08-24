@@ -1,6 +1,6 @@
 // src/features/Login/LoginPage.tsx
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, useMotionValue } from "framer-motion";
 import Layout from "../../components/Layout";
 import "./LoginPage.css";
@@ -10,6 +10,9 @@ import { loginAPI, saveToken, ID_KEY, clearEmail } from "../../api/login";
 import ScrollHint from "../../components/ScrollHint/ScrollHint";
 import { ServiceIntro } from "../../components/ServiceIntro/ServiceIntro";
 import { FEATURE_STEPS, HOWTO_STEPS } from "../../content/serviceIntroData";
+
+import HeroBanner from "../../components/HeroBanner/HeroBanner";
+import mainHero from "../../assets/banner/banner.png"; // src/assets 경로
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -74,7 +77,25 @@ export default function LoginPage() {
     <Layout mainClassName="loginMain">
       {/* 상단 진행바 */}
       <motion.div className="topProgress" style={{ scaleX: progressMV }} aria-hidden />
-
+      {/* ✅ 히어로 배너 */}
+      <HeroBanner
+        src={mainHero}
+        height="30vh"
+        fullBleed
+        flushTop
+        alt="공공시설물 통합 안전관리 소개 이미지"
+        shape="none"
+        hover="none"
+      >
+        <div className="heroCopy">
+          <h1 className="heroTitle">공공시설물 통합 안전관리</h1>
+          <p className="heroDesc">
+            AI 기반 탐지·상태평가·정기점검·보고서 자동화까지, 하나의 화면에서 안전한 도시 관리를 지원합니다.
+          </p>
+          <a href="#features-feat-detect" className="heroCta">서비스 소개 보기</a>
+        </div>
+      </HeroBanner>
+      
       {/* 로그인 박스 */}
       <div className="loginBox">
         <p className="loginSubTitle">공공시설물 관리자 로그인</p>
