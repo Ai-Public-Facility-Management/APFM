@@ -1,0 +1,19 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: dnjsdnapfm 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dnjsdnapfm
+  template:
+    metadata:
+      labels:
+        app: dnjsdnapfm 
+    spec:
+      containers:
+        - name: dnjsdnapfm 
+          image: apfmrg.azurecr.io/dnjsdnapfm
+          ports:
+          - containerPort: 8000
