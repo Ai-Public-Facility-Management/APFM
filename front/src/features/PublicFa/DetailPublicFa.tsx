@@ -159,12 +159,19 @@ export default function DetailPublicFa(){
                         <td>{detail.obstruction}</td>
                     </tr>
                     <tr>
+                        <th>방해도</th>
+                        <td style={{ whiteSpace: "pre-line" }}>
+                            {detail.obstruction_basis?.replace(/\\n/g, "\n")}
+                        </td>
+                    </tr>
+                    <tr>
                         <th>예상 견적</th>
                         <p>{detail.estimate?.toLocaleString?.() ?? "견적 없음"}</p>
                     </tr>
                     <tr>
                         <th>견적 근거</th>
-                        <td>{detail.estimateBasis}</td>
+                        <td style={{whiteSpace: "pre-line"}}>
+                            {detail.estimateBasis.replace(/\\n/g, "\n")}</td>
                     </tr>
                 </tbody>
             </table>

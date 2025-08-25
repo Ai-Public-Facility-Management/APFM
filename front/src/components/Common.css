@@ -28,11 +28,22 @@
 
 /* ───── Header ───── */
 .header {
+  position: sticky;         /* ✅ 스크롤해도 상단 고정 */
+  top: 0;                   /* ✅ 붙는 위치 */
+  z-index: 2000;            /* ✅ 히어로/컨텐츠 위로 */
+  background: rgba(255,255,255,0.94);  /* ✅ 반투명 배경(선택) */
+  backdrop-filter: saturate(115%) blur(6px); /* ✅ 유리 효과(선택) */
   border-bottom: 1px solid #ddd;
   padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: box-shadow .25s ease, background .25s ease; /* ✅ 스크롤 반응 */
+}
+
+/* 스크롤 시작 시 은은한 그림자 */
+.header.isScrolled {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
 .headerTop {
@@ -40,55 +51,26 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+
+  /* 선택: 중앙 정렬+최대폭 주고 싶으면 추가 */
+  /* max-width: 1280px;
+     margin: 0 auto; */
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
+.logo { display: flex; align-items: center; text-decoration: none; }
+.logo-image { height: 35px; margin-right: 5px; }
+.logo-text { font-size: 18px; font-weight: bold; color: #000; }
 
-.logo-image {
-  height: 35px;
-  margin-right: 5px;
-}
+.headerIcons { display: flex; font-weight: bold; gap: 24px; }
+.headerIcons a { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #000; }
 
-.logo-text {
-  font-size: 18px;
-  font-weight: bold;
-  color: #000;
-}
+.search-image, .login-image, .signup-image { width: 22px; height: 22px; margin-bottom: 5px; }
 
-.headerIcons {
-  display: flex;
-  font-weight: bold;
-  gap: 24px;
-}
-
-.headerIcons a {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #000;
-}
-
-.search-image,
-.login-image,
-.signup-image {
-  width: 22px;
-  height: 22px;
-  margin-bottom: 5px;
-}
-/* 유저 아이템만 세로 정렬 */
 .headerIcons .userItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #000;
-  font-weight: bold;
+  display: flex; flex-direction: column; align-items: center;
+  text-decoration: none; color: #000; font-weight: bold;
 }
+
 
 /* ───── Footer ───── */
 .footer {

@@ -26,8 +26,12 @@ spring:
       max-request-size: 11MB
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: apfm-redis.redis.cache.windows.net
+      port: 6380
+      username: default
+      password: ${REDIS_PASSWORD}
+      ssl.enabled: true
+
 
 
   datasource:
@@ -127,6 +131,14 @@ spring:
   config:
     activate:
       on-profile: docker
+
+  data:
+    redis:
+      host: apfm-redis.redis.cache.windows.net
+      port: 6380
+      username: default
+      password: ${REDIS_PASSWORD}
+      ssl.enabled: true
   jpa:
     properties:
       hibernate:

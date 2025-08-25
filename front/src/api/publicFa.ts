@@ -47,6 +47,7 @@ export interface FacilityDetail {
   lastRepair: string;
   status: string;
   obstruction: number;
+  obstruction_basis : string;
   estimate: number;
   estimateBasis: string;
   hasReport:boolean;

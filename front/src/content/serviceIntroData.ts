@@ -25,18 +25,18 @@ export const FEATURE_STEPS: IntroStep[] = [
     images: DETECT_IMAGES,
   },
   {
-    id: "feat-estimate",
-    title: "AI 상태평가 및 견적 산출",
-    desc:
-      "한국건설기술연구원 ‘2025 건설공사 표준품셈’ 원문과 국토교통부 ‘2025 표준시장단가 DB’를 근거로, RAG 기반 LLM 랭그래프가 시설물 상태를 판정하고 필요한 공사 항목과 예상 비용을 산출합니다. 산출 근거가 함께 제공되어 검토가 용이합니다.",
-  },
-  {
     id: "feat-pedestrian",
     title: "보행 방해도 점수화",
     desc:
       "보행자 데이터로 학습한 Tracking 모드 YOLO v11m이 보행 흐름과의 간섭 정도를 분석해 ‘방해도 점수’를 제공합니다. 위험 요소나 통행 불편이 큰 지점을 우선 파악할 수 있습니다.",
     video:  pedestrianVideo, // 준비되면 경로 교체
     poster: pedestrianPoster,
+  },
+  {
+    id: "feat-estimate",
+    title: "AI 상태평가 및 견적 산출",
+    desc:
+      "한국건설기술연구원 ‘2025 건설공사 표준품셈’ 원문과 국토교통부 ‘2025 표준시장단가 DB’를 근거로, AI가 시설물 상태를 판정하고 필요한 공사 항목과 예상 비용을 산출합니다. 산출 근거가 함께 제공되어 검토가 용이합니다.",
   },
   {
     id: "feat-db",
