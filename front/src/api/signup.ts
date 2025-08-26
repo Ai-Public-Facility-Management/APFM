@@ -1,5 +1,5 @@
 // src/api/signup.ts
-import axios from "axios";
+import { api } from "./http";
 
 export interface SignUpRequest {
   email: string;
@@ -10,8 +10,8 @@ export interface SignUpRequest {
 
 /** 인증코드 발송: 문자열 메시지 반환 */
 export const sendVerificationCode = async (email: string) => {
-  const res = await axios.post<string>(
-    "/api/auth/send-code",
+  const res = await api.post<string>(
+    "/auth/send-code",
     null,
     { params: { email }, responseType: "text" }
   );
@@ -20,8 +20,8 @@ export const sendVerificationCode = async (email: string) => {
 
 /** 인증코드 검증: 문자열 메시지 반환 */
 export const verifyCode = async (email: string, code: string) => {
-  const res = await axios.post<string>(
-    "/api/auth/verify-code",
+  const res = await api.post<string>(
+    "/auth/verify-code",
     null,
     { params: { email, code }, responseType: "text" }
   );
@@ -30,8 +30,8 @@ export const verifyCode = async (email: string, code: string) => {
 
 /** 회원가입 제출: 문자열 메시지 반환 */
 export const submitSignUp = async (data: SignUpRequest) => {
-  const res = await axios.post<string>(
-    "/api/auth/signup",
+  const res = await api.post<string>(
+    "/auth/signup",
     data,
     { responseType: "text" }
   );

@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/inspection")
+@RequestMapping("/inspection")
 @RequiredArgsConstructor
 public class InspectionController {
 

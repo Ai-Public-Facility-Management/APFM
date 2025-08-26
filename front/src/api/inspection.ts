@@ -49,7 +49,7 @@ export const fetchInspectionList = async (
   page = 0,
   size = 10
 ): Promise<PageResponse<InspectionSummary>> => {
-  const { data } = await api.get("/api/inspection/all", { params: { page, size } });
+  const { data } = await api.get("/inspection/all", { params: { page, size } });
   return data.data as PageResponse<InspectionSummary>; // 백엔드가 { data: Page<...> }로 주므로
 };
 
@@ -57,30 +57,17 @@ export const fetchInspectionList = async (
 export const fetchInspectionDetail = async (
   inspectionId: number
 ): Promise<InspectionDetail> => {
-  const { data } = await api.get(`/api/inspection/${inspectionId}`);
+  const { data } = await api.get(`/inspection/${inspectionId}`);
   return data.data as InspectionDetail;
 };
 
 // [기능 요약] 점검 주기 설정 저장
 export const saveInspectionSetting = (payload: InspectionSettingDTO) => {
-  api.put("/api/inspection/setting", payload).then(res => res.data);
+  api.put("/inspection/setting", payload).then(res => res.data);
 };
 
 // [기능 요약] 보고서 생성 (LLM)
-export const generateInspectionReport = async (inspectionId: number, issueIds: number[]) => {
-  const payload = {
-    inspection_id: inspectionId, // 또는 inspectionId
-    issueIds
-  };
-
-  // ✅ 로컬스토리지에서 JWT 토큰 꺼내서 Authorization 헤더에 붙여줌
-  const token = localStorage.getItem("token");
-
-  return api.post("/api/inspection/generate", payload, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    responseType: "blob",
-  });
-
+export const generateInspectionReport = async (issueIds: number[]) => {
+  const { data } = await api.post("/inspection/generate", { issueIds });
+  return data; // DTO 구조에 맞게 사용
 };

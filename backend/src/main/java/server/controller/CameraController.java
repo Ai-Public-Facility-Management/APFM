@@ -14,7 +14,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping(value="/api/camera")
+@RequestMapping(value="/camera")
 @Transactional
 public class CameraController {
 

@@ -9,7 +9,7 @@ import server.service.ProposalService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/proposal")
+@RequestMapping("/proposal")
 @RequiredArgsConstructor
 public class ProposalController {
 

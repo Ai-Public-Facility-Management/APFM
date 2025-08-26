@@ -16,7 +16,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/issue")
+@RequestMapping("/issue")
 @Transactional
 public class IssueController {
 

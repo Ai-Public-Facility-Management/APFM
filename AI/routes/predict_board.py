@@ -23,7 +23,7 @@ def expand_box(x1, y1, x2, y2, img_w, img_h, pad_px=40):
     )
 
 # ---------- 라우트 ----------
-@router.post("/predict-board")
+@router.post("/ai/predict-board")
 async def predict_board(image: UploadFile = File(...)):
     try:
         # 원본 이미지 로드

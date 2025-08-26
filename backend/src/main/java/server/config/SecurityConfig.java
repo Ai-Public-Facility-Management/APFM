@@ -51,22 +51,22 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // ✅ 프리플라이트 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/auth/login","/auth/signup","/auth/send-code","/auth/verify-code","/users/reset-code/**","/users/reset-password/**").permitAll()
                         .requestMatchers(
-
-                                 "/api/auth/**","/api/publicfa/**","/api/issue/**","/api/users/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**","/api/camera/**","/api/inspection/**",
-                                "/api/proposal/**", "/api/boards/**","/test/**"
-
-                        ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                 "/auth/**","/publicfa/**","/issue/**","/users/**",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**","/camera/**","/inspection/**",
+                                "/proposal/**", "/boards/**","/upload/**"
+                        ).hasRole("INSPECTOR")
+                        .requestMatchers("/admin/**","/auth/**","/publicfa/**","/issue/**","/users/**",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**","/camera/**","/inspection/**",
+                                "/proposal/**", "/boards/**","/upload/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 iframe 허용
                 .formLogin(login -> login.disable()) // Postman 무한 리다이렉트 방지
                 .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
+                        .logoutUrl("/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             response.setContentType("text/plain;charset=UTF-8");
                             response.setStatus(HttpServletResponse.SC_OK);
@@ -85,6 +85,9 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtUtil jwtUtil,
             TokenBlacklistService tokenBlacklistService) {
+
+
+
         return new JwtAuthenticationFilter(jwtUtil, tokenBlacklistService);
     }
 }

@@ -9,7 +9,7 @@ import server.service.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/auth")
+@RequestMapping("/auth")
 public class AuthController {
     private final EmailService emailService;
     private final UsersService usersService;

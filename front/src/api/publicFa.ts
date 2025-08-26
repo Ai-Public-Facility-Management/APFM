@@ -24,7 +24,7 @@ export interface FacilityPage {
  * @returns 페이지 데이터
  */
 export async function fetchFacilities(page: number, size: number): Promise<FacilityPage> {
-    const response = await api.get("/api/publicfa/all", { params: { page, size } });
+    const response = await api.get("/publicfa/all", { params: { page, size } });
     return {
         content: response.data.publicFas.content,
         totalElements: response.data.publicFas.totalElements,
@@ -55,7 +55,7 @@ export interface FacilityDetail {
 }
 
 export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {
-  const response = await api.get("/api/publicfa/detail", { params: { id } });
+  const response = await api.get("/publicfa/detail", { params: { id } });
   return response.data.publicFa;
 }
 
@@ -66,7 +66,7 @@ export async function fetchFacilityDetail(id: number): Promise<FacilityDetail> {
  */
 export const createProposal = async (ids: number[]) => {
   try {
-    const response = await api.post("/api/proposal/generate", ids, {
+    const response = await api.post("/proposal/generate", ids, {
       headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
@@ -89,14 +89,14 @@ export interface ProposalData {
 }
 
 export const fetchProposal = async (): Promise<ProposalData> => {
-  const res = await api.get<{ proposal: ProposalData }>("http://localhost:8080/proposal/latest");
+  const res = await api.get<{ proposal: ProposalData }>("http://localhost:8080/ai/proposal/latest");
   return res.data.proposal;
 };
 
 export const saveProposal = async (proposal: ProposalData) => {
   try {
     const res = await api.post(
-        "http://localhost:8080/proposal-to-docx",
+        "http://localhost:8080/ai/proposal-to-docx",
         { proposal },
         {
           responseType: "blob", // DOCX는 바이너리 파일

@@ -10,7 +10,7 @@ export async function uploadResult(
     formData.append("file", file);
     // @ts-ignore
     formData.append("publicFa_id",publicFa_id);
-    await api.post("/api/issue/result", formData, {
+    await api.post("/issue/result", formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         },

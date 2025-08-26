@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping(value="/api/publicfa")
+@RequestMapping(value="/publicfa")
 @Transactional
 public class PublicFaController {
 

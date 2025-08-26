@@ -9,7 +9,7 @@ export interface LoginResponse {
 }
 
 export async function loginAPI(data: { email: string; password: string; rememberId: boolean; }): Promise<LoginResponse> {
-  const res = await api.post<LoginResponse>("/api/auth/login", data);
+  const res = await api.post<LoginResponse>("/auth/login", data);
   // 토큰 필수 확인
   if (!res.data?.token) throw new Error("로그인 응답에서 토큰을 찾지 못했습니다.");
   if (res.data.username) saveUserName(res.data.username);
@@ -50,6 +50,6 @@ export const clearUserName = () => localStorage.removeItem(USER_NAME_KEY);
 
 // 로그아웃도 api 사용 (Authorization 자동 주입)
 export async function logoutAPI(): Promise<string> {
-  const res = await api.post("/api/auth/logout", null, { responseType: "text" });
+  const res = await api.post("/auth/logout", null, { responseType: "text" });
   return res.data;
 }

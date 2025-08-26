@@ -7,14 +7,14 @@ export interface PendingUser {
 }
 
 export const getPendingUsers = async (): Promise<PendingUser[]> => {
-  const { data } = await api.get("/api/admin/pending");
+  const { data } = await api.get("/admin/pending");
   return data;
 };
 
 export const approveUser = async (email: string) => {
-  await api.post(`/api/admin/approve/${email}`);
+  await api.post(`/admin/approve/${email}`);
 };
 
 export const rejectUser = async (email: string) => {
-  await api.post(`/api/admin/reject/${email}`);
+  await api.post(`/admin/reject/${email}`);
 };

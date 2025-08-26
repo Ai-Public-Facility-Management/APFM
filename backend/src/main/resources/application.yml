@@ -16,6 +16,10 @@ azure:
   connection_string: ${CONNECTION_STRING}
   container_name: ${CONTAINER_NAME}
 
+management:
+  tracing:
+    enabled: false
+
 spring:
   config:
     activate:

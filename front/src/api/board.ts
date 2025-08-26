@@ -59,7 +59,7 @@ export async function fetchBoards(
   const params: Record<string, any> = { page, size };
   if (q) params.q = q;
 
-  const response = await api.get("/api/boards", { params });
+  const response = await api.get("/boards", { params });
   // 백엔드 API 응답 구조에 맞게 조정 필요
   return {
     content: response.data.content,
@@ -80,7 +80,7 @@ export async function fetchBoards(
 
 // 게시글 상세 조회
 export async function fetchBoardDetail(id: number): Promise<BoardDetail> {
-  const response = await api.get(`/api/boards/${id}`);
+  const response = await api.get(`/boards/${id}`);
   return response.data;
 }
 
@@ -91,7 +91,7 @@ export async function fetchComments(
   size = 10,
   sort = "latest"
 ): Promise<{ content: Comment[] }> {
-  const response = await api.get(`/api/boards/${postId}/comments`, {
+  const response = await api.get(`/boards/${postId}/comments`, {
     params: { page, size, sort },
   });
   return response.data;
@@ -99,20 +99,20 @@ export async function fetchComments(
 
 // 📌 댓글 작성
 export async function createComment(postId: number, content: string): Promise<void> {
-  await api.post(`/api/boards/${postId}/comments`, { content });
+  await api.post(`/boards/${postId}/comments`, { content });
 }
 
 // 📌 댓글 수정
 export async function updateComment(commentId: number, content: string): Promise<void> {
-  await api.put(`/api/boards/comments/${commentId}`, { content });
+  await api.put(`/boards/comments/${commentId}`, { content });
 }
 
 // 📌 댓글 삭제
 export async function deleteComment(commentId: number): Promise<void> {
-  await api.delete(`/api/boards/comments/${commentId}`);
+  await api.delete(`/boards/comments/${commentId}`);
 }
 
 // 📌 게시글 삭제
 export async function deletePost(postId: number): Promise<void> {
-  await api.delete(`/api/boards/${postId}`);
+  await api.delete(`/boards/${postId}`);
 }

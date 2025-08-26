@@ -22,7 +22,7 @@ export type PublicFaDto = {
 export async function fetchDashboardInspections(
   count = 5
 ): Promise<InspectionDto[]> {
-  const { data } = await api.get("/api/inspection/dashboard", {
+  const { data } = await api.get("/inspection/dashboard", {
     params: { count },
   });
 
@@ -43,7 +43,7 @@ export async function fetchDashboardInspections(
 export async function fetchDashboardPublicFas(
   count = 5
 ): Promise<PublicFaDto[]> {
-  const { data } = await api.get("/api/publicfa/dashboard", {
+  const { data } = await api.get("/publicfa/dashboard", {
     params: { count },
   });
 
@@ -68,7 +68,7 @@ export interface Camera {
 
 /** ✅ 전체 카메라 목록 조회 */
 export async function fetchAllCameras(): Promise<Camera[]> {
-  const { data } = await api.get("/api/camera");
+  const { data } = await api.get("/camera");
 
   const rows = (data as any)?.cameras ?? [];
 

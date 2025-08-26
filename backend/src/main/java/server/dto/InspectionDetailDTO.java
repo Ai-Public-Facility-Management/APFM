@@ -10,6 +10,7 @@ public class InspectionDetailDTO {
     private String createDate;              //정기점검 날짜
     private List<Camera> cameras;         //이슈사항
     private String status;                  //보고서 작성 여부
+    private String report_path;             //보고서
 
     @Data
     public static class Camera{

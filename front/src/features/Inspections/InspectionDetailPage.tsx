@@ -138,7 +138,7 @@ export default function InspectionDetailPage() {
                       c.issues.map(i => i.id)
                     );
 
-                    const response = await generateInspectionReport(inspectionId, issueIds);
+                    const response = await generateInspectionReport(issueIds);
 
                     const blob = new Blob([response.data], { type: "application/pdf" });
                     const url = window.URL.createObjectURL(blob);

@@ -14,7 +14,7 @@ import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class LoginController {
 
     private final LoginService authService;

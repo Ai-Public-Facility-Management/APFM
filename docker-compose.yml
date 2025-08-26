@@ -18,8 +18,8 @@ services:
       - fastapi
 
   frontend:
-    build: ./frontend
-    container_name: frontend
+    build: ./front
+    container_name: front
     ports:
       - "80:80"
 
