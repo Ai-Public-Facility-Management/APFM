@@ -25,7 +25,7 @@ stages:
   - job: Build_Backend
     displayName: Build Backend
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     steps:
     - task: Docker@2
       displayName: Build and push Backend image
@@ -33,6 +33,7 @@ stages:
         command: buildAndPush
         repository: dnjsdnapfm-backend
         dockerfile: backend/Dockerfile
+        buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
@@ -40,14 +41,15 @@ stages:
   - job: Build_Frontend
     displayName: Build Frontend
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     steps:
     - task: Docker@2
       displayName: Build and push Frontend image
       inputs:
         command: buildAndPush
         repository: dnjsdnapfm-frontend
-        dockerfile: frontend/Dockerfile
+        dockerfile: front/Dockerfile
+        buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
@@ -55,14 +57,15 @@ stages:
   - job: Build_Fastapi
     displayName: Build FastAPI
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     steps:
     - task: Docker@2
       displayName: Build and push FastAPI image
       inputs:
         command: buildAndPush
         repository: dnjsdnapfm-fastapi
-        dockerfile: fastapi/Dockerfile
+        dockerfile: AI/Dockerfile
+        buildContext: AI
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
@@ -71,7 +74,7 @@ stages:
   - job: Publish_Manifests
     displayName: Publish manifests
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     steps:
     - upload: manifests
       artifact: manifests
@@ -86,7 +89,7 @@ stages:
   - deployment: Deploy
     displayName: Deploy to AKS
     pool:
-      vmImage: $(vmImageName)
+      name: Default
     environment: 'dnjsdn752APFM.apfm'
     strategy:
       runOnce:
