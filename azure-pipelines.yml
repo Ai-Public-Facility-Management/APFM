@@ -64,8 +64,8 @@ stages:
       inputs:
         command: buildAndPush
         repository: dnjsdnapfm-fastapi
-        dockerfile: fastapi/Dockerfile
-        buildContext: fastapi
+        dockerfile: AI/Dockerfile
+        buildContext: AI
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
