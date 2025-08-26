@@ -86,4 +86,11 @@ public class InspectionReportService {
         return Base64.getDecoder().decode(pdfBase64);
 
     }
+    public byte[] downloadReport(Long inspectionId) {
+        Report report = reportRepository.findByInspection_Id(inspectionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        String fileUrl = report.getContent().getUrl();
+        return azureService.azureDownloadFile(fileUrl);  // Azure에서 PDF 그대로 내려줌
+    }
 }

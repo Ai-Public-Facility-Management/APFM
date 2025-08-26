@@ -7,7 +7,8 @@ import {
   type InspectionDetail,
   type Camera,
   type IssueItem,
-  generateInspectionReport
+  generateInspectionReport,
+  downloadInspectionReport
 } from "../../api/inspection";
 import { Backdrop, CircularProgress } from "@mui/material";
 import "./InspectionDetailPage.css";
@@ -127,54 +128,72 @@ export default function InspectionDetailPage() {
 
             {/* 하단 버튼 */}
             <div className="inspDetail-actions">
-              <button
-                className="inspDetail-primaryBtn"
-                onClick={async () => {
-                  if (!data) return;
-                  try {
-                    setReportLoading(true);
-                    const inspectionId = data.id;
-                    const issueIds = data.cameras.flatMap(c =>
-                      c.issues.map(i => i.id)
-                    );
+              {/* 작성 버튼 (보고서 없을 때만 표시) */}
+              {data.status !== "작성 완료" && (
+                <button
+                  className="inspDetail-primaryBtn"
+                  disabled={reportLoading}
+                  onClick={async () => {
+                    if (!data) return;
+                    try {
+                      setReportLoading(true);
+                      const inspectionId = data.id;
+                      const issueIds = data.cameras.flatMap(c => c.issues.map(i => i.id));
 
-                    const response = await generateInspectionReport(issueIds);
+                      // 보고서 생성 요청 (PDF 받아오지만 지금은 저장 안 하고 상태만 갱신)
+                      await generateInspectionReport(inspectionId, issueIds);
 
-                    const blob = new Blob([response.data], { type: "application/pdf" });
-                    const url = window.URL.createObjectURL(blob);
+                      alert("보고서가 저장되었습니다 ✅");
 
-                    // 오늘 날짜 구하기
-                    const today = new Date();
-                    const year = today.getFullYear();
-                    const month = String(today.getMonth() + 1).padStart(2, "0");
-                    const day = String(today.getDate()).padStart(2, "0");
+                      // 상태 갱신
+                      const refreshed = await fetchInspectionDetail(inspectionId);
+                      setData(refreshed);
+                    } catch (err) {
+                      console.error(err);
+                      alert("보고서 생성 중 오류가 발생했습니다.");
+                    } finally {
+                      setReportLoading(false);
+                    }
+                  }}
+                >
+                  정기 점검 보고서 작성
+                </button>
+              )}
 
-                    // 파일명: 2025-08-26_정기점검보고서.pdf
-                    const fileName = `${year}-${month}-${day}_정기점검보고서.pdf`;
+              {/* 다운로드 버튼 (보고서가 있을 때만 표시) */}
+              {data.status === "작성 완료" && (
+                <button
+                  className="inspDetail-secondaryBtn"
+                  onClick={async () => {
+                    try {
+                      if (!data) return;
+                      const response = await downloadInspectionReport(data.id); // ✅ 변경됨
 
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute("download", fileName);
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
+                      const blob = new Blob([response.data], { type: "application/pdf" });
+                      const url = window.URL.createObjectURL(blob);
 
-                    // 👉 메모리 누수 방지
-                    window.URL.revokeObjectURL(url);
+                      const today = new Date();
+                      const fileName = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}_정기점검보고서.pdf`;
 
-                    alert(`${fileName} 가 다운로드되었습니다 `);
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.setAttribute("download", fileName);
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
 
-                    navigate("/inspections");
-                  } catch (err) {
-                    console.error(err);
-                    alert("보고서 생성 중 오류가 발생했습니다.");
-                  } finally {
-                    setReportLoading(false);
-                  }
-                }}
-              >
-                정기 점검 보고서 작성
-              </button>
+                      window.URL.revokeObjectURL(url);
+
+                      alert(`${fileName} 다운로드 완료 ✅`);
+                    } catch (err) {
+                      console.error(err);
+                      alert("보고서 다운로드 중 오류가 발생했습니다.");
+                    }
+                  }}
+                >
+                  보고서 다운로드
+                </button>
+              )}
             </div>
 
 

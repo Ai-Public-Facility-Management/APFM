@@ -118,7 +118,8 @@
   margin-top: 24px;
 }
 
-.inspDetail-primaryBtn {
+.inspDetail-primaryBtn,
+.inspDetail-secondaryBtn{
   height: 44px;
   padding: 0 20px;
   border-radius: 8px;

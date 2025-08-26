@@ -65,6 +65,16 @@ public class InspectionController {
                 .body(pdfBytes);
     }
 
+    // 보고서 다운로드
+    @GetMapping("/{id}/report/download")
+    public ResponseEntity<byte[]> downloadReport(@PathVariable Long id) {
+        byte[] pdfBytes = inspectionReportService.downloadReport(id);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=정기점검보고서.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
 
     // 점검 상세 페이지
     @GetMapping("/{id}")

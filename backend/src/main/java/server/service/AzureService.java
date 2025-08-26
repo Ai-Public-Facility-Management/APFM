@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+import java.net.URI;  // 추가
+import com.azure.storage.common.StorageSharedKeyCredential;
+
 
 @Service
 @RequiredArgsConstructor
@@ -113,5 +116,23 @@ public class AzureService {
         });
 
         return videos;
+    }
+    public byte[] azureDownloadFile(String fileUrl) {
+        try {
+            URI uri = URI.create(fileUrl);
+            String path = uri.getPath(); // /container/inspection/report_1_2025-08-26.pdf
+            String blobName = path.substring(path.indexOf('/', 1) + 1); // inspection/report_1_2025-08-26.pdf
+
+            BlobClient blobClient = new BlobClientBuilder()
+                    .endpoint("https://" + accountName + ".blob.core.windows.net")
+                    .containerName(containerName)
+                    .blobName(blobName)
+                    .credential(new StorageSharedKeyCredential(accountName, accountKey))
+                    .buildClient();
+
+            return blobClient.downloadContent().toBytes();
+        } catch (Exception e) {
+            throw new RuntimeException("Azure Blob 다운로드 실패: " + fileUrl, e);
+        }
     }
 }

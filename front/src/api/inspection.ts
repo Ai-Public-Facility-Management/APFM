@@ -66,8 +66,22 @@ export const saveInspectionSetting = (payload: InspectionSettingDTO) => {
   api.put("/inspection/setting", payload).then(res => res.data);
 };
 
-// [기능 요약] 보고서 생성 (LLM)
-export const generateInspectionReport = async (issueIds: number[]) => {
-  const { data } = await api.post("/inspection/generate", { issueIds });
-  return data; // DTO 구조에 맞게 사용
+// 보고서 생성 (DB 저장)
+export const generateInspectionReport = async (inspectionId: number, issueIds: number[]) => {
+  const payload = { inspection_id: inspectionId, issueIds };
+  const token = localStorage.getItem("token");
+
+  return api.post("/inspection/generate", payload, {
+    headers: { Authorization: `Bearer ${token || ""}` }
+  });
+};
+
+// 보고서 다운로드 (PDF Blob 응답)
+export const downloadInspectionReport = async (inspectionId: number) => {
+  const token = localStorage.getItem("token");
+
+  return api.get(`/inspection/${inspectionId}/report/download`, {
+    headers: { Authorization: `Bearer ${token || ""}` },
+    responseType: "blob"
+  });
 };
