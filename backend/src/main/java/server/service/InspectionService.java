@@ -20,6 +20,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -101,12 +103,21 @@ public class InspectionService {
     public InspectionSettingDTO setInspectionSetting(InspectionSettingDTO dto) {
         InspectionSetting setting = settingRepository.findById(1L)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         setting.setInspectionCycle(dto.getInspectionCycle());
-        // setting.setAddress(dto.getAddress());
-        setting.setStartTime(dto.getStartTime());
+
+        // ✅ "HH:mm" 포맷 강제 적용
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime parsedTime = LocalTime.parse(dto.getStartTime(), formatter);
+        setting.setStartTime(parsedTime.format(formatter));
+
         setting.setStartDate(dto.getStartDate());
+
+        // ✅ 주기 새로 설정하면 오늘이라도 실행되도록 초기화
+        setting.setLastInspectedDate(null);
+
         settingRepository.save(setting);
-        return dto;
+        return new InspectionSettingDTO(setting);
     }
 
     // ✅ FastAPI 응답 결과를 저장하는 메서드
