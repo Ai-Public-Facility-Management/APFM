@@ -9,48 +9,82 @@ resources:
 - repo: self
 
 variables:
-
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'
-  imageRepository: 'dnjsdnapfm'
   containerRegistry: 'apfmrg.azurecr.io'
-  dockerfilePath: '**/Dockerfile'
   tag: '$(Build.BuildId)'
   imagePullSecret: 'apfmrgf81e-auth'
-
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
-
 stages:
+# =========================
+# Build Stage
+# =========================
 - stage: Build
   displayName: Build stage
   jobs:
-  - job: Build
-    displayName: Build
+  - job: Build_Backend
+    displayName: Build Backend
     pool:
       vmImage: $(vmImageName)
     steps:
     - task: Docker@2
-      displayName: Build and push an image to container registry
+      displayName: Build and push Backend image
       inputs:
         command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
+        repository: dnjsdnapfm-backend
+        dockerfile: backend/Dockerfile
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
 
+  - job: Build_Frontend
+    displayName: Build Frontend
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push Frontend image
+      inputs:
+        command: buildAndPush
+        repository: dnjsdnapfm-frontend
+        dockerfile: frontend/Dockerfile
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+
+  - job: Build_Fastapi
+    displayName: Build FastAPI
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push FastAPI image
+      inputs:
+        command: buildAndPush
+        repository: dnjsdnapfm-fastapi
+        dockerfile: fastapi/Dockerfile
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
+
+  # 👉 manifests 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
+  - job: Publish_Manifests
+    displayName: Publish manifests
+    pool:
+      vmImage: $(vmImageName)
+    steps:
     - upload: manifests
       artifact: manifests
 
+# =========================
+# Deploy Stage
+# =========================
 - stage: Deploy
   displayName: Deploy stage
   dependsOn: Build
-
   jobs:
   - deployment: Deploy
-    displayName: Deploy
+    displayName: Deploy to AKS
     pool:
       vmImage: $(vmImageName)
     environment: 'dnjsdn752APFM.apfm'
@@ -66,13 +100,16 @@ stages:
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
+            displayName: Deploy backend, frontend, fastapi
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/manifests/template.yml
+                $(Pipeline.Workspace)/manifests/backend.yml
+                $(Pipeline.Workspace)/manifests/frontend.yml
+                $(Pipeline.Workspace)/manifests/fastapi.yml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                $(containerRegistry)/$(imageRepository):$(tag)
-
+                backend=$(containerRegistry)/dnjsdnapfm-backend:$(tag)
+                frontend=$(containerRegistry)/dnjsdnapfm-frontend:$(tag)
+                fastapi=$(containerRegistry)/dnjsdnapfm-fastapi:$(tag)
