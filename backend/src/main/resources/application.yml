@@ -35,7 +35,7 @@ spring:
       username: default
       password: ${REDIS_PASSWORD}
       ssl.enabled: true
-
+#
 
 
   datasource:
