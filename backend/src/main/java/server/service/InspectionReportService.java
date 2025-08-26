@@ -29,7 +29,7 @@ public class InspectionReportService {
     private final ReportRepository reportRepository;
     private final InspectionRepository inspectionRepository;
     // ✅ 정기점검 보고서 생성
-    public void generateReport(InspectionReportDTO requestDTO) throws IOException {
+    public byte[] generateReportAndPdf(InspectionReportDTO requestDTO) throws IOException {
         List<Issue> issues = issueRepository.findAllById(requestDTO.getIssueIds());
         Inspection inspection = inspectionRepository.findById(requestDTO.getInspection_id()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
         String fastapiUrl = "http://localhost:8080/priority/run";
@@ -74,14 +74,16 @@ public class InspectionReportService {
 
         Map<String,String> res = response.getBody();
         assert res != null;
-        String pdf = res.get("data");
+        String pdfBase64 = res.get("data");
 
         Report report = new Report();
         report.setCreationDate(inspection.getCreateDate());
         report.setInspection(inspection);
         report = reportRepository.save(report);
-        report.setContent(new File(azureService.azureSaveFile(pdf,inspection.getId(),"report"),"정기점검보고서"));
+        report.setContent(new File(azureService.azureSaveFile(pdfBase64,inspection.getId(),"report"),"정기점검보고서"));
         reportRepository.save(report);
+
+        return Base64.getDecoder().decode(pdfBase64);
 
     }
 }

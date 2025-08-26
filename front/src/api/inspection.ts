@@ -68,9 +68,19 @@ export const saveInspectionSetting = (payload: InspectionSettingDTO) => {
 
 // [기능 요약] 보고서 생성 (LLM)
 export const generateInspectionReport = async (inspectionId: number, issueIds: number[]) => {
-  const { data } = await api.post("/api/inspection/generate", {
-    inspection_id: inspectionId,
+  const payload = {
+    inspection_id: inspectionId, // 또는 inspectionId
     issueIds
+  };
+
+  // ✅ 로컬스토리지에서 JWT 토큰 꺼내서 Authorization 헤더에 붙여줌
+  const token = localStorage.getItem("token");
+
+  return api.post("/api/inspection/generate", payload, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    responseType: "blob",
   });
-  return data;
+
 };

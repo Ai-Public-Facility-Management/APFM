@@ -6,6 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import server.dto.InspectionReportDTO;
 import server.dto.InspectionSettingDTO;
 import server.dto.InspectionDetailDTO;
@@ -53,13 +55,16 @@ public class InspectionController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ 점검 보고서 생성 요청 (LLM)
     @PostMapping("/generate")
-    public ResponseEntity<String> generateReport(
-            @RequestBody InspectionReportDTO requestDTO) throws IOException {
-        inspectionReportService.generateReport(requestDTO);
-        return ResponseEntity.ok("");
+    public ResponseEntity<byte[]> generateReport(@RequestBody InspectionReportDTO requestDTO) throws IOException {
+        byte[] pdfBytes = inspectionReportService.generateReportAndPdf(requestDTO);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=정기점검보고서.pdf") // ✅ 다운로드 되도록
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
     }
+
 
     // 점검 상세 페이지
     @GetMapping("/{id}")
