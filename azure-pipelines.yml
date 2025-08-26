@@ -33,6 +33,7 @@ stages:
         command: buildAndPush
         repository: dnjsdnapfm-backend
         dockerfile: backend/Dockerfile
+        buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
@@ -48,6 +49,7 @@ stages:
         command: buildAndPush
         repository: dnjsdnapfm-frontend
         dockerfile: front/Dockerfile
+        buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
@@ -63,6 +65,7 @@ stages:
         command: buildAndPush
         repository: dnjsdnapfm-fastapi
         dockerfile: fastapi/Dockerfile
+        buildContext: fastapi
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
