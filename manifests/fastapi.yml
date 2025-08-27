@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+  namespace: apfm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: apfmrg.azurecr.io/dnjsdnapfm-fastapi:latest   # ✅ 팀원 FastAPI 이미지
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi
+  namespace: apfm
+spec:
+  type: ClusterIP
+  selector:
+    app: fastapi
+  ports:
+    - port: 8000
+      targetPort: 8000
