@@ -137,7 +137,7 @@ export default function Findpasswordpage() {
     <Layout>
       {/* 변수와 스타일은 컨테이너에 직접 선언된 값으로 강제 적용 */}
       <div className="fp-container">
-        <h2 className="fp-title">비밀번호 찾기 / 재설정</h2>
+        <h2 className="fp-title">비밀번호 재설정</h2>
 
         <section className="fp-card">
           <h2 className="fp-subtitle">이름 / 이메일 확인</h2>

@@ -120,7 +120,7 @@ export default function LoginPage() {
           <button type="submit" className="loginButton">로그인</button>
         </form>
         <div className="loginLinks">
-          <Link to="/find-password">비밀번호 찾기</Link><span>|</span>
+          <Link to="/find-password">비밀번호 재설정</Link><span>|</span>
           <Link to="/signup">회원가입</Link>
         </div>
         <hr className="loginHr" />

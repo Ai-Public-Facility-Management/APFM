@@ -17,6 +17,7 @@ const Footer = () => {
               <img src={koreaLogo} alt="로고" className="logo-image" />
               <span className="footer-text">공공시설물 관리 | APFM</span>
             </div>
+            <p>KT AIVLE SCHOOL AI 트랙 25조</p>
             <p>(48819) 부산광역시 동구 초량중로 29</p>
             <p><strong>대표전화</strong> 1234-5678 (유료, 평일 09시-18시)</p>
             <p><strong>해외이용</strong> +82-1234-5678 (유료, 평일 09시-18시)</p>
