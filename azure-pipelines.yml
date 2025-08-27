@@ -11,7 +11,6 @@ resources:
 variables:
   dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'
   containerRegistry: 'apfmrg.azurecr.io'
-  tag: '$(Build.BuildId)'
   imagePullSecret: 'apfmrgf81e-auth'
   vmImageName: 'ubuntu-latest'
 
@@ -36,7 +35,8 @@ stages:
         buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          latest
+          $(Build.BuildId)
 
   - job: Build_Frontend
     displayName: Build Frontend
@@ -52,7 +52,8 @@ stages:
         buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          latest
+          $(Build.BuildId)
 
   # - job: Build_Fastapi
   #   displayName: Build FastAPI
@@ -113,6 +114,6 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                backend=$(containerRegistry)/dnjsdnapfm-backend:$(tag)
-                frontend=$(containerRegistry)/dnjsdnapfm-frontend:$(tag)
-                fastapi=apfmrg.azurecr.io/fastapi:latest
+                backend=$(containerRegistry)/dnjsdnapfm-backend:latest 
+                frontend=$(containerRegistry)/dnjsdnapfm-frontend:latest
+                fastapi=apfmrg.azurecr.io/dnjsdnapfm-fastapi:latest 

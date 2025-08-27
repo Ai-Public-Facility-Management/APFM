@@ -55,15 +55,19 @@ class FolderPathRequest(BaseModel):
 # 기존 엔드포인트 유지
 latest_proposal = None
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 @app.post("/ai/proposal/generate-from-spring")
-def generate_from_spring(payload: dict):
+async def generate_from_spring(payload: dict):
     global latest_proposal
     proposal = generate_proposal(payload.get("estimations", []))
     latest_proposal = proposal
-    return {"proposal": proposal}
+    return {"status": "ok"}
 
 @app.get("/ai/proposal/latest")
-def get_latest_proposal():
+async def get_latest_proposal():
     if not latest_proposal:
         raise HTTPException(status_code=404, detail="아직 생성된 제안서가 없습니다.")
     return {"proposal": latest_proposal}

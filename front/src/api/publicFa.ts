@@ -1,4 +1,5 @@
 import { api } from "./http";
+import axios from "axios";
 
 export interface Facility {
   publicFaId: number;
@@ -89,14 +90,14 @@ export interface ProposalData {
 }
 
 export const fetchProposal = async (): Promise<ProposalData> => {
-  const res = await api.get<{ proposal: ProposalData }>("http://localhost:8080/ai/proposal/latest");
+  const res = await axios.get<{ proposal: ProposalData }>("/ai/proposal/latest");
   return res.data.proposal;
 };
 
 export const saveProposal = async (proposal: ProposalData) => {
   try {
-    const res = await api.post(
-        "http://localhost:8080/ai/proposal-to-docx",
+    const res = await axios.post(
+        "/ai/proposal-to-docx",
         { proposal },
         {
           responseType: "blob", // DOCX는 바이너리 파일

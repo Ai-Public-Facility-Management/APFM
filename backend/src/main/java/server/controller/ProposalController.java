@@ -18,10 +18,11 @@ public class ProposalController {
     /**
      * 선택된 ID들로 제안서 생성 (Spring → FastAPI 호출)
      */
+
     @PostMapping("/generate")
-    public Mono<ResponseEntity<String>> generateProposal(@RequestBody List<Long> ids) {
-        return proposalService.generateProposalForIds(ids)
-                .map(ResponseEntity::ok);
+    public ResponseEntity<String> generateProposal(@RequestBody List<Long> ids) {
+        return proposalService.generateProposalForIds(ids);
+
     }
 
 }
