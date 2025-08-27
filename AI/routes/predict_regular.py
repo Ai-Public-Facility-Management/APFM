@@ -46,7 +46,7 @@ def get_first_frame(video_path):
 # ---------- 라우트 ----------
 @router.post("/predict")
 async def predict_regular_video():
-    BASE_DIR = Path(__file__).parent
+    BASE_DIR = Path(__file__).parent.parent
     save_folder = BASE_DIR / "videos"
     if not os.path.exists(save_folder) or not os.path.isdir(save_folder):
         raise HTTPException(status_code=400, detail="유효한 동영상 폴더 경로가 아닙니다.")

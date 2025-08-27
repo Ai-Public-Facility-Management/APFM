@@ -16,7 +16,7 @@ state = {
         },
         {
             "name": "볼라드",
-            "damage": "노후화",
+            "damage": "균열",
             "estimated_cost": 400000,
             "hindrance_level": "보통",
             "complaints": 1,
@@ -25,7 +25,7 @@ state = {
         },
         {
             "name": "가로수 지주대",
-            "damage": "양호",
+            "damage": "변색",
             "estimated_cost": 200000,
             "hindrance_level": "보통",
             "complaints": 0,

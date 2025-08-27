@@ -3,12 +3,14 @@ from datetime import datetime
 
 def priority_score(facility: dict) -> dict:
     detail = {}
-    if facility.get("damage") == "파손":
+    damage = facility.get("damage")
+
+    if damage == "파손":
         detail["damage_score"] = 50
-    elif facility.get("damage") == "노후화":
+    elif damage in ["변형", "균열"]:
         detail["damage_score"] = 30
     else:
-        detail["damage_score"] = 0
+        detail["damage_score"] = 20
 
     hindrance_weight = {"없음": 0, "보통": 20, "높음": 40}
     detail["hindrance_score"] = hindrance_weight.get(facility.get("hindrance_level"), 0)
