@@ -358,7 +358,9 @@ function AutomationCluster({
                 </span>
               </div>
 
-              <div className="auto-circle" aria-hidden />
+              <div className="auto-circle">
+                {s.img && <img src={s.img} alt={s.title} className="auto-img" />}
+              </div>
 
               <h3 className="auto-itemTitle">{s.title}</h3>
               <p className="auto-itemDesc">{s.desc}</p>

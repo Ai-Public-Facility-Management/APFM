@@ -148,9 +148,19 @@
   aspect-ratio: 1 / 1;
   border-radius: 9999px;
   margin: 0 auto;
-  background: radial-gradient(120% 120% at 20% 20%, #eef2ff 0%, #dbeafe 40%, #c7d2fe 70%, #e5e7eb 100%);
+  overflow: hidden; /* 이미지 삐져나가지 않게 */
   border: 6px solid #fff;
   box-shadow: 0 10px 30px rgba(0,0,0,.08), inset 0 10px 30px rgba(255,255,255,.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f9f9fb; /* 이미지 없을 때 기본 배경 */
+}
+
+.auto-circle .auto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지 꽉 차게 */
 }
 
 .auto-itemTitle {

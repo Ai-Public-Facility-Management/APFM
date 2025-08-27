@@ -1,6 +1,11 @@
 import pedestrianVideo from '../assets/videos/pedestrian_demo3.mp4';
 import pedestrianPoster from '../assets/videos/pedestrian_poster.jpg';
 
+import aiEstimationImg from '../assets/visuals/ai_estimation.png';
+import facilityDbImg from '../assets/visuals/facility_db.png';
+import inspectionReportImg from '../assets/visuals/inspection_report.png';
+import aiProposalImg from '../assets/visuals/ai_proposal.png';
+
 // src/content/serviceIntroData.ts
 export type IntroStep = {
   id: string;
@@ -9,6 +14,7 @@ export type IntroStep = {
   video?: string;
   poster?: string;
   images?: string[];
+  img?: string;
 };
 
 // CRA는 require.context 사용
@@ -37,24 +43,28 @@ export const FEATURE_STEPS: IntroStep[] = [
     title: "AI 상태평가 및 견적 산출",
     desc:
       "한국건설기술연구원 ‘2025 건설공사 표준품셈’ 원문과 국토교통부 ‘2025 표준시장단가 DB’를 근거로, AI가 시설물 상태를 판정하고 필요한 공사 항목과 예상 비용을 산출합니다. 산출 근거가 함께 제공되어 검토가 용이합니다.",
+    img: aiEstimationImg,
   },
   {
     id: "feat-db",
     title: "시설물 DB 관리",
     desc:
       "시설물 종류, 상태, 방해도, 예상 견적 등 점검 결과를 시설물별 데이터베이스로 저장·관리합니다. 과거 이력과 공사 필요 여부를 한눈에 확인할 수 있어 의사결정이 빨라집니다.",
+    img: facilityDbImg,
   },
   {
     id: "feat-report",
     title: "정기 점검 자동화 보고서 생성",
     desc:
       "모든 CCTV에 대해 설정된 주기대로 점검 내역을 자동 관리합니다. AI가 정기 점검 보고서와 철거·교체 우선순위 공문 초안을 생성하여 행정 문서 작업을 줄여줍니다.",
+    img: inspectionReportImg,
   },
   {
     id: "feat-proposal",
     title: "AI 공사 제안요청서 작성",
     desc:
       "공사가 필요한 시설물을 선택하면 AI가 공문 형식의 제안요청서 초안을 작성합니다. 담당자가 보완·수정 후 Word 파일로 내려받을 수 있습니다.",
+    img: aiProposalImg,
   },
 ];
 
