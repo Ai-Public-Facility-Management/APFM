@@ -66,7 +66,7 @@ public class InspectionSchedulerService {
 
             // ✅ 실행 후 lastInspectedDate는 이번 실행 시각으로 저장
             LocalDateTime executedTime = now.toLocalDate()
-                    .atTime(LocalTime.parse(setting.getStartTime()));
+                    .atTime(LocalTime.parse(setting.getStartTime())).plusHours(9);
             setting.setLastInspectedDate(executedTime);
             inspectionSettingRepository.save(setting);
         }
@@ -104,7 +104,7 @@ public class InspectionSchedulerService {
             // 1️⃣ FastAPI 서버 URL
             List<Long> camera_ids = cameraRepository.findAll().stream().map(Camera::getId).collect(Collectors.toList());
             camera_ids = azureService.getVideos(camera_ids);
-            String fastapiUrl = "http://localhost:8080/predict";
+            String fastapiUrl = "http://fastapi:8080/predict";
 
             // 3️⃣ Multipart Form 구성
             Map<String, Object> body = new HashMap<>();
