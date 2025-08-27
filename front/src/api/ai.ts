@@ -1,7 +1,7 @@
 // src/api/ai.ts
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/ai/predict-board";
+const API_URL = "/ai/predict-board";
 
 /**
  * 단일 객체 감지 결과 타입

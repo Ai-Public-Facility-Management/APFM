@@ -121,7 +121,7 @@ export default function BoardWrite() {
 
     try {
       if (isEditMode) {
-        await axios.put(`${API_BASE}/api/boards/${editPost.id}`, formData, {
+        await axios.put(`/api/boards/${editPost.id}`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`
@@ -129,7 +129,7 @@ export default function BoardWrite() {
         });
         alert("글이 수정되었습니다.");
       } else {
-        await axios.post(`${API_BASE}/api/boards`, formData, {
+        await axios.post(`/api/boards`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`

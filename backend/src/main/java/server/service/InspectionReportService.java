@@ -32,7 +32,7 @@ public class InspectionReportService {
     public byte[] generateReportAndPdf(InspectionReportDTO requestDTO) throws IOException {
         List<Issue> issues = issueRepository.findAllById(requestDTO.getIssueIds());
         Inspection inspection = inspectionRepository.findById(requestDTO.getInspection_id()).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
-        String fastapiUrl = "http://localhost:8080/priority/run";
+        String fastapiUrl = "http://fastapi:8080/priority/run";
 
         List<ReportDTO> dtos = new ArrayList<>();
         issues.forEach(issue -> {

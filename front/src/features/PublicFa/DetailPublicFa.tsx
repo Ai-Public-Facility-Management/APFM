@@ -170,8 +170,9 @@ export default function DetailPublicFa(){
                     </tr>
                     <tr>
                         <th>견적 근거</th>
-                        <td style={{whiteSpace: "pre-line"}}>
-                            {detail.estimateBasis.replace(/\\n/g, "\n")}</td>
+                        <td style={{ whiteSpace: "pre-line" }}>
+                            {detail.estimateBasis ? detail.estimateBasis.replace(/\\n/g, "\n") : ""}
+                        </td>
                     </tr>
                 </tbody>
             </table>
