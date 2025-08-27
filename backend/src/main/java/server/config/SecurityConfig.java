@@ -57,10 +57,8 @@ public class SecurityConfig {
                                  "/auth/**","/publicfa/**","/issue/**","/users/**",
                                 "/css/**", "/js/**", "/images/**", "/webjars/**","/camera/**","/inspection/**",
                                 "/proposal/**", "/boards/**","/upload/**"
-                        ).hasRole("INSPECTOR")
-                        .requestMatchers("/admin/**","/auth/**","/publicfa/**","/issue/**","/users/**",
-                                "/css/**", "/js/**", "/images/**", "/webjars/**","/camera/**","/inspection/**",
-                                "/proposal/**", "/boards/**","/upload/**").hasRole("ADMIN")
+                        ).hasAnyRole("ADMIN","INSPECTOR")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin())) // H2 콘솔 iframe 허용
