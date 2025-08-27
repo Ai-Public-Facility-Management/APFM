@@ -46,7 +46,7 @@ public class InspectionSchedulerService {
     // ✅ 1분마다 점검 주기 확인
     @Scheduled(fixedRate = 60000)
     public void performScheduledInspections() {
-        log.info("⏰ 점검 주기 검사 실행");
+//        log.info("⏰ 점검 주기 검사 실행");
         InspectionSetting setting = inspectionSettingRepository.findById(1L).orElseThrow();
         LocalDateTime now = LocalDateTime.now();
 
@@ -55,10 +55,10 @@ public class InspectionSchedulerService {
                 setting.getStartTime(),
                 setting.getLastInspectedDate());
 
-        log.info("🔍 설정값 확인: cycle={}, startTime={}, lastDate={}",
-                setting.getInspectionCycle(),
-                setting.getStartTime(),
-                setting.getLastInspectedDate());
+//        log.info("🔍 설정값 확인: cycle={}, startTime={}, lastDate={}",
+//                setting.getInspectionCycle(),
+//                setting.getStartTime(),
+//                setting.getLastInspectedDate());
 
         if (isDue(setting, now)) {
             log.info("✅ 점검 실행됨: {}", now);
@@ -66,7 +66,7 @@ public class InspectionSchedulerService {
 
             // ✅ 실행 후 lastInspectedDate는 이번 실행 시각으로 저장
             LocalDateTime executedTime = now.toLocalDate()
-                    .atTime(LocalTime.parse(setting.getStartTime())).plusHours(9);
+                    .atTime(LocalTime.parse(setting.getStartTime()));
             setting.setLastInspectedDate(executedTime);
             inspectionSettingRepository.save(setting);
         }
