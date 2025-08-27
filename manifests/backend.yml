@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: apfm
 spec:
-  replicas: 2                     # ✅ 최소 2개 이상 유지 → 무중단 보장
+  replicas: 1                     # ✅ 최소 2개 이상 유지 → 무중단 보장
   strategy:
     type: RollingUpdate
     rollingUpdate:
