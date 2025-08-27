@@ -4,7 +4,12 @@ metadata:
   name: backend
   namespace: apfm
 spec:
-  replicas: 1
+  replicas: 2                     # ✅ 최소 2개 이상 유지 → 무중단 보장
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0           # ✅ 기존 Pod 절대 안 내려감
+      maxSurge: 1                 # ✅ 새 Pod 하나 더 띄운 후 교체
   selector:
     matchLabels:
       app: backend
@@ -15,9 +20,21 @@ spec:
     spec:
       containers:
         - name: backend
-          image: apfmrg.azurecr.io/dnjsdnapfm-backend:latest   # ✅ Backend 이미지
+          image: apfmrg.azurecr.io/dnjsdnapfm-backend:latest
           ports:
             - containerPort: 8082
+          readinessProbe:         # ✅ 새 Pod 준비되기 전엔 트래픽 안 붙음
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:          # ✅ 죽은 Pod 자동 재시작
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
