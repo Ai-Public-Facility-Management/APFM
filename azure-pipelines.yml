@@ -35,7 +35,7 @@ stages:
         buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          latest              # ✅ 항상 latest 태그로도 push
+          latest
           $(Build.BuildId)
 
   - job: Build_Frontend
@@ -52,7 +52,7 @@ stages:
         buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          latest              # ✅ 항상 latest 태그로도 push
+          latest
           $(Build.BuildId)
 
   # - job: Build_Fastapi
@@ -114,6 +114,6 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                backend=$(containerRegistry)/dnjsdnapfm-backend:latest   # ✅ latest로 고정
-                frontend=$(containerRegistry)/dnjsdnapfm-frontend:latest # ✅ latest로 고정
-                fastapi=apfmrg.azurecr.io/dnjsdnapfm-fastapi:latest     # ✅ 팀원 이미지 정확히 지정
+                backend=$(containerRegistry)/dnjsdnapfm-backend:latest 
+                frontend=$(containerRegistry)/dnjsdnapfm-frontend:latest
+                fastapi=apfmrg.azurecr.io/dnjsdnapfm-fastapi:latest 
