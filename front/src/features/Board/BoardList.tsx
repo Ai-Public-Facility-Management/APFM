@@ -15,7 +15,7 @@ const departmentLabels: Record<string, string> = {
   FINANCE: "재무과",
 };
 
-// 이름 마스킹 함수
+// 이름 마스킹 함수 //3
 const maskName = (name: string) => {
   if (!name) return "";
     if (name.includes("@")) {
