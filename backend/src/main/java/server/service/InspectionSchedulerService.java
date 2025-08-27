@@ -46,7 +46,7 @@ public class InspectionSchedulerService {
     // ✅ 1분마다 점검 주기 확인
     @Scheduled(fixedRate = 60000)
     public void performScheduledInspections() {
-        log.info("⏰ 점검 주기 검사 실행");
+//        log.info("⏰ 점검 주기 검사 실행");
         InspectionSetting setting = inspectionSettingRepository.findById(1L).orElseThrow();
         LocalDateTime now = LocalDateTime.now();
 
@@ -55,10 +55,10 @@ public class InspectionSchedulerService {
                 setting.getStartTime(),
                 setting.getLastInspectedDate());
 
-        log.info("🔍 설정값 확인: cycle={}, startTime={}, lastDate={}",
-                setting.getInspectionCycle(),
-                setting.getStartTime(),
-                setting.getLastInspectedDate());
+//        log.info("🔍 설정값 확인: cycle={}, startTime={}, lastDate={}",
+//                setting.getInspectionCycle(),
+//                setting.getStartTime(),
+//                setting.getLastInspectedDate());
 
         if (isDue(setting, now)) {
             log.info("✅ 점검 실행됨: {}", now);
@@ -104,7 +104,7 @@ public class InspectionSchedulerService {
             // 1️⃣ FastAPI 서버 URL
             List<Long> camera_ids = cameraRepository.findAll().stream().map(Camera::getId).collect(Collectors.toList());
             camera_ids = azureService.getVideos(camera_ids);
-            String fastapiUrl = "http://localhost:8080/predict";
+            String fastapiUrl = "http://fastapi:8080/predict";
 
             // 3️⃣ Multipart Form 구성
             Map<String, Object> body = new HashMap<>();

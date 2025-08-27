@@ -36,4 +36,4 @@ COPY . .
 COPY weights/yolo/v8/best.pt /app/weights/yolo/v8/best.pt
 
 EXPOSE 8080
-CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8080", "--limit-max-request-size", "52428800"]

@@ -5,6 +5,7 @@ import { fetchFacilityDetail, FacilityDetail } from "../../api/publicFa";
 import React, { useEffect, useState, useRef } from "react";
 import {uploadResult} from "../../api/upload";
 
+
 export default function DetailPublicFa(){
     const { id } = useParams<{ id: string }>();
     const [detail, setDetail] = useState<FacilityDetail | null>(null);
@@ -44,70 +45,73 @@ export default function DetailPublicFa(){
         }, duration);
     }
 
-    function addFiles(list: FileList | null) {
-        if (!list) return;
-        const arr = Array.from(list);
+    function addFile(file: File | null) {
+        if (!file) return;
+
         const errs: string[] = [];
-        const valid: File[] = [];
+        const ext = pickExt(file.name);
 
-        arr.forEach(f => {
-            const ext = pickExt(f.name);
-            if (!ACCEPT_EXT.includes(ext)) errs.push(`${f.name}: 형식 미허용(${ext})`);
-            else if (f.size > MAX_SIZE) errs.push(`${f.name}: 용량 초과(${humanSize(MAX_SIZE)} 이하)`);
-            else valid.push(f);
-        });
-
-        const remain = Math.max(0, MAX_COUNT - reports.length);
-        const trimmed = valid.slice(0, remain);
-        if (valid.length > remain) errs.push(`최대 ${MAX_COUNT}개까지 업로드 가능합니다.`);
-
-        if (errs.length) alert(errs.join("\n"));
-
-        if (trimmed.length) {
-            const newRows = trimmed.map(f => ({
-                id: crypto.randomUUID(),
-                file: f,
-                name: f.name.replace(/\.[^/.]+$/, ""),
-                ext: pickExt(f.name),
-                sizeLabel: humanSize(f.size),
-                status: "uploading" as const,
-                progress: 0
-            }));
-            setReports(prev => [...prev, ...newRows]);
-
-            // 업로드 시작
-            newRows.forEach(row => {
-                uploadResult(row.file,Number(id),(percent) => {
-                    setReports(prev =>
-                        prev.map(r =>
-                            r.id === row.id ? { ...r, progress: percent } : r
-                        )
-                    );
-                }).then(() => {
-                    setReports(prev =>
-                        prev.map(r =>
-                            r.id === row.id
-                                ? { ...r, status: "done", progress: 100 }
-                                : r
-                        )
-                    );
-                    setDetail(prev => prev ? { ...prev, hasReport: true } : prev);
-                }).catch(() => {
-                    alert(`${row.name} 업로드 실패`);
-                    setReports(prev => prev.filter(r => r.id !== row.id));
-                });
-            });
+        if (!ACCEPT_EXT.includes(ext)) {
+            errs.push(`${file.name}: 형식 미허용(${ext})`);
+        } else if (file.size > MAX_SIZE) {
+            errs.push(`${file.name}: 용량 초과(${humanSize(MAX_SIZE)} 이하)`);
         }
+
+        if (errs.length) {
+            alert(errs.join("\n"));
+            return;
+        }
+
+        // 기존 업로드 제거하고 새 파일만 유지 (단일 파일 전용)
+        const newRow = {
+            id: Math.random().toString(36).substring(2, 10) + Date.now().toString(36),
+            file: file,
+            name: file.name.replace(/\.[^/.]+$/, ""),
+            ext: ext,
+            sizeLabel: humanSize(file.size),
+            status: "uploading" as const,
+            progress: 0
+        };
+
+        setReports([newRow]); // 항상 하나만 저장
+
+        // 업로드 시작
+        uploadResult(file, Number(id), (percent) => {
+            setReports(prev =>
+                prev.length ? [{ ...prev[0], progress: percent }] : prev
+            );
+        })
+            .then(() => {
+                setReports(prev =>
+                    prev.map(r =>
+                        r.id === newRow.id
+                            ? { ...r, status: "done", progress: 100 }
+                            : r
+                    )
+                );
+                setDetail(prev => prev ? { ...prev, hasReport: true } : prev);
+            })
+            .catch(() => {
+                alert(`${newRow.name} 업로드 실패`);
+                setReports([]); // 실패 시 비움
+            });
     }
 
     const onDragOver  = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
     const onDragEnter = (e: React.DragEvent) => { e.preventDefault(); setDragging(true); };
     const onDragLeave = () => setDragging(false);
-    const onDrop      = (e: React.DragEvent) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files); };
-
+    const onDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragging(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            addFile(e.dataTransfer.files[0]);
+        }
+    };
     const onBrowseClick = () => inputRef.current?.click();
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        addFiles(e.target.files);
+        if (e.target.files && e.target.files[0]) {
+            addFile(e.target.files[0]);
+        }
         e.target.value = ""; // 같은 파일 재선택 가능하도록 초기화
     };
 
@@ -231,7 +235,6 @@ export default function DetailPublicFa(){
                             <input
                                 ref={inputRef}
                                 type="file"
-                                multiple
                                 accept={ACCEPT_EXT.join(",")}
                                 className="sr-only"
                                 onChange={onInputChange}
