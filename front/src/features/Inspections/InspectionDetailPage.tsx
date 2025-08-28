@@ -57,7 +57,7 @@ export default function InspectionDetailPage() {
     // 모든 카메라의 이슈 개수 합산
     const count =
       data?.cameras?.reduce((sum, cam) => sum + (cam.issues?.length ?? 0), 0) ?? 0;
-    return `${date} 정기점검 확인 요구 사항 ${count}건 있습니다.`;
+    return `${date} 정기점검 확인 요구 사항 ${count}건 있습니다요.`;
   }, [data]);
 
   return (
