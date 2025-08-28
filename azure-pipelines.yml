@@ -1,6 +1,5 @@
 # Deploy to Azure Kubernetes Service
 # Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
 - main
@@ -9,10 +8,15 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'
-  containerRegistry: 'apfmrg.azurecr.io'
-  imagePullSecret: 'apfmrgf81e-auth'
-  vmImageName: 'ubuntu-latest'
+- name: dockerRegistryServiceConnection
+  value: '05c23959-ace4-4487-a73b-d09fe638aff7'
+- name: containerRegistry
+  value: 'apfmrg.azurecr.io'
+- name: imagePullSecret
+  value: 'apfmrgf81e-auth'
+- name: vmImageName
+  value: 'ubuntu-latest'
+- group: apfmk   # 🔹 DevOps Library 연결
 
 stages:
 # =========================
@@ -45,7 +49,7 @@ stages:
     variables:
       - group: frontend-secrets      
     steps:
-    # 👉 프론트 .env 파일 생성 (Windows CMD 호환)
+    # 👉 프론트 .env 파일 생성
     - script: |
         echo REACT_APP_KAKAO_JS_KEY=$(REACT_APP_KAKAO_JS_KEY) > front\.env
         echo .env file created:
@@ -62,24 +66,6 @@ stages:
         tags: |
           latest
           $(Build.BuildId)
-
-  # 👉 fastapi는 이미지 용량 크고 자주 안 바뀌므로 파이프라인 빌드/푸시 제외
-  # - job: Build_Fastapi
-  #   displayName: Build FastAPI
-  #   pool:
-  #     name: Default
-  #   steps:
-  #   - task: Docker@2
-  #     displayName: Build and push FastAPI image
-  #     inputs:
-  #       command: buildAndPush
-  #       repository: dnjsdnapfm-fastapi
-  #       dockerfile: AI/Dockerfile
-  #       buildContext: AI
-  #       containerRegistry: $(dockerRegistryServiceConnection)
-  #       tags: |
-  #         latest
-  #         $(Build.BuildId)
 
   # 👉 k8s 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests
@@ -106,6 +92,7 @@ stages:
       runOnce:
         deploy:
           steps:
+          # 🔹 1) imagePullSecret 생성
           - task: KubernetesManifest@0
             displayName: Create imagePullSecret
             inputs:
@@ -114,6 +101,26 @@ stages:
               secretName: $(imagePullSecret)
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
+          # 🔹 2) backend-secrets 생성
+          - task: KubernetesManifest@0
+            displayName: Create backend-secrets
+            inputs:
+              action: createSecret
+              namespace: apfm
+              secretName: backend-secrets
+              secretArguments: |
+                --from-literal=ACCOUNT_KEY=$(ACCOUNT_KEY)
+                --from-literal=ACCOUNT_NAME=$(ACCOUNT_NAME)
+                --from-literal=ADMIN_EMAIL=$(ADMIN_EMAIL)
+                --from-literal=ADMIN_PASSWORD=$(ADMIN_PASSWORD)
+                --from-literal=CONNECTION_STRING=$(CONNECTION_STRING)
+                --from-literal=CONTAINER_NAME=$(CONTAINER_NAME)
+                --from-literal=MAIL_PASSWORD=$(MAIL_PASSWORD)
+                --from-literal=MAIL_USERNAME=$(MAIL_USERNAME)
+                --from-literal=REDIS_PASSWORD=$(REDIS_PASSWORD)
+                --from-literal=SECRET_KEY=$(SECRET_KEY)
+
+          # 🔹 3) 실제 배포
           - task: KubernetesManifest@1
             displayName: Deploy backend, frontend, fastapi, nginx
             inputs:
