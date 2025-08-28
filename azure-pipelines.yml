@@ -100,6 +100,7 @@ stages:
                 --from-literal=ADMIN_PASSWORD="$env:ADMIN_PASSWORD" `
                 --from-literal=REDIS_PASSWORD="$env:REDIS_PASSWORD" `
                 --from-literal=ACCOUNT_KEY="$env:ACCOUNT_KEY" `
+                --from-literal=ACCOUNT_NAME="$env:ACCOUNT_NAME" `
                 --from-literal=CONNECTION_STRING="$env:CONNECTION_STRING" `
                 --from-literal=CONTAINER_NAME="$env:CONTAINER_NAME" `
                 --from-literal=MAIL_USERNAME="$env:MAIL_USERNAME" `
