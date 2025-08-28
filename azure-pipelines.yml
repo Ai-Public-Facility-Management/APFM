@@ -108,7 +108,6 @@ stages:
               action: createSecret
               namespace: apfm
               secretName: backend-secrets
-              secretType: generic 
               secretArguments: |
                 --from-literal=ACCOUNT_KEY=$(ACCOUNT_KEY)
                 --from-literal=ACCOUNT_NAME=$(ACCOUNT_NAME)
