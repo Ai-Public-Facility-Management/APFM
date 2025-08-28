@@ -1,7 +1,7 @@
 # ===============================
 # Azure DevOps Pipeline for APFM
 # 빌드 → ACR 푸시 → AKS 배포 (kubectl + kubeconfig 주입)
-# Self-hosted Agent 버전
+# Windows Self-hosted Agent 버전
 # ===============================
 
 trigger:
@@ -26,7 +26,7 @@ stages:
   - job: Build_Backend
     displayName: Build Backend
     pool:
-      name: Default          # ✅ Self-hosted agent pool 이름 (보통 Default)
+      name: Default          # ✅ Self-hosted agent pool
     steps:
     - task: Docker@2
       displayName: Build and push Backend image
@@ -53,7 +53,7 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: latest
 
-  # FastAPI 빌드가 필요하다면 주석 해제
+  # FastAPI 빌드가 필요하면 주석 해제
   # - job: Build_FastAPI
   #   displayName: Build FastAPI
   #   pool:
@@ -80,22 +80,23 @@ stages:
     displayName: Deploy to Kubernetes
     environment: 'apfm-aks'
     pool:
-      name: Default          # ✅ Self-hosted agent pool 이름
+      name: Default
     strategy:
       runOnce:
         deploy:
           steps:
           # 1️⃣ kubeconfig 파일 생성 (Library 변수에 KUBECONFIG_CONTENT 등록 필요)
-          - script: |
-              echo "$(KUBECONFIG_CONTENT)" > ./kubeconfig.yaml
-              export KUBECONFIG=./kubeconfig.yaml
+          - powershell: |
+              Write-Output "Setting up kubeconfig..."
+              Set-Content -Path "./kubeconfig.yaml" -Value "$(KUBECONFIG_CONTENT)"
+              $env:KUBECONFIG = "$(System.DefaultWorkingDirectory)\kubeconfig.yaml"
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 2️⃣ backend-secrets 생성/갱신
-          - script: |
-              echo "Creating backend secrets..."
-              cat <<EOF | kubectl apply -n $(namespace) -f -
+          # 2️⃣ backend-secrets 생성/갱신 (PowerShell Here-String)
+          - powershell: |
+              Write-Output "Creating backend secrets..."
+              $secret = @"
               apiVersion: v1
               kind: Secret
               metadata:
@@ -112,11 +113,12 @@ stages:
                 CONTAINER_NAME: $(CONTAINER_NAME)
                 MAIL_USERNAME: $(MAIL_USERNAME)
                 MAIL_PASSWORD: $(MAIL_PASSWORD)
-              EOF
+              "@
+              $secret | kubectl apply -f -
             displayName: "Create/Update backend secrets"
 
           # 3️⃣ Deployment/Service 배포
-          - script: |
+          - powershell: |
               kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
               kubectl apply -f k8s/frontend-deploy.yaml -n $(namespace)
               kubectl apply -f k8s/fastapi-deploy.yaml -n $(namespace)
