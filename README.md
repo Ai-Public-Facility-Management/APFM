@@ -23,12 +23,26 @@
    * kakao map API를 활용해 해당 CCTV 위치와 시설물 상태를 지도 위에 시각화하여 직관적으로 관리한다.
    * 사용 기술: FastAPI, kakao map API
   
+### 서비스 배경
+* 도심 공공시설물로 인한 시민 불편과 안전 문제
+  * 도심 보행로·차도에 노후·파손·무분별 설치된 공공시설물이 방치되어 시민의 보행권과 도시 경관을 저해
+  * 시설물이 보행 공간을 점유하거나 시야를 가려 안전사고로 이어질 위험 존재
+  * 부산시의 “도시비우기 정책” 추진 사례에서 볼 수 있듯, 노후·불필요 시설물 정비는 사회적 요구로 대두
+
+ * 수작업 중심 점검 방식의 한계
+   * 대부분의 지자체·공공기관은 인력에 의존한 현장 점검과 수기 기록 위주로 운영
+   * 도로부속물·옥외시설물 점검 주기: 분기 1회 또는 연 3회 수준으로 한계 존재
+   * 1개 구역 점검에 평균 2~3일 이상 소요 → 업무 비효율 및 대응 지연
+   * 파손·방해 요소 파악이 늦어 사후 대응 중심 관리가 반복
+   * 수리/철거 시 견적 산출 및 우선순위 판단에 많은 행정 리소스 소모
+  
 
 ### 목표 고객
 공공시설물 유지관리 전문기관, 관련 지자체​
 
+---
 
-## 멤버 구성
+### 멤버 구성
 * 윤원우: AI detection, Data Preprocessing, FastApi, FE
 * 김예지: Estimate AI Agent, LLM LangGraph, FastApi, FE
 * 오지민: Report AI Agent, LLM LangGraph, FastApi, FE
@@ -38,11 +52,17 @@
 * 한정민: Spring, CI/CD, Cloud, FE
 
 
-## 프로젝트 기간
+
+### 프로젝트 기간
 2025.07.07 - 2025.09.01
 
+---
 
-## 서비스 아키텍쳐
+### 서비스 아키텍쳐
+<img width="1311" height="775" alt="Image" src="https://github.com/user-attachments/assets/1125b13e-4e32-4f13-b324-178239ed92c7" />
 
+
+### 서비스 플로우
+<img width="2645" height="338" alt="Image" src="https://github.com/user-attachments/assets/25b799dc-7a21-4062-af35-305b5cb07a02" />
 
   
