@@ -1,7 +1,6 @@
 # ===============================
 # Azure DevOps Pipeline for APFM
-# 빌드 → ACR 푸시 → AKS 배포 (kubectl + kubeconfig 주입)
-# Windows Self-hosted Agent 버전
+# 빌드 → ACR 푸시 → AKS 배포 (kubectl + SecureFile kubeconfig)
 # ===============================
 
 trigger:
@@ -85,15 +84,20 @@ stages:
       runOnce:
         deploy:
           steps:
-          # 1️⃣ kubeconfig 파일 생성 (Library 변수에 KUBECONFIG_CONTENT 등록 필요)
+          # 1️⃣ kubeconfig Secure file 다운로드
+          - task: DownloadSecureFile@1
+            name: kubeconfigFile
+            inputs:
+              secureFile: kubeconfig.yaml   # 🔹 Secure files에 올린 이름과 동일해야 함
+
+          # 2️⃣ kubeconfig 환경 변수 설정
           - powershell: |
               Write-Output "Setting up kubeconfig..."
-              Set-Content -Path "./kubeconfig.yaml" -Value "$(KUBECONFIG_CONTENT)"
-              $env:KUBECONFIG = "$(System.DefaultWorkingDirectory)\kubeconfig.yaml"
+              $env:KUBECONFIG = "$(Agent.TempDirectory)\$(kubeconfigFile.secureFilePath)"
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 2️⃣ backend-secrets 생성/갱신 (PowerShell Here-String)
+          # 3️⃣ backend-secrets 생성/갱신
           - powershell: |
               Write-Output "Creating backend secrets..."
               $secret = @"
@@ -117,7 +121,7 @@ stages:
               $secret | kubectl apply -f -
             displayName: "Create/Update backend secrets"
 
-          # 3️⃣ Deployment/Service 배포
+          # 4️⃣ Deployment/Service 배포
           - powershell: |
               kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
               kubectl apply -f k8s/frontend-deploy.yaml -n $(namespace)
