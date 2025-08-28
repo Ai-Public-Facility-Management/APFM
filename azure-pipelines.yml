@@ -40,7 +40,6 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           latest
-          $(Build.BuildId)
 
   - job: Build_Frontend
     displayName: Build Frontend
@@ -65,7 +64,6 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           latest
-          $(Build.BuildId)
 
   # 👉 k8s 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests
@@ -135,7 +133,7 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                backend=$(containerRegistry)/backend:$(Build.BuildId)
-                frontend=$(containerRegistry)/frontend:$(Build.BuildId)
+                backend=$(containerRegistry)/backend:latest
+                frontend=$(containerRegistry)/frontend:latest
                 # fastapi는 기존 이미지(apfmrg.azurecr.io/fastapi:latest) 그대로 사용
                 # nginx는 Docker Hub 이미지 사용 → 매핑 불필요
