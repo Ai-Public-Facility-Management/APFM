@@ -30,7 +30,7 @@ stages:
       displayName: Build and push Backend image
       inputs:
         command: buildAndPush
-        repository: dnjsdnapfm-backend
+        repository: backend
         dockerfile: backend/Dockerfile
         buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
@@ -55,7 +55,7 @@ stages:
       displayName: Build and push Frontend image
       inputs:
         command: buildAndPush
-        repository: dnjsdnapfm-frontend
+        repository: frontend
         dockerfile: front/Dockerfile
         buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
