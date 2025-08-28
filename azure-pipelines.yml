@@ -1,6 +1,7 @@
 # ===============================
 # Azure DevOps Pipeline for APFM
 # 빌드 → ACR 푸시 → AKS 배포 (kubectl + SecureFile kubeconfig)
+# Windows Self-hosted Agent 버전
 # ===============================
 
 trigger:
@@ -25,7 +26,7 @@ stages:
   - job: Build_Backend
     displayName: Build Backend
     pool:
-      name: Default          # ✅ Self-hosted agent pool
+      name: Default
     steps:
     - task: Docker@2
       displayName: Build and push Backend image
@@ -52,22 +53,6 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: latest
 
-  # FastAPI 빌드가 필요하면 주석 해제
-  # - job: Build_FastAPI
-  #   displayName: Build FastAPI
-  #   pool:
-  #     name: Default
-  #   steps:
-  #   - task: Docker@2
-  #     displayName: Build and push FastAPI image
-  #     inputs:
-  #       command: buildAndPush
-  #       repository: fastapi
-  #       dockerfile: AI/Dockerfile
-  #       buildContext: AI
-  #       containerRegistry: $(dockerRegistryServiceConnection)
-  #       tags: latest
-
 # =========================
 # Deploy Stage
 # =========================
@@ -88,7 +73,7 @@ stages:
           - task: DownloadSecureFile@1
             name: kubeconfigFile
             inputs:
-              secureFile: kubeconfig.yaml   # 🔹 Secure files에 올린 이름과 동일해야 함
+              secureFile: kubeconfig.yaml
 
           # 2️⃣ kubeconfig 환경 변수 설정
           - powershell: |
@@ -97,9 +82,20 @@ stages:
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 3️⃣ backend-secrets 생성/갱신
+          # 3️⃣ backend-secrets 생성/갱신 (변수 먼저 담고 Here-String에 삽입)
           - powershell: |
               Write-Output "Creating backend secrets..."
+
+              $secretKey      = "$(SECRET_KEY)"
+              $adminEmail     = "$(ADMIN_EMAIL)"
+              $adminPassword  = "$(ADMIN_PASSWORD)"
+              $redisPassword  = "$(REDIS_PASSWORD)"
+              $accountKey     = "$(ACCOUNT_KEY)"
+              $connectionStr  = "$(CONNECTION_STRING)"
+              $containerName  = "$(CONTAINER_NAME)"
+              $mailUser       = "$(MAIL_USERNAME)"
+              $mailPass       = "$(MAIL_PASSWORD)"
+
               $secret = @"
               apiVersion: v1
               kind: Secret
@@ -108,16 +104,17 @@ stages:
                 namespace: $(namespace)
               type: Opaque
               stringData:
-                SECRET_KEY: $(SECRET_KEY)
-                ADMIN_EMAIL: $(ADMIN_EMAIL)
-                ADMIN_PASSWORD: $(ADMIN_PASSWORD)
-                REDIS_PASSWORD: $(REDIS_PASSWORD)
-                ACCOUNT_KEY: $(ACCOUNT_KEY)
-                CONNECTION_STRING: $(CONNECTION_STRING)
-                CONTAINER_NAME: $(CONTAINER_NAME)
-                MAIL_USERNAME: $(MAIL_USERNAME)
-                MAIL_PASSWORD: $(MAIL_PASSWORD)
+                SECRET_KEY: $secretKey
+                ADMIN_EMAIL: $adminEmail
+                ADMIN_PASSWORD: $adminPassword
+                REDIS_PASSWORD: $redisPassword
+                ACCOUNT_KEY: $accountKey
+                CONNECTION_STRING: $connectionStr
+                CONTAINER_NAME: $containerName
+                MAIL_USERNAME: $mailUser
+                MAIL_PASSWORD: $mailPass
               "@
+
               $secret | kubectl apply -f -
             displayName: "Create/Update backend secrets"
 
