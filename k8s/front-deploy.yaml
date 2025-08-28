@@ -1,4 +1,3 @@
-# [기능 요약] React 정적 사이트(Nginx) 배포 및 외부 노출(LoadBalancer)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,24 +6,24 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels: { app: frontend }
+    matchLabels:
+      app: frontend
   template:
     metadata:
-      labels: { app: frontend }
+      labels:
+        app: frontend
     spec:
+      imagePullSecrets:
+        - name: apfmrgf81e-auth
       containers:
         - name: frontend
-          # 필요한 import(이미지): ACR에 올린 경로 반영
           image: apfmrg.azurecr.io/frontend:latest
+          imagePullPolicy: Always   # ✅ 최신 이미지 항상 가져오기
           ports:
-            - containerPort: 80
-          # (선택) 헬스체크 필요 시 간단히 루트로
-          readinessProbe:
-            httpGet: { path: /, port: 80 }
-            initialDelaySeconds: 5
-          livenessProbe:
-            httpGet: { path: /, port: 80 }
-            initialDelaySeconds: 10
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: frontend-secrets   # 카카오 JS KEY 등 프론트용 Secret
 ---
 apiVersion: v1
 kind: Service
@@ -32,9 +31,9 @@ metadata:
   name: frontend
   namespace: apfm
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: frontend
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 3000
+      targetPort: 3000
