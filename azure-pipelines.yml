@@ -93,7 +93,7 @@ stages:
           # 2️⃣ kubeconfig 환경 변수 설정
           - powershell: |
               Write-Output "Setting up kubeconfig..."
-              $env:KUBECONFIG = "$(Agent.TempDirectory)\$(kubeconfigFile.secureFilePath)"
+              $env:KUBECONFIG = "$(kubeconfigFile.secureFilePath)"
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
