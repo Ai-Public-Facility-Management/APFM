@@ -42,7 +42,7 @@ stages:
         buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          latest   # ✅ latest만 사용 (빌드ID 태그 제거)
+          latest  
 
   - job: Build_Frontend
     displayName: Build Frontend
@@ -66,7 +66,7 @@ stages:
         buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          latest   # ✅ latest만 사용
+          latest  
 
   # 👉 k8s 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests
