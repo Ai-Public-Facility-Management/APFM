@@ -93,7 +93,7 @@ stages:
         deploy:
           steps:
           # 🔹 1) imagePullSecret 생성
-          - task: KubernetesManifest@0
+          - task: KubernetesManifest@1
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
@@ -102,7 +102,7 @@ stages:
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           # 🔹 2) backend-secrets 생성
-          - task: KubernetesManifest@0
+          - task: KubernetesManifest@1
             displayName: Create backend-secrets
             inputs:
               action: createSecret
