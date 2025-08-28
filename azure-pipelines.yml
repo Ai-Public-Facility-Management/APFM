@@ -63,6 +63,7 @@ stages:
           latest
           $(Build.BuildId)
 
+  # 👉 fastapi는 이미지 용량 크고 자주 안 바뀌므로 파이프라인 빌드/푸시 제외
   # - job: Build_Fastapi
   #   displayName: Build FastAPI
   #   pool:
@@ -80,14 +81,14 @@ stages:
   #         latest
   #         $(Build.BuildId)
 
-  # 👉 manifests 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
+  # 👉 k8s 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests
-    displayName: Publish manifests
+    displayName: Publish k8s manifests
     pool:
       name: Default
     steps:
-    - upload: manifests
-      artifact: manifests
+    - upload: k8s
+      artifact: k8s-manifests
 
 # =========================
 # Deploy Stage
@@ -114,17 +115,19 @@ stages:
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           - task: KubernetesManifest@1
-            displayName: Deploy backend, frontend, fastapi
+            displayName: Deploy backend, frontend, fastapi, nginx
             inputs:
               action: deploy
               namespace: apfm 
               manifests: |
-                $(Pipeline.Workspace)/manifests/backend.yml
-                $(Pipeline.Workspace)/manifests/frontend.yml
-                $(Pipeline.Workspace)/manifests/fastapi.yml
+                $(Pipeline.Workspace)/k8s-manifests/backend-deploy.yaml
+                $(Pipeline.Workspace)/k8s-manifests/front-deploy.yaml
+                $(Pipeline.Workspace)/k8s-manifests/fastapi-deploy.yaml
+                $(Pipeline.Workspace)/k8s-manifests/nginx-lb.yaml
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                backend=$(containerRegistry)/dnjsdnapfm-backend:latest 
-                frontend=$(containerRegistry)/dnjsdnapfm-frontend:latest
-                fastapi=$(containerRegistry)/dnjsdnapfm-fastapi:stable
+                backend=$(containerRegistry)/dnjsdnapfm-backend:$(Build.BuildId)
+                frontend=$(containerRegistry)/dnjsdnapfm-frontend:$(Build.BuildId)
+                # fastapi는 기존 이미지(apfmrg.azurecr.io/fastapi:latest) 그대로 사용
+                # nginx는 Docker Hub 이미지 사용 → 매핑 불필요
