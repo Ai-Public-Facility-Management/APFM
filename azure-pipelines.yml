@@ -127,7 +127,7 @@ stages:
               imagePullSecrets: |
                 $(imagePullSecret)
               containers: |
-                backend=$(containerRegistry)/dnjsdnapfm-backend:$(Build.BuildId)
-                frontend=$(containerRegistry)/dnjsdnapfm-frontend:$(Build.BuildId)
+                backend=$(containerRegistry)/backend:$(Build.BuildId)
+                frontend=$(containerRegistry)/frontend:$(Build.BuildId)
                 # fastapi는 기존 이미지(apfmrg.azurecr.io/fastapi:latest) 그대로 사용
                 # nginx는 Docker Hub 이미지 사용 → 매핑 불필요
