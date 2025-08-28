@@ -93,7 +93,7 @@ stages:
         deploy:
           steps:
           # 🔹 1) imagePullSecret 생성
-          - task: KubernetesManifest@1
+          - task: KubernetesManifest@0
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
@@ -102,12 +102,13 @@ stages:
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
           # 🔹 2) backend-secrets 생성
-          - task: KubernetesManifest@1
+          - task: KubernetesManifest@0
             displayName: Create backend-secrets
             inputs:
               action: createSecret
               namespace: apfm
               secretName: backend-secrets
+              secretType: generic 
               secretArguments: |
                 --from-literal=ACCOUNT_KEY=$(ACCOUNT_KEY)
                 --from-literal=ACCOUNT_NAME=$(ACCOUNT_NAME)
@@ -121,7 +122,7 @@ stages:
                 --from-literal=SECRET_KEY=$(SECRET_KEY)
 
           # 🔹 3) 실제 배포
-          - task: KubernetesManifest@1
+          - task: KubernetesManifest@0
             displayName: Deploy backend, frontend, fastapi, nginx
             inputs:
               action: deploy
