@@ -108,10 +108,9 @@ stages:
               $secret | kubectl apply -f -
             displayName: "Create/Update backend secrets"
 
-          # 4️⃣ Deployment/Service 배포
           - powershell: |
-              kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
-              kubectl apply -f k8s/frontend-deploy.yaml -n $(namespace)
-              kubectl apply -f k8s/fastapi-deploy.yaml -n $(namespace)
-              kubectl apply -f k8s/nginx-deploy.yaml -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/backend-deploy.yaml" -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/frontend-deploy.yaml" -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/fastapi-deploy.yaml" -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/nginx-deploy.yaml" -n $(namespace)
             displayName: "Apply manifests"
