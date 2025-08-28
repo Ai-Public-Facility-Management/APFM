@@ -53,20 +53,20 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: latest
 
-  - job: Build_FastAPI
-    displayName: Build FastAPI
-    pool:
-      name: Default
-    steps:
-    - task: Docker@2
-      displayName: Build and push FastAPI image
-      inputs:
-        command: buildAndPush
-        repository: fastapi
-        dockerfile: AI/Dockerfile
-        buildContext: AI
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: latest
+  # - job: Build_FastAPI
+  #   displayName: Build FastAPI
+  #   pool:
+  #     name: Default
+  #   steps:
+  #   - task: Docker@2
+  #     displayName: Build and push FastAPI image
+  #     inputs:
+  #       command: buildAndPush
+  #       repository: fastapi
+  #       dockerfile: AI/Dockerfile
+  #       buildContext: AI
+  #       containerRegistry: $(dockerRegistryServiceConnection)
+  #       tags: latest
 
 # =========================
 # Deploy Stage
