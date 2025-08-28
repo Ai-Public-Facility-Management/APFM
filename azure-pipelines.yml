@@ -69,7 +69,8 @@ stages:
         buildContext: AI
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          latest
+          $(Build.BuildId)
 
   # 👉 manifests 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests

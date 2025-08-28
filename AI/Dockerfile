@@ -33,7 +33,8 @@ COPY --from=base /usr/local /usr/local
 COPY . .
 
 # 모델 가중치는 별도로 복사 (코드와 따로 관리 가능)
-COPY weights/yolo/v8/best.pt /app/weights/yolo/v8/best.pt
+COPY weights/v8/best.pt /app/weights/v8/best.pt
+COPY weights/tracking/best.pt /app/weights/tracking/best.pt
 
 EXPOSE 8080
 CMD ["uvicorn", "run:app", "--host", "0.0.0.0", "--port", "8080", "--limit-max-request-size", "52428800"]
