@@ -92,48 +92,28 @@ stages:
 
           # 3️⃣ backend-secrets 생성/갱신
           - powershell: |
-              Write-Output "Creating backend secrets..."
-
-              $secret = @"
-              apiVersion: v1
-              kind: Secret
-              metadata:
-                name: backend-secrets
-                namespace: $(namespace)
-              type: Opaque
-              stringData:
-                SECRET_KEY: $env:SECRET_KEY
-                ADMIN_EMAIL: $env:ADMIN_EMAIL
-                ADMIN_PASSWORD: $env:ADMIN_PASSWORD
-                REDIS_PASSWORD: $env:REDIS_PASSWORD
-                ACCOUNT_KEY: $env:ACCOUNT_KEY
-                CONNECTION_STRING: $env:CONNECTION_STRING
-                CONTAINER_NAME: $env:CONTAINER_NAME
-                MAIL_USERNAME: $env:MAIL_USERNAME
-                MAIL_PASSWORD: $env:MAIL_PASSWORD
-              "@
-
-              $secret | kubectl apply -f -
+              Write-Host "Creating backend secrets..."
+              kubectl delete secret backend-secrets -n $(namespace) --ignore-not-found
+              kubectl create secret generic backend-secrets `
+                --from-literal=SECRET_KEY="$env:SECRET_KEY" `
+                --from-literal=ADMIN_EMAIL="$env:ADMIN_EMAIL" `
+                --from-literal=ADMIN_PASSWORD="$env:ADMIN_PASSWORD" `
+                --from-literal=REDIS_PASSWORD="$env:REDIS_PASSWORD" `
+                --from-literal=ACCOUNT_KEY="$env:ACCOUNT_KEY" `
+                --from-literal=CONNECTION_STRING="$env:CONNECTION_STRING" `
+                --from-literal=CONTAINER_NAME="$env:CONTAINER_NAME" `
+                --from-literal=MAIL_USERNAME="$env:MAIL_USERNAME" `
+                --from-literal=MAIL_PASSWORD="$env:MAIL_PASSWORD" `
+                -n $(namespace)
             displayName: "Create/Update backend secrets"
 
           # 4️⃣ frontend-secrets 생성/갱신
           - powershell: |
-              Write-Output "Creating frontend secrets..."
-
-              $kakaoKey = $env:REACT_APP_KAKAO_JS_KEY
-
-              $secret = @"
-              apiVersion: v1
-              kind: Secret
-              metadata:
-                name: frontend-secrets
-                namespace: $(namespace)
-              type: Opaque
-              stringData:
-                REACT_APP_KAKAO_JS_KEY: $kakaoKey
-              "@
-
-              $secret | kubectl apply -f -
+              Write-Host "Creating frontend secrets..."
+              kubectl delete secret frontend-secrets -n $(namespace) --ignore-not-found
+              kubectl create secret generic frontend-secrets `
+                --from-literal=REACT_APP_KAKAO_JS_KEY="$env:REACT_APP_KAKAO_JS_KEY" `
+                -n $(namespace)
             displayName: "Create/Update frontend secrets"
 
           # 5️⃣ Deployment/Service 배포 (파일명 맞춰 수정)
