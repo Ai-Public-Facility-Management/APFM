@@ -1,7 +1,7 @@
 # ===============================
 # Azure DevOps Pipeline for APFM
 # 빌드 → ACR 푸시 → AKS 배포 (kubectl + SecureFile kubeconfig)
-# Windows Self-hosted Agent 버전
+# Backend + Frontend Secrets 반영
 # ===============================
 
 trigger:
@@ -11,10 +11,18 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'  # ✅ ACR 로그인용
-  containerRegistry: 'apfmrg.azurecr.io'
-  imagePullSecret: 'apfmrgf81e-auth'
-  namespace: 'apfm'
+# 🔹 두 개의 Variable Group을 불러옴
+- group: apfmk              # backend 관련 값들 (SECRET_KEY 등)
+- group: frontend-secrets   # frontend 관련 값들 (REACT_APP_KAKAO_JS_KEY)
+
+- name: dockerRegistryServiceConnection
+  value: '05c23959-ace4-4487-a73b-d09fe638aff7'
+- name: containerRegistry
+  value: 'apfmrg.azurecr.io'
+- name: imagePullSecret
+  value: 'apfmrgf81e-auth'
+- name: namespace
+  value: 'apfm'
 
 stages:
 # =========================
@@ -82,7 +90,7 @@ stages:
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 3️⃣ backend-secrets 생성/갱신 (환경변수 방식)
+          # 3️⃣ backend-secrets 생성/갱신
           - powershell: |
               Write-Output "Creating backend secrets..."
 
@@ -108,9 +116,30 @@ stages:
               $secret | kubectl apply -f -
             displayName: "Create/Update backend secrets"
 
+          # 4️⃣ frontend-secrets 생성/갱신
           - powershell: |
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/backend-deploy.yaml" -n $(namespace)
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/front-deploy.yaml" -n $(namespace)
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/fastapi-deploy.yaml" -n $(namespace)
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/nginx-lb.yaml" -n $(namespace)
+              Write-Output "Creating frontend secrets..."
+
+              $kakaoKey = $env:REACT_APP_KAKAO_JS_KEY
+
+              $secret = @"
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: frontend-secrets
+                namespace: $(namespace)
+              type: Opaque
+              stringData:
+                REACT_APP_KAKAO_JS_KEY: $kakaoKey
+              "@
+
+              $secret | kubectl apply -f -
+            displayName: "Create/Update frontend secrets"
+
+          # 5️⃣ Deployment/Service 배포 (파일명 맞춰 수정)
+          - powershell: |
+              kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/front-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/fastapi-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/nginx-lb.yaml -n $(namespace)
             displayName: "Apply manifests"
