@@ -15,7 +15,7 @@ spec:
       containers:
         - name: frontend
           # 필요한 import(이미지): ACR에 올린 경로 반영
-          image: apfmrg.azurecr.io/front:latest
+          image: apfmrg.azurecr.io/frontend:latest
           ports:
             - containerPort: 80
           # (선택) 헬스체크 필요 시 간단히 루트로

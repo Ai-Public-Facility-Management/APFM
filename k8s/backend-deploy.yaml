@@ -1,4 +1,4 @@
-# [기능 요약] Spring Boot 백엔드 외부 노출(LoadBalancer)
+# [기능 요약] Spring Boot 백엔드 외부 노출 (ClusterIP, 필요 시 LoadBalancer 교체 가능)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,39 +7,36 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels: { app: backend }
+    matchLabels:
+      app: backend
   template:
     metadata:
-      labels: { app: backend }
+      labels:
+        app: backend
     spec:
+      imagePullSecrets:
+        - name: apfmrgf81e-auth   # ACR 인증 Secret
       containers:
         - name: backend
-          image: apfmregistry.azurecr.io/backend:latest
+          image: apfmrg.azurecr.io/backend:latest
           ports:
-            - containerPort: 8082   # ✅ 실제 앱 포트 맞춤
-          env:
-            - name: JWT_SECRET
-              value: "test-secret"          # 👉 실제 값으로 교체
-            - name: JWT_EXPIRATION
-              value: "3600000"
-            - name: SPRING_PROFILES_ACTIVE
-              value: "docker"
-#            - name: SPRING_DATASOURCE_URL
-#              value: "jdbc:mysql://<mysql-service>:3306/apfm"
-#            - name: SPRING_DATASOURCE_USERNAME
-#              value: "root"
-#            - name: SPRING_DATASOURCE_PASSWORD
-#              value: "password"
+            - containerPort: 8082
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8082
-            initialDelaySeconds: 15
+            initialDelaySeconds: 60
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8082
-            initialDelaySeconds: 20
+            initialDelaySeconds: 90
+            periodSeconds: 20
+          envFrom:
+            - secretRef:
+                name: backend-secrets   # 🔹 DevOps Library 값들이 Secret으로 주입됨
+
 ---
 apiVersion: v1
 kind: Service
@@ -47,9 +44,9 @@ metadata:
   name: backend
   namespace: apfm
 spec:
-  type: ClusterIP
+  type: ClusterIP   # 필요 시 LoadBalancer 로 교체 가능
   selector:
     app: backend
   ports:
     - port: 8082
-      targetPort: 8082   # ✅ 실제 컨테이너 포트랑 맞춤
+      targetPort: 8082
