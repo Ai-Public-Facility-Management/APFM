@@ -1,5 +1,7 @@
-# Deploy to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
+# ===============================
+# Azure DevOps Pipeline for APFM
+# 빌드 → ACR 푸시 → AKS 배포 (kubectl + kubeconfig 주입)
+# ===============================
 
 trigger:
 - main
@@ -8,18 +10,11 @@ resources:
 - repo: self
 
 variables:
-# 🔹 DevOps Library (apfmk) 변수 그룹을 최상단에 명시해야 모든 Job에서 참조 가능
-- group: apfmk   
-
-# 🔹 파이프라인 내에서 사용할 개별 변수들
-- name: dockerRegistryServiceConnection
-  value: '05c23959-ace4-4487-a73b-d09fe638aff7'
-- name: containerRegistry
-  value: 'apfmrg.azurecr.io'
-- name: imagePullSecret
-  value: 'apfmrgf81e-auth'
-- name: vmImageName
-  value: 'ubuntu-latest'
+  dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'  # ✅ ACR 로그인용 (이건 필요)
+  containerRegistry: 'apfmrg.azurecr.io'
+  imagePullSecret: 'apfmrgf81e-auth'
+  vmImageName: 'ubuntu-latest'
+  namespace: 'apfm'
 
 stages:
 # =========================
@@ -41,22 +36,13 @@ stages:
         dockerfile: backend/Dockerfile
         buildContext: backend
         containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          latest  
+        tags: latest
 
   - job: Build_Frontend
     displayName: Build Frontend
     pool:
       name: Default
-    variables:
-      - group: frontend-secrets      
     steps:
-    # 👉 프론트 .env 파일 생성
-    - script: |
-        echo REACT_APP_KAKAO_JS_KEY=$(REACT_APP_KAKAO_JS_KEY) > front\.env
-        echo .env file created:
-        type front\.env
-      displayName: 'Create .env file for frontend build'
     - task: Docker@2
       displayName: Build and push Frontend image
       inputs:
@@ -65,17 +51,22 @@ stages:
         dockerfile: front/Dockerfile
         buildContext: front
         containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          latest  
+        tags: latest
 
-  # 👉 k8s 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
-  - job: Publish_Manifests
-    displayName: Publish k8s manifests
+  - job: Build_FastAPI
+    displayName: Build FastAPI
     pool:
       name: Default
     steps:
-    - upload: k8s
-      artifact: k8s-manifests
+    - task: Docker@2
+      displayName: Build and push FastAPI image
+      inputs:
+        command: buildAndPush
+        repository: fastapi
+        dockerfile: AI/Dockerfile
+        buildContext: AI
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: latest
 
 # =========================
 # Deploy Stage
@@ -84,60 +75,49 @@ stages:
   displayName: Deploy stage
   dependsOn: Build
   jobs:
-  - deployment: Deploy
-    displayName: Deploy to AKS
+  - deployment: Deploy_to_K8s
+    displayName: Deploy to Kubernetes
+    environment: 'apfm-aks'
     pool:
-      name: Default
-    environment: 'dnjsdn752APFM.apfm'
+      vmImage: $(vmImageName)
     strategy:
       runOnce:
         deploy:
           steps:
-          # 🔹 1) imagePullSecret 생성
-          - task: KubernetesManifest@0
-            displayName: Create imagePullSecret
-            inputs:
-              action: createSecret
-              namespace: apfm
-              secretName: $(imagePullSecret)
-              dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
+          # 1️⃣ kubeconfig 파일 생성 (Library 변수에 KUBECONFIG_CONTENT 등록 필요)
+          - script: |
+              echo "$(KUBECONFIG_CONTENT)" > ./kubeconfig.yaml
+              export KUBECONFIG=./kubeconfig.yaml
+              kubectl get nodes
+            displayName: "Setup kubeconfig"
 
-          # 🔹 2) backend-secrets 생성 (Library 값 → Secret)
-          - task: KubernetesManifest@1
-            displayName: Create backend-secrets
-            inputs:
-              action: createSecret
-              namespace: apfm
-              secretName: backend-secrets
-              secretType: generic
-              secretArguments: |
-                --from-literal=ACCOUNT_KEY=$(ACCOUNT_KEY)
-                --from-literal=ACCOUNT_NAME=$(ACCOUNT_NAME)
-                --from-literal=ADMIN_EMAIL=$(ADMIN_EMAIL)
-                --from-literal=ADMIN_PASSWORD=$(ADMIN_PASSWORD)
-                --from-literal=CONNECTION_STRING=$(CONNECTION_STRING)
-                --from-literal=CONTAINER_NAME=$(CONTAINER_NAME)
-                --from-literal=MAIL_PASSWORD=$(MAIL_PASSWORD)
-                --from-literal=MAIL_USERNAME=$(MAIL_USERNAME)
-                --from-literal=REDIS_PASSWORD=$(REDIS_PASSWORD)
-                --from-literal=SECRET_KEY=$(SECRET_KEY)
+          # 2️⃣ backend-secrets 생성/갱신 (DevOps Library 값 반영)
+          - script: |
+              echo "Creating backend secrets..."
+              cat <<EOF | kubectl apply -n $(namespace) -f -
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: backend-secrets
+                namespace: $(namespace)
+              type: Opaque
+              stringData:
+                SECRET_KEY: $(SECRET_KEY)
+                ADMIN_EMAIL: $(ADMIN_EMAIL)
+                ADMIN_PASSWORD: $(ADMIN_PASSWORD)
+                REDIS_PASSWORD: $(REDIS_PASSWORD)
+                ACCOUNT_KEY: $(ACCOUNT_KEY)
+                CONNECTION_STRING: $(CONNECTION_STRING)
+                CONTAINER_NAME: $(CONTAINER_NAME)
+                MAIL_USERNAME: $(MAIL_USERNAME)
+                MAIL_PASSWORD: $(MAIL_PASSWORD)
+              EOF
+            displayName: "Create/Update backend secrets"
 
-          # 🔹 3) 실제 배포
-          - task: KubernetesManifest@0
-            displayName: Deploy backend, frontend, fastapi, nginx
-            inputs:
-              action: deploy
-              namespace: apfm 
-              manifests: |
-                $(Pipeline.Workspace)/k8s-manifests/backend-deploy.yaml
-                $(Pipeline.Workspace)/k8s-manifests/front-deploy.yaml
-                $(Pipeline.Workspace)/k8s-manifests/fastapi-deploy.yaml
-                $(Pipeline.Workspace)/k8s-manifests/nginx-lb.yaml
-              imagePullSecrets: |
-                $(imagePullSecret)
-              containers: |
-                backend=$(containerRegistry)/backend:latest
-                frontend=$(containerRegistry)/frontend:latest
-                # fastapi는 기존 이미지(apfmrg.azurecr.io/fastapi:latest) 그대로 사용
-                # nginx는 Docker Hub 이미지 사용 → 매핑 불필요
-              rolloutStatusTimeout: 300   # 🔹 5분까지 rollout 대기 (CrashLoop 방지)
+          # 3️⃣ Deployment/Service 배포
+          - script: |
+              kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/frontend-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/fastapi-deploy.yaml -n $(namespace)
+              kubectl apply -f k8s/nginx-deploy.yaml -n $(namespace)
+            displayName: "Apply manifests"
