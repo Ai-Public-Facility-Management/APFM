@@ -25,14 +25,18 @@ spec:
             httpGet:
               path: /actuator/health
               port: 8082
-            initialDelaySeconds: 60
+            initialDelaySeconds: 120
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8082
-            initialDelaySeconds: 90
+            initialDelaySeconds: 150
             periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 5
           envFrom:
             - secretRef:
                 name: backend-secrets   # 🔹 DevOps Library 값들이 Secret으로 주입됨
