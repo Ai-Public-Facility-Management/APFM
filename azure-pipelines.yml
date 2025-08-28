@@ -1,6 +1,7 @@
 # ===============================
 # Azure DevOps Pipeline for APFM
 # 빌드 → ACR 푸시 → AKS 배포 (kubectl + kubeconfig 주입)
+# Self-hosted Agent 버전
 # ===============================
 
 trigger:
@@ -10,10 +11,9 @@ resources:
 - repo: self
 
 variables:
-  dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'  # ✅ ACR 로그인용 (이건 필요)
+  dockerRegistryServiceConnection: '05c23959-ace4-4487-a73b-d09fe638aff7'  # ✅ ACR 로그인용
   containerRegistry: 'apfmrg.azurecr.io'
   imagePullSecret: 'apfmrgf81e-auth'
-  vmImageName: 'ubuntu-latest'
   namespace: 'apfm'
 
 stages:
@@ -26,7 +26,7 @@ stages:
   - job: Build_Backend
     displayName: Build Backend
     pool:
-      name: Default
+      name: Default          # ✅ Self-hosted agent pool 이름 (보통 Default)
     steps:
     - task: Docker@2
       displayName: Build and push Backend image
@@ -53,6 +53,7 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: latest
 
+  # FastAPI 빌드가 필요하다면 주석 해제
   # - job: Build_FastAPI
   #   displayName: Build FastAPI
   #   pool:
@@ -79,7 +80,7 @@ stages:
     displayName: Deploy to Kubernetes
     environment: 'apfm-aks'
     pool:
-      vmImage: $(vmImageName)
+      name: Default          # ✅ Self-hosted agent pool 이름
     strategy:
       runOnce:
         deploy:
@@ -91,7 +92,7 @@ stages:
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 2️⃣ backend-secrets 생성/갱신 (DevOps Library 값 반영)
+          # 2️⃣ backend-secrets 생성/갱신
           - script: |
               echo "Creating backend secrets..."
               cat <<EOF | kubectl apply -n $(namespace) -f -
