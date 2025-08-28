@@ -82,19 +82,9 @@ stages:
               kubectl get nodes
             displayName: "Setup kubeconfig"
 
-          # 3️⃣ backend-secrets 생성/갱신 (변수 먼저 담고 Here-String에 삽입)
+          # 3️⃣ backend-secrets 생성/갱신 (환경변수 방식)
           - powershell: |
               Write-Output "Creating backend secrets..."
-
-              $secretKey      = "$(SECRET_KEY)"
-              $adminEmail     = "$(ADMIN_EMAIL)"
-              $adminPassword  = "$(ADMIN_PASSWORD)"
-              $redisPassword  = "$(REDIS_PASSWORD)"
-              $accountKey     = "$(ACCOUNT_KEY)"
-              $connectionStr  = "$(CONNECTION_STRING)"
-              $containerName  = "$(CONTAINER_NAME)"
-              $mailUser       = "$(MAIL_USERNAME)"
-              $mailPass       = "$(MAIL_PASSWORD)"
 
               $secret = @"
               apiVersion: v1
@@ -104,15 +94,15 @@ stages:
                 namespace: $(namespace)
               type: Opaque
               stringData:
-                SECRET_KEY: $secretKey
-                ADMIN_EMAIL: $adminEmail
-                ADMIN_PASSWORD: $adminPassword
-                REDIS_PASSWORD: $redisPassword
-                ACCOUNT_KEY: $accountKey
-                CONNECTION_STRING: $connectionStr
-                CONTAINER_NAME: $containerName
-                MAIL_USERNAME: $mailUser
-                MAIL_PASSWORD: $mailPass
+                SECRET_KEY: $env:SECRET_KEY
+                ADMIN_EMAIL: $env:ADMIN_EMAIL
+                ADMIN_PASSWORD: $env:ADMIN_PASSWORD
+                REDIS_PASSWORD: $env:REDIS_PASSWORD
+                ACCOUNT_KEY: $env:ACCOUNT_KEY
+                CONNECTION_STRING: $env:CONNECTION_STRING
+                CONTAINER_NAME: $env:CONTAINER_NAME
+                MAIL_USERNAME: $env:MAIL_USERNAME
+                MAIL_PASSWORD: $env:MAIL_PASSWORD
               "@
 
               $secret | kubectl apply -f -
