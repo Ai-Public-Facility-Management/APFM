@@ -42,7 +42,15 @@ stages:
     displayName: Build Frontend
     pool:
       name: Default
+    variables:
+      - group: frontend-secrets      
     steps:
+    # 👉 프론트 .env 파일 생성 (Windows CMD 호환)
+    - script: |
+        echo REACT_APP_KAKAO_JS_KEY=$(REACT_APP_KAKAO_JS_KEY) > front\.env
+        echo .env file created:
+        type front\.env
+      displayName: 'Create .env file for frontend build'
     - task: Docker@2
       displayName: Build and push Frontend image
       inputs:
@@ -101,13 +109,15 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
+              namespace: apfm
               secretName: $(imagePullSecret)
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
-          - task: KubernetesManifest@0
+          - task: KubernetesManifest@1
             displayName: Deploy backend, frontend, fastapi
             inputs:
               action: deploy
+              namespace: apfm 
               manifests: |
                 $(Pipeline.Workspace)/manifests/backend.yml
                 $(Pipeline.Workspace)/manifests/frontend.yml
