@@ -109,6 +109,7 @@ stages:
             displayName: Create imagePullSecret
             inputs:
               action: createSecret
+              namespace: apfm
               secretName: $(imagePullSecret)
               dockerRegistryEndpoint: $(dockerRegistryServiceConnection)
 
@@ -116,6 +117,7 @@ stages:
             displayName: Deploy backend, frontend, fastapi
             inputs:
               action: deploy
+              namespace: apfm 
               manifests: |
                 $(Pipeline.Workspace)/manifests/backend.yml
                 $(Pipeline.Workspace)/manifests/frontend.yml
