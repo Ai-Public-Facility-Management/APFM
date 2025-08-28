@@ -35,7 +35,7 @@ public class Issue {
     private String estimateBasis;
 
 
-    @Column(length = 500)
+    @Column(length = 1000)
     private String visionAnalysis;
 
     private boolean isProcessing;

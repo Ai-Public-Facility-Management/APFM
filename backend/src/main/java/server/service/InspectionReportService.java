@@ -17,6 +17,7 @@ import server.repository.IssueRepository;
 import server.repository.ReportRepository;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -50,9 +51,10 @@ public class InspectionReportService {
             dto.setPriority_score(0.0F);
             dtos.add(dto);
         });
-
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = sdf.format(inspection.getCreateDate());
         Map<String, Object> body = new HashMap<>();
-        body.put("inspection_date",inspection.getCreateDate().toString());
+        body.put("inspection_date",formattedDate);
         body.put("facilities",dtos);
 
         // 4️⃣ HTTP Header 설정

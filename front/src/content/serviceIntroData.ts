@@ -6,6 +6,12 @@ import facilityDbImg from '../assets/visuals/facility_db.png';
 import inspectionReportImg from '../assets/visuals/inspection_report.png';
 import aiProposalImg from '../assets/visuals/ai_proposal.png';
 
+import intro_board from '../assets/videos/intro_board.mp4';
+import intro_inspection from '../assets/videos/intro_inspection.mp4';
+import proposal from '../assets/videos/proposal.mp4';
+import result_report from '../assets/videos/result_report.mp4';
+import setinspection from '../assets/videos/setinspection.mp4';
+
 // src/content/serviceIntroData.ts
 export type IntroStep = {
   id: string;
@@ -74,29 +80,34 @@ export const HOWTO_STEPS: IntroStep[] = [
     title: "정기 점검 주기 설정",
     desc:
       "메인 페이지 상단 ‘점검주기 설정’에서 주기를 지정합니다. 설정된 주기마다 정기 점검 내역과 시설물 대시보드가 자동 갱신됩니다.",
+    video:setinspection,
   },
   {
     id: "howto-history",
     title: "정기점검 내역 조회 및 보고서 작성",
     desc:
       "‘정기점검 내역’에서 과거 기록을 확인하고, 상세 화면의 ‘정기 점검 보고서 작성’을 누르면 점검 보고서와 우선순위 보고서가 자동 작성됩니다.",
+    video: intro_inspection,
   },
   {
     id: "howto-dashboard",
     title: "공사 제안요청서 생성",
     desc:
       "‘시설물 리스트’에서 전체 DB를 조회합니다. 수리가 필요한 시설물을 다중 선택 후 ‘제안요청서 작성’을 누르면 초안이 생성되며, 검토·수정 후 Word 파일로 다운로드할 수 있습니다.",
+    video: proposal,
   },
   {
     id: "howto-detail",
     title: "시설물 상세 조회와 결과보고서 업로드",
     desc:
       "시설물 상세 화면에서 이력, 견적, 상태를 확인합니다. 공사 완료 후 결과보고서를 업로드하면 마지막 공사 날짜가 자동 갱신됩니다.",
+    video: result_report,
   },
   {
     id: "howto-board",
     title: "게시판과 AI 견적 활용",
     desc:
       "공지사항 확인과 게시글 작성이 가능합니다. 게시글 작성 시 이미지를 올리고 ‘AI 견적 생성’을 누르면 자동으로 산출된 견적 요약이 글 내용에 추가됩니다.",
+    video: intro_board,
   },
 ];
