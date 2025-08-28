@@ -110,7 +110,7 @@ stages:
 
           - powershell: |
               kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/backend-deploy.yaml" -n $(namespace)
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/frontend-deploy.yaml" -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/front-deploy.yaml" -n $(namespace)
               kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/fastapi-deploy.yaml" -n $(namespace)
-              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/nginx-deploy.yaml" -n $(namespace)
+              kubectl apply -f "$(System.DefaultWorkingDirectory)/k8s/nginx-lb.yaml" -n $(namespace)
             displayName: "Apply manifests"
