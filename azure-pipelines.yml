@@ -55,22 +55,22 @@ stages:
           latest
           $(Build.BuildId)
 
-  - job: Build_Fastapi
-    displayName: Build FastAPI
-    pool:
-      name: Default
-    steps:
-    - task: Docker@2
-      displayName: Build and push FastAPI image
-      inputs:
-        command: buildAndPush
-        repository: dnjsdnapfm-fastapi
-        dockerfile: AI/Dockerfile
-        buildContext: AI
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          latest
-          $(Build.BuildId)
+  # - job: Build_Fastapi
+  #   displayName: Build FastAPI
+  #   pool:
+  #     name: Default
+  #   steps:
+  #   - task: Docker@2
+  #     displayName: Build and push FastAPI image
+  #     inputs:
+  #       command: buildAndPush
+  #       repository: dnjsdnapfm-fastapi
+  #       dockerfile: AI/Dockerfile
+  #       buildContext: AI
+  #       containerRegistry: $(dockerRegistryServiceConnection)
+  #       tags: |
+  #         latest
+  #         $(Build.BuildId)
 
   # 👉 manifests 디렉토리를 아티팩트로 업로드 (배포 단계에서 사용)
   - job: Publish_Manifests
@@ -117,4 +117,4 @@ stages:
               containers: |
                 backend=$(containerRegistry)/dnjsdnapfm-backend:latest 
                 frontend=$(containerRegistry)/dnjsdnapfm-frontend:latest
-                fastapi=$(containerRegistry)/fastapi:latest
+                fastapi=$(containerRegistry)/dnjsdnapfm-fastapi:stable
