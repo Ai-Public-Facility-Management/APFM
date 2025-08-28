@@ -122,5 +122,5 @@ stages:
               kubectl apply -f k8s/backend-deploy.yaml -n $(namespace)
               kubectl apply -f k8s/front-deploy.yaml -n $(namespace)
               # kubectl apply -f k8s/fastapi-deploy.yaml -n $(namespace)
-              kubectl apply -f k8s/nginx-lb.yaml -n $(namespace)
+              # kubectl apply -f k8s/nginx-lb.yaml -n $(namespace)
             displayName: "Apply manifests"
